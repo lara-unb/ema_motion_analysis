@@ -1,3 +1,4 @@
+from ctypes import util
 import tensorflow as tf
 import numpy as np
 from matplotlib import pyplot as plt
@@ -9,29 +10,12 @@ sys.path.append("../utils/")
 import fileManagement
 import drawing
 import colors
+import utils
+import poses
 
 
-# Mover isso aqui para outra pasta!!!
-EDGES = {
-    (0, 1): 'm',
-    (0, 2): 'c',
-    (1, 3): 'm',
-    (2, 4): 'c',
-    # (0, 5): 'm',
-    # (0, 6): 'c',
-    (5, 7): 'm',
-    (7, 9): 'm',
-    (6, 8): 'c',
-    (8, 10): 'c',
-    (5, 6): 'y',
-    (5, 11): 'm',
-    (6, 12): 'c',
-    (11, 12): 'y',
-    (11, 13): 'm',
-    (13, 15): 'm',
-    (12, 14): 'c',
-    (14, 16): 'c'
-}
+
+
 
 
 
@@ -73,18 +57,27 @@ def predictionToVideo(interpreter, video_path, video_out_path):
         
         # Make predictions 
         interpreter.set_tensor(input_details[0]['index'], np.array(input_image))
-        interpreter.invoke()
+        interpreter.invoke() 
         keypoints_with_scores = interpreter.get_tensor(output_details[0]['index'])
         
+        # Key points - Mudar nome de utils - Colocar Threshold em uma variável!
+        key_points = utils.transformDATA(keypoints_with_scores, 0.3, frame_width, frame_height)
+
         # Rendering 
-        drawing.draw_connections(frame, keypoints_with_scores, EDGES, 0.3)
-        drawing.draw_keypoints(frame, keypoints_with_scores, 0.3)
+        jump_sagittal_left = ['left_hip', 'left_knee', 'left_ankle']
+        jump_sagittal_right = ['right_hip', 'right_knee', 'right_ankle']
+        key_point_pairings = poses.get_kp_pairings(jump_sagittal_right, poses.KEYPOINT_DICT, poses.EDGES)
+        
+        selected_joints = poses.select_joints(key_points, jump_sagittal_right, poses.KEYPOINT_DICT)
+        print(colors.BLUE, key_point_pairings, colors.RESET)
+        drawing.draw_connections(frame, selected_joints, key_point_pairings)
+        drawing.draw_keypoints(frame, selected_joints)
         
         out.write(frame)
 
         cv2.imshow('MoveNet Lightning', frame)
 
-        
+        # ESC para sair
         k = cv2.waitKey(25) & 0xFF
         if k == 27:
             break
