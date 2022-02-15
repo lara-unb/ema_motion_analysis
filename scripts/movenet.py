@@ -9,23 +9,18 @@ import sys
 sys.path.append("../utils/")
 import fileManagement
 import drawing
-import colors
 import utils
 import poses
 
 
+#-------------------------------------------------------------------------------------
 
-
-
-
-
-
+# Trashhold que vai ser utilizado para as predições
+TRASHHOLD = 0.3
 
 def predictionToVideo(interpreter, video_path, video_out_path):
     cap = cv2.VideoCapture(video_path)
-    if(not cap.isOpened()):
-        print(colors.RED, "Couldn't open video!", colors.RESET)
-        return
+    fileManagement.videoCheck(cap)
 
     has_frame, image = cap.read()
     fps = int(cap.get(cv2.CAP_PROP_FPS))
@@ -60,17 +55,15 @@ def predictionToVideo(interpreter, video_path, video_out_path):
         interpreter.invoke() 
         keypoints_with_scores = interpreter.get_tensor(output_details[0]['index'])
         
-        # Key points - Mudar nome de utils - Colocar Threshold em uma variável!
-        key_points = utils.transformDATA(keypoints_with_scores, 0.3, frame_width, frame_height)
+        # Key points
+        keypoints = utils.transformDATA(keypoints_with_scores, TRASHHOLD, frame_width, frame_height)
 
         # Rendering 
-        jump_sagittal_left = ['left_hip', 'left_knee', 'left_ankle']
-        jump_sagittal_right = ['right_hip', 'right_knee', 'right_ankle']
-        key_point_pairings = poses.get_kp_pairings(jump_sagittal_right, poses.KEYPOINT_DICT, poses.EDGES)
-        
-        selected_joints = poses.select_joints(key_points, jump_sagittal_right, poses.KEYPOINT_DICT)
-        print(colors.BLUE, key_point_pairings, colors.RESET)
-        drawing.draw_connections(frame, selected_joints, key_point_pairings)
+        keypoint_pairings = poses.getPairings(poses.JUMP_SAGITTAL_RIGHT, poses.KEYPOINT_DICT, poses.EDGES)
+        selected_joints = poses.selectJoints(keypoints, poses.JUMP_SAGITTAL_RIGHT, poses.KEYPOINT_DICT)
+
+        # Draw the joints and pairings
+        drawing.draw_connections(frame, selected_joints, keypoint_pairings)
         drawing.draw_keypoints(frame, selected_joints)
         
         out.write(frame)
@@ -86,6 +79,7 @@ def predictionToVideo(interpreter, video_path, video_out_path):
     cv2.destroyAllWindows()
     out.release()
 
+#-------------------------------------------------------------------------------------
 
 if __name__ == "__main__":
     interpreter = tf.lite.Interpreter(model_path='lite-model_movenet_singlepose_lightning_3.tflite')
@@ -93,3 +87,6 @@ if __name__ == "__main__":
     video_path = fileManagement.readFileDialog("Open video file")
     video_out_path = video_path.split(".")[0] + "_mnl.avi"
     predictionToVideo(interpreter, video_path, video_out_path)
+
+
+#-------------------------------------------------------------------------------------

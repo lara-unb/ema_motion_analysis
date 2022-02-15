@@ -1,4 +1,6 @@
 import numpy as np
+
+#-------------------------------------------------------------------------------------
 # Dictionary to map joints of body part
 KEYPOINT_DICT = {
     'nose':0,
@@ -19,7 +21,9 @@ KEYPOINT_DICT = {
     'left_ankle':15,
     'right_ankle':16
 } 
-# Mover isso aqui para outra pasta!!!
+
+#-------------------------------------------------------------------------------------
+# Joint parings 
 EDGES = {
     (0, 1): 'm',
     (0, 2): 'c',
@@ -41,7 +45,17 @@ EDGES = {
     (14, 16): 'c'
 }
 
-def get_kp_pairings(desired_kp, kp_dict, kp_pairings):
+#-------------------------------------------------------------------------------------
+# Different poses that can be processed
+
+JUMP_SAGITTAL_LEFT = ['left_hip', 'left_knee', 'left_ankle']
+JUMP_SAGITTAL_RIGHT = ['right_hip', 'right_knee', 'right_ankle']
+
+# colocar pulo frontal e o que mais precisar
+
+#-------------------------------------------------------------------------------------
+# Function to get the parings of the desired joints
+def getPairings(desired_kp, kp_dict, kp_pairings):
     new_kp_dict = {}
     new_kp_pairings = {}
     for kp_name in desired_kp:
@@ -55,7 +69,9 @@ def get_kp_pairings(desired_kp, kp_dict, kp_pairings):
    
     return new_kp_pairings
 
-def select_joints(keypoints, desired_keypoints, kp_dict):
+#-------------------------------------------------------------------------------------
+# Function to select only the desired joints
+def selectJoints(keypoints, desired_keypoints, kp_dict):
     selected_joints = np.zeros([len(desired_keypoints), 2])
 
     for i in range(len(desired_keypoints)):
@@ -66,6 +82,7 @@ def select_joints(keypoints, desired_keypoints, kp_dict):
 
     return selected_joints
 
+#-------------------------------------------------------------------------------------
 
 
 
