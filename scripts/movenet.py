@@ -59,8 +59,14 @@ def predictionToVideo(interpreter, video_path, video_out_path):
         keypoints = utils.transformDATA(keypoints_with_scores, TRASHHOLD, frame_width, frame_height)
 
         # Rendering 
+
+        # RIGHT
         keypoint_pairings = poses.getPairings(poses.JUMP_SAGITTAL_RIGHT, poses.KEYPOINT_DICT, poses.EDGES)
         selected_joints = poses.selectJoints(keypoints, poses.JUMP_SAGITTAL_RIGHT, poses.KEYPOINT_DICT)
+
+        # FRONTAL
+        # keypoint_pairings = poses.getPairings(poses.JUMP_FRONTAL, poses.KEYPOINT_DICT, poses.EDGES)
+        # selected_joints = poses.selectJoints(keypoints, poses.JUMP_FRONTAL, poses.KEYPOINT_DICT)
 
         # Draw the joints and pairings
         drawing.draw_connections(frame, selected_joints, keypoint_pairings)

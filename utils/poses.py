@@ -50,8 +50,8 @@ EDGES = {
 
 JUMP_SAGITTAL_LEFT = ['left_hip', 'left_knee', 'left_ankle']
 JUMP_SAGITTAL_RIGHT = ['right_hip', 'right_knee', 'right_ankle']
+JUMP_FRONTAL = ['right_hip', 'left_hip', 'right_knee', 'left_knee','right_ankle', 'left_ankle']
 
-# colocar pulo frontal e o que mais precisar
 
 #-------------------------------------------------------------------------------------
 # Function to get the parings of the desired joints
