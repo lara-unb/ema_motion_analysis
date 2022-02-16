@@ -44,6 +44,6 @@ def initialMenu():
                     print("Valor inválido!")
             
             video_path = fileManagement.getAbsolutePath() + VIDEOS[videoSelected][1]
-            video_out_path = video_path + "mnl.avi"
+            video_out_path = video_path.split(".")[0] + "mnl.avi"
             break
     return video_path, video_out_path, profile
