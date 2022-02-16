@@ -1,10 +1,13 @@
 import colors
 import fileManagement
 
+# Add new examples by selecter an interger key, a profile and it's path
 VIDEOS = {
     1: ("right","\\examples\\right-rafilsk1.mp4"),
     2: ("frontal", "\\examples\\frontal-girl.mp4")
 }
+
+# Poses available
 PROFILES = {
     1: "frontal",
     2: "right",
