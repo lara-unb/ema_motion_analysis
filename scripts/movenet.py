@@ -11,6 +11,7 @@ import fileManagement
 import drawing
 import utils
 import poses
+import userInterface
 
 
 #-------------------------------------------------------------------------------------
@@ -18,7 +19,7 @@ import poses
 # Trashhold que vai ser utilizado para as predições
 TRASHHOLD = 0.3
 
-def predictionToVideo(interpreter, video_path, video_out_path):
+def predictionToVideo(interpreter, video_path, video_out_path, profile):
     cap = cv2.VideoCapture(video_path)
     fileManagement.videoCheck(cap)
 
@@ -58,15 +59,15 @@ def predictionToVideo(interpreter, video_path, video_out_path):
         # Key points
         keypoints = utils.transformDATA(keypoints_with_scores, TRASHHOLD, frame_width, frame_height)
 
-        # Rendering 
-
-        # RIGHT
-        keypoint_pairings = poses.getPairings(poses.JUMP_SAGITTAL_RIGHT, poses.KEYPOINT_DICT, poses.EDGES)
-        selected_joints = poses.selectJoints(keypoints, poses.JUMP_SAGITTAL_RIGHT, poses.KEYPOINT_DICT)
-
-        # FRONTAL
-        # keypoint_pairings = poses.getPairings(poses.JUMP_FRONTAL, poses.KEYPOINT_DICT, poses.EDGES)
-        # selected_joints = poses.selectJoints(keypoints, poses.JUMP_FRONTAL, poses.KEYPOINT_DICT)
+        # Select correct pose 
+        pose_selected = poses.JUMP_FRONTAL
+        if(profile == "left"):
+            pose_selected = poses.JUMP_SAGITTAL_LEFT
+        elif(profile == "right"):
+            pose_selected = poses.JUMP_SAGITTAL_RIGHT
+        
+        keypoint_pairings = poses.getPairings(pose_selected, poses.KEYPOINT_DICT, poses.EDGES)
+        selected_joints = poses.selectJoints(keypoints, pose_selected, poses.KEYPOINT_DICT)
 
         # Draw the joints and pairings
         drawing.draw_connections(frame, selected_joints, keypoint_pairings)
@@ -90,9 +91,9 @@ def predictionToVideo(interpreter, video_path, video_out_path):
 if __name__ == "__main__":
     interpreter = tf.lite.Interpreter(model_path='lite-model_movenet_singlepose_lightning_3.tflite')
     interpreter.allocate_tensors()
-    video_path = fileManagement.readFileDialog("Open video file")
-    video_out_path = video_path.split(".")[0] + "_mnl.avi"
-    predictionToVideo(interpreter, video_path, video_out_path)
+    video_path, video_out_path, profile = userInterface.initialMenu()
+    print(video_path)
+    predictionToVideo(interpreter, video_path, video_out_path, profile)
 
 
 #-------------------------------------------------------------------------------------
