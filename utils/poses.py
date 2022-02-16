@@ -46,7 +46,7 @@ EDGES = {
 }
 
 #-------------------------------------------------------------------------------------
-# Different poses that can be processed
+# Different poses to be processed
 
 JUMP_SAGITTAL_LEFT = ['left_hip', 'left_knee', 'left_ankle']
 JUMP_SAGITTAL_RIGHT = ['right_hip', 'right_knee', 'right_ankle']

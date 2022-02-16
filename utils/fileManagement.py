@@ -9,8 +9,11 @@ import os
 #-------------------------------------------------------------------------------------
 # Get absolute path to root project
 def getAbsolutePath():
-    absolute_main_path = os.path.dirname(os.path.abspath(__file__)).split("\\")[:-1]
-    return "\\".join(absolute_main_path)
+    absolute_main_path = os.path.dirname(os.path.abspath(__file__)) #.split("\\")[:-1]
+    print(colors.CYAN, absolute_main_path, colors.RESET)
+    return absolute_main_path
+
+#-------------------------------------------------------------------------------------
 # Function to open file dialog to choose video
 def readFileDialog(title="Open File", file_type="All Files"):
     app = QApplication(sys.argv)

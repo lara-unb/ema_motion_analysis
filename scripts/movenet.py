@@ -19,7 +19,10 @@ import userInterface
 # Trashhold que vai ser utilizado para as predições
 TRASHHOLD = 0.3
 
+#-------------------------------------------------------------------------------------
+# ACHO Q A GNT PODE QUEBRAR MAIS ESSA FUNÇÃOZONA
 def predictionToVideo(interpreter, video_path, video_out_path, profile):
+    # get video
     cap = cv2.VideoCapture(video_path)
     fileManagement.videoCheck(cap)
 

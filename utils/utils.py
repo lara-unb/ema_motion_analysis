@@ -1,16 +1,10 @@
+
 import numpy as np
 import json
 import poses
 
-
 #-------------------------------------------------------------------------------------
-
-def writeToDATA(file_path, data, write_mode='w'):
-    with open(file_path, write_mode) as f:
-        json.dump(data, f)
-
-#-------------------------------------------------------------------------------------
-
+# get the keypoints above the trashhold and change vector to numpy array
 def transformDATA(kp_w_scores_vec, confidence_threshold, frame_width, frame_height):
     keypoints_vec = np.zeros([len(list(poses.KEYPOINT_DICT.values())), 2])
     
@@ -32,3 +26,8 @@ def transformDATA(kp_w_scores_vec, confidence_threshold, frame_width, frame_heig
 
 
 #-------------------------------------------------------------------------------------
+# A GENTE TMB N TA USANDO ESSA
+
+# def writeToDATA(file_path, data, write_mode='w'):
+#     with open(file_path, write_mode) as f:
+#         json.dump(data, f)
