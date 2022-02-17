@@ -45,6 +45,8 @@ def predictionToVideo(video_path, video_out_path, profile):
       print(frame)
       frame.flags.writeable = False
       frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+      
+      # Process image
       results = pose.process(frame)
 
       # Draw the pose annotation on the image.
