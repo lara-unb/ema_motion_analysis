@@ -41,17 +41,7 @@ def save_to_file(data_dic, file_path):
             pickle.dump(key, f)
             pickle.dump(data_dic[key], f)
 
-    # Exemplo de uso
-    
-    # 'force': force_cropped, 'force_time': time_cropped,
-    # 'audio': audio_cropped, 'audio_time': audiot_cropped,
-    data = {​​​​​​​
-    'f_info': {​​​​​​​'fs': fs}​​​​​​​, 
-    'v_info': v_info,
-    'kp': kp_vec, # 'angles': ang,
-    'kp_w_scores_vec': kp_w_scores_vec,
-    'kp_time': video_time
-    }
 
-    save_to_file(data, out_path)   
+#-------------------------------------------------------------------------------------
+
     
