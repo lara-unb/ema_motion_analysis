@@ -1,6 +1,4 @@
 
-
-
 # DAQUI PRA BAIXO ERA DO ARQUIVO UTILS.PY
 #-------------------------------------------------------------------------------------
 import numpy as np

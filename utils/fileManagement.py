@@ -9,8 +9,7 @@ import os
 #-------------------------------------------------------------------------------------
 # Get absolute path to root project
 def getAbsolutePath():
-    absolute_main_path = os.path.dirname(os.path.abspath(__file__)) #.split("\\")[:-1]
-    print(colors.CYAN, absolute_main_path, colors.RESET)
+    absolute_main_path = os.path.dirname(os.path.abspath(__file__))
     return absolute_main_path
 
 #-------------------------------------------------------------------------------------
@@ -30,8 +29,8 @@ def readFileDialog(title="Open File", file_type="All Files"):
 def videoCheck(video):
     if(not video.isOpened()):
         print(colors.RED, "Couldn't open video!", colors.RESET)
-        return
-
+        return False
+    return True
 #-------------------------------------------------------------------------------------
 
     
