@@ -24,7 +24,8 @@ TRASHHOLD = 0.3
 def predictionToVideo(interpreter, video_path, video_out_path, profile):
     # get video
     cap = cv2.VideoCapture(video_path)
-    fileManagement.videoCheck(cap)
+    if(not fileManagement.videoCheck(cap)):
+        return
 
     has_frame, image = cap.read()
     fps = int(cap.get(cv2.CAP_PROP_FPS))
@@ -70,11 +71,10 @@ def predictionToVideo(interpreter, video_path, video_out_path, profile):
         elif(profile == "right"):
             pose_selected = poses.JUMP_SAGITTAL_RIGHT
         
-        keypoint_pairings = poses.getPairings(pose_selected, poses.KEYPOINT_DICT, poses.EDGES)
-        selected_joints = poses.selectJoints(keypoints, pose_selected, poses.KEYPOINT_DICT)
+        keypoint_pairings = poses.getPairings(pose_selected, poses.KEYPOINT_DICT, poses.EDGES, "movenet")
+        selected_joints = poses.selectJoints(frame, keypoints, pose_selected, poses.KEYPOINT_DICT, 'movenet')
 
-        print(keypoint_pairings)
-
+        print("PAirings: ", keypoint_pairings)
         # Draw the joints and pairings
         drawing.draw_connections(frame, selected_joints, keypoint_pairings)
         drawing.draw_keypoints(frame, selected_joints)
