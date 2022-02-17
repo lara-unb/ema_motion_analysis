@@ -20,7 +20,7 @@ import userInterface
 TRASHHOLD = 0.3
 
 #-------------------------------------------------------------------------------------
-# ACHO Q A GNT PODE QUEBRAR MAIS ESSA FUNÇÃOZONA
+# ACHO Q A GNT PODE QUEBRAR MAIS ESSA FUNÇÃOZONA SIM
 def predictionToVideo(interpreter, video_path, video_out_path, profile):
     # get video
     cap = cv2.VideoCapture(video_path)
@@ -39,6 +39,7 @@ def predictionToVideo(interpreter, video_path, video_out_path, profile):
     cap = cv2.VideoCapture(video_path)
 
     out = cv2.VideoWriter(video_out_path, fourcc, fps, (frame_width,frame_height))
+
     while True:
         ret, frame = cap.read()
         # frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
@@ -72,6 +73,8 @@ def predictionToVideo(interpreter, video_path, video_out_path, profile):
         keypoint_pairings = poses.getPairings(pose_selected, poses.KEYPOINT_DICT, poses.EDGES)
         selected_joints = poses.selectJoints(keypoints, pose_selected, poses.KEYPOINT_DICT)
 
+        print(keypoint_pairings)
+
         # Draw the joints and pairings
         drawing.draw_connections(frame, selected_joints, keypoint_pairings)
         drawing.draw_keypoints(frame, selected_joints)
@@ -95,7 +98,6 @@ if __name__ == "__main__":
     interpreter = tf.lite.Interpreter(model_path='lite-model_movenet_singlepose_lightning_3.tflite')
     interpreter.allocate_tensors()
     video_path, video_out_path, profile = userInterface.initialMenu()
-    print(video_path)
     predictionToVideo(interpreter, video_path, video_out_path, profile)
 
 
