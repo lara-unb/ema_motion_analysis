@@ -6,7 +6,9 @@ import fileManagement
 # Add new examples by selecter an interger key, a profile and it's path
 VIDEOS = {
     1: ("right","/../examples/right-rafilsk1.mp4"),
-    2: ("frontal", "/../examples/frontal-girl.mp4")
+    2: ("frontal", "/../examples/frontal-girl.mp4"),
+    3: ("frontal", "/../examples/frontal-rafa.mp4"),
+    4: ("left", "/../examples/left-rafa.mp4"),
 }
 
 #-------------------------------------------------------------------------------------

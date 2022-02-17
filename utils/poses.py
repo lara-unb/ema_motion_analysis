@@ -128,6 +128,8 @@ def getPairings(desired_kp, kp_dict, kp_pairings, neural_network):
 # Function to select only the desired joints
 def selectJoints(image, keypoints, desired_keypoints, kp_dict, neural_network):
     image_height, image_width, _ = image.shape
+    print(image.shape)
+    print(keypoints)
     selected_joints = np.zeros([len(desired_keypoints), 2])
 
     for i in range(len(desired_keypoints)):
