@@ -6,6 +6,8 @@ from turtle import color
 import cv2
 import mediapipe as mp
 import numpy as np
+import matplotlib.pyplot as plt
+
 
 sys.path.append("../utils/")
 import colors
@@ -39,6 +41,8 @@ def predictionToVideo(video_path, video_out_path, profile):
 
       # To improve performance, optionally mark the image as not writeable to
       # pass by reference.
+      print(colors.BLUE, "----", colors.RESET)
+      print(frame)
       frame.flags.writeable = False
       frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
       results = pose.process(frame)
@@ -46,7 +50,8 @@ def predictionToVideo(video_path, video_out_path, profile):
       # Draw the pose annotation on the image.
       frame.flags.writeable = True
       frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-
+      print(colors.RED, "----", colors.RESET)
+      print(frame)
       # Select correct pose
       pose_selected = poses.JUMP_FRONTAL
       if(profile == "left"):
@@ -55,6 +60,7 @@ def predictionToVideo(video_path, video_out_path, profile):
         pose_selected = poses.JUMP_SAGITTAL_RIGHT
 
       # selected_joints = selectJoints(results, frame)
+      print(results.pose_landmarks)
       keypoint_pairings = poses.getPairings(pose_selected, poses.KEYPOINT_DICT_BLAZEPOSE, mp_pose.POSE_CONNECTIONS, neural_network="blazepose")
       selected_joints = poses.selectJoints(frame, results.pose_landmarks, pose_selected, poses.KEYPOINT_DICT_BLAZEPOSE, 'blazepose')
 

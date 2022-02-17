@@ -73,8 +73,7 @@ def predictionToVideo(interpreter, video_path, video_out_path, profile):
         
         keypoint_pairings = poses.getPairings(pose_selected, poses.KEYPOINT_DICT, poses.EDGES, "movenet")
         selected_joints = poses.selectJoints(frame, keypoints, pose_selected, poses.KEYPOINT_DICT, 'movenet')
-
-        print("PAirings: ", keypoint_pairings)
+        
         # Draw the joints and pairings
         drawing.draw_connections(frame, selected_joints, keypoint_pairings)
         drawing.draw_keypoints(frame, selected_joints)
