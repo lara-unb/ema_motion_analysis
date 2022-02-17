@@ -130,21 +130,23 @@ def selectJoints(image, keypoints, desired_keypoints, kp_dict, neural_network):
     image_height, image_width, _ = image.shape
     print(image.shape)
     print(keypoints)
+
     selected_joints = np.zeros([len(desired_keypoints), 2])
+    selected_joints[:] = np.NaN
 
-    for i in range(len(desired_keypoints)):
-        joint = desired_keypoints[i]
-        
-        if(neural_network == 'movenet'):
-            idx = list(kp_dict.keys()).index(joint)
-            selected_joints[i, :] = keypoints[idx, :]
-        elif(neural_network == 'blazepose'):
-            joint_object = kp_dict[desired_keypoints[i]][1]
-            selected_joints[i, :] = [
-                    keypoints.landmark[joint_object].x * image_width, 
-                    keypoints.landmark[joint_object].y * image_height
-            ]
-
+    if(keypoints != None):
+        for i in range(len(desired_keypoints)):
+            joint = desired_keypoints[i]
+            
+            if(neural_network == 'movenet'):
+                idx = list(kp_dict.keys()).index(joint)
+                selected_joints[i, :] = keypoints[idx, :]
+            elif(neural_network == 'blazepose'):
+                joint_object = kp_dict[desired_keypoints[i]][1]
+                selected_joints[i, :] = [
+                        keypoints.landmark[joint_object].x * image_width, 
+                        keypoints.landmark[joint_object].y * image_height
+                ]
     return selected_joints
 
 #-------------------------------------------------------------------------------------
