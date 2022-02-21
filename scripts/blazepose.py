@@ -56,7 +56,9 @@ def predictionToVideo(video_path, video_out_path, profile):
 
         cap = cv2.VideoCapture(video_path)
 
-        out = cv2.VideoWriter(video_out_path, fourcc, fps, (frame_width,frame_height))
+        # Create output video file
+        print(colors.RED, video_out_path, colors.RESET)
+        out = fileManagement.createOutputVideoFile(video_out_path, cap)
 
         # Pass by each frame of the video and draw points and connections
         while video.isOpened():
@@ -83,9 +85,6 @@ def predictionToVideo(video_path, video_out_path, profile):
             elif(profile == "right"):
                 pose_selected = poses.JUMP_SAGITTAL_RIGHT_FULL
 
-            print(dir(mp_results_object))
-            print(dir(mp_results_object.segmentation_mask))
-            print((mp_results_object.segmentation_mask))
             # Get pairings of interest
             keypoint_pairings = poses.getPairings(pose_selected, poses.KEYPOINT_DICT_BLAZEPOSE, mp_pose.POSE_CONNECTIONS, neural_network="blazepose")
             selected_joints = poses.selectJoints(frame, mp_results_object.pose_landmarks, pose_selected, poses.KEYPOINT_DICT_BLAZEPOSE, 'blazepose')
