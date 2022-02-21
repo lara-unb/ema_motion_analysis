@@ -92,7 +92,9 @@ EDGES = {
 # Different poses to be processed
 
 JUMP_SAGITTAL_LEFT = ['left_hip', 'left_knee', 'left_ankle']
+JUMP_SAGITTAL_LEFT_FULL = ['left_hip', 'left_knee', 'left_ankle', 'left_foot_index', 'left_heel']
 JUMP_SAGITTAL_RIGHT = ['right_hip', 'right_knee', 'right_ankle']
+JUMP_SAGITTAL_RIGHT_FULL = ['right_hip', 'right_knee', 'right_ankle', 'right_foot_index', 'right_heel']
 JUMP_FRONTAL = ['right_hip', 'left_hip', 'right_knee', 'left_knee','right_ankle', 'left_ankle']
 
 
@@ -132,7 +134,8 @@ def selectJoints(image, keypoints, desired_keypoints, kp_dict, neural_network):
     selected_joints = np.zeros([len(desired_keypoints), 2])
     selected_joints[:] = np.NaN
 
-    if(keypoints != None):
+
+    if(type(keypoints) != None):
         for i in range(len(desired_keypoints)):
             joint = desired_keypoints[i]
             

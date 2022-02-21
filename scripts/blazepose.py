@@ -39,6 +39,25 @@ def predictionToVideo(video_path, video_out_path, profile):
       min_detection_confidence=THRESHOLD,
       min_tracking_confidence=THRESHOLD) as pose: 
 
+        # get video
+        cap = cv2.VideoCapture(video_path)
+        if(not fileManagement.videoCheck(cap)):
+            return
+
+        has_frame, image = cap.read()
+        fps = int(cap.get(cv2.CAP_PROP_FPS))
+        n_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        frame_width = image.shape[0]
+        frame_height = image.shape[1]
+        cap.release() 
+
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        fourcc = cv2.VideoWriter_fourcc('M','J','P','G')
+
+        cap = cv2.VideoCapture(video_path)
+
+        out = cv2.VideoWriter(video_out_path, fourcc, fps, (frame_width,frame_height))
+
         # Pass by each frame of the video and draw points and connections
         while video.isOpened():
             ret, frame = video.read()
@@ -60,10 +79,13 @@ def predictionToVideo(video_path, video_out_path, profile):
             # Select correct pose
             pose_selected = poses.JUMP_FRONTAL
             if(profile == "left"):
-                pose_selected = poses.JUMP_SAGITTAL_LEFT
+                pose_selected = poses.JUMP_SAGITTAL_LEFT_FULL
             elif(profile == "right"):
-                pose_selected = poses.JUMP_SAGITTAL_RIGHT
+                pose_selected = poses.JUMP_SAGITTAL_RIGHT_FULL
 
+            print(dir(mp_results_object))
+            print(dir(mp_results_object.segmentation_mask))
+            print((mp_results_object.segmentation_mask))
             # Get pairings of interest
             keypoint_pairings = poses.getPairings(pose_selected, poses.KEYPOINT_DICT_BLAZEPOSE, mp_pose.POSE_CONNECTIONS, neural_network="blazepose")
             selected_joints = poses.selectJoints(frame, mp_results_object.pose_landmarks, pose_selected, poses.KEYPOINT_DICT_BLAZEPOSE, 'blazepose')
@@ -72,12 +94,14 @@ def predictionToVideo(video_path, video_out_path, profile):
             drawing.draw_connections(frame, selected_joints, keypoint_pairings)
             drawing.draw_keypoints(frame,selected_joints)
 
+            out.write(frame)
+            
             # Show image
             cv2.imshow('MediaPipe Pose', frame) 
             if cv2.waitKey(5) & 0xFF == 27:
                 break
     
-    # Fecha vídeo
+    # Close video
     video.release()
 
 
