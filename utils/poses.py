@@ -100,7 +100,7 @@ JUMP_FRONTAL = ['right_hip', 'left_hip', 'right_knee', 'left_knee','right_ankle'
 
 #-------------------------------------------------------------------------------------
 # Function to get the parings of the desired joints
-def getPairings(desired_kp, kp_dict, kp_pairings, neural_network):
+def selectConnections(desired_kp, kp_dict, kp_pairings, neural_network):
     new_kp_dict = {}
     new_kp_pairings = {}
 
@@ -128,7 +128,7 @@ def getPairings(desired_kp, kp_dict, kp_pairings, neural_network):
 
 #-------------------------------------------------------------------------------------
 # Function to select only the desired joints
-def selectJoints(image, keypoints, desired_keypoints, kp_dict, neural_network):
+def selectKeypoints(image, keypoints, desired_keypoints, kp_dict, neural_network):
     image_height, image_width, _ = image.shape
 
     selected_joints = np.zeros([len(desired_keypoints), 2])

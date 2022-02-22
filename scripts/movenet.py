@@ -16,48 +16,49 @@ import userInterface
 
 #-------------------------------------------------------------------------------------
 
-# Trashhold que vai ser utilizado para as predições
-TRASHHOLD = 0.3
+# Threshold of a prediction confidence
+THRESHOLD = 0.3
 
 #-------------------------------------------------------------------------------------
-# ACHO Q A GNT PODE QUEBRAR MAIS ESSA FUNÇÃOZONA SIM
 def predictionToVideo(interpreter, video_path, video_out_path, profile):
     # get video
-    cap = cv2.VideoCapture(video_path)
-    if(not fileManagement.videoCheck(cap)):
+    video_capture = cv2.VideoCapture(video_path)
+    if(not fileManagement.videoCheck(video_capture)):
         return
 
-
     # Create output video file
-    out = fileManagement.createOutputVideoFile(video_out_path, cap)
+    output_video = fileManagement.createOutputVideoFile(video_out_path, video_capture)
+    video_capture.release()
 
-    cap = cv2.VideoCapture(video_path)
+    # Create video file to process
+    video_capture = cv2.VideoCapture(video_path)
+    if(not fileManagement.videoCheck(video_capture)):
+        return
 
+    # Iterate through video frame
     while True:
-        ret, frame = cap.read()
-        # frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
-        if not ret:
-            print("Oi")
+        has_frame, frame = video_capture.read()
+        if not has_frame:
             break
         
         # Reshape image
-        img = frame.copy()
-        img = tf.image.resize_with_pad(np.expand_dims(img, axis=0), 192,192)
-        input_image = tf.cast(img, dtype=tf.float32)
+        reshaped_frame = frame.copy()
+        reshaped_frame = tf.image.resize_with_pad(np.expand_dims(reshaped_frame, axis=0), 192,192)
+        processed_frame = tf.cast(reshaped_frame, dtype=tf.float32)
         
         # Setup input and output 
         input_details = interpreter.get_input_details()
         output_details = interpreter.get_output_details()
         
         # Make predictions 
-        interpreter.set_tensor(input_details[0]['index'], np.array(input_image))
+        interpreter.set_tensor(input_details[0]['index'], np.array(processed_frame))
         interpreter.invoke() 
         keypoints_with_scores = interpreter.get_tensor(output_details[0]['index'])
         
         # Key points
         frame_width = frame.shape[0]
         frame_height = frame.shape[1]
-        keypoints = utils.transformDATA(keypoints_with_scores, TRASHHOLD, frame_width, frame_height)
+        keypoints = utils.transformDATA(keypoints_with_scores, THRESHOLD, frame_width, frame_height)
 
         # Select correct pose 
         pose_selected = poses.JUMP_FRONTAL
@@ -66,34 +67,39 @@ def predictionToVideo(interpreter, video_path, video_out_path, profile):
         elif(profile == "right"):
             pose_selected = poses.JUMP_SAGITTAL_RIGHT
         
-        keypoint_pairings = poses.getPairings(pose_selected, poses.KEYPOINT_DICT, poses.EDGES, "movenet")
-        selected_joints = poses.selectJoints(frame, keypoints, pose_selected, poses.KEYPOINT_DICT, 'movenet')
+        keypoints_connections = poses.selectConnections(pose_selected, poses.KEYPOINT_DICT, poses.EDGES, "movenet")
+        selected_keypoints = poses.selectKeypoints(frame, keypoints, pose_selected, poses.KEYPOINT_DICT, 'movenet')
         
-        # Draw the joints and pairings
-        drawing.draw_connections(frame, selected_joints, keypoint_pairings)
-        drawing.draw_keypoints(frame, selected_joints)
+        # Draw the keypoints and pairings
+        drawing.drawConnections(frame, selected_keypoints, keypoints_connections)
+        drawing.drawKeypoints(frame, selected_keypoints)
         
         # Write video to file
-        out.write(frame)
+        output_video.write(frame)
 
+        # Show video frame
         cv2.imshow('MoveNet Lightning', frame)
 
-        # ESC para sair
+        # ESC to leave
         k = cv2.waitKey(25) & 0xFF
         if k == 27:
             break
-            
-    cap.release()
+    
+    # Finish exhibition
+    video_capture.release()
     cv2.destroyAllWindows()
-    out.release()
+    output_video.release()
 
 #-------------------------------------------------------------------------------------
 
 if __name__ == "__main__":
+    # Start tensor flow
     interpreter = tf.lite.Interpreter(model_path='lite-model_movenet_singlepose_lightning_3.tflite')
     interpreter.allocate_tensors()
+    # Selec video
     video_path, video_out_path, profile = userInterface.initialMenu()
-    predictionToVideo(interpreter, video_path, video_out_path, profile)
 
+    # Make predictions
+    predictionToVideo(interpreter, video_path, video_out_path, profile)
 
 #-------------------------------------------------------------------------------------

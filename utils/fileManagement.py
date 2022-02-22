@@ -41,7 +41,6 @@ def createOutputVideoFile(video_out_path, video_capture):
     n_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
     frame_width = image.shape[0]
     frame_height = image.shape[1]
-    video_capture.release() 
 
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
     fourcc = cv2.VideoWriter_fourcc('M','J','P','G')

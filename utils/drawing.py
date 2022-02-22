@@ -9,7 +9,7 @@ CIRCLE_RATIO = 170
 
 #-------------------------------------------------------------------------------------
 # Function to draw points in the specified joints in each frame
-def draw_keypoints(frame, keypoints):
+def drawKeypoints(frame, keypoints):
     y, x, c = frame.shape
     circle_radius = int(y/CIRCLE_RATIO)
     for kp in keypoints:
@@ -20,7 +20,7 @@ def draw_keypoints(frame, keypoints):
 
 #-------------------------------------------------------------------------------------
 # Function to draw lines in the specified parings in each frame
-def draw_connections(frame, selected_joints, edges):
+def drawConnections(frame, selected_joints, edges):
     y, x, c = frame.shape
     linewidth = int(y/LINEWIDTH_RATIO)
     for edge, color in edges.items():
