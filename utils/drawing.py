@@ -20,10 +20,10 @@ def drawKeypoints(frame, keypoints):
 
 #-------------------------------------------------------------------------------------
 # Function to draw lines in the specified parings in each frame
-def drawConnections(frame, selected_joints, edges):
+def drawConnections(frame, selected_joints, keypoints_connections):
     y, x, c = frame.shape
     linewidth = int(y/LINEWIDTH_RATIO)
-    for edge, color in edges.items():
+    for edge, color in keypoints_connections.items():
         p1, p2 = edge
         x1, y1 = selected_joints[p1]
         x2, y2 = selected_joints[p2]
