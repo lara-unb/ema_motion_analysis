@@ -22,7 +22,6 @@ PROFILES = {
 #-------------------------------------------------------------------------------------
 # Function to show inicial menu
 def initialMenu():
-
     print(colors.BLUE, "\nMOTION ANALYSIS DEMO!\n", colors.RESET)
     print("\nVocê deseja:")
     print("1 - Select video from computer")
@@ -56,11 +55,7 @@ def initialMenu():
                     print(colors.RED, "Valor inválido!", colors.RESET)
             
             video_path = fileManagement.getAbsolutePath() + VIDEOS[selectedVideo][1] + VIDEOS[selectedVideo][2]
-
             video_out_path = fileManagement.getAbsolutePath() + VIDEOS[selectedVideo][1] + "mnl.avi"
-
-            print(video_out_path, VIDEOS[selectedVideo][1].split(".")[0])
-            input()
             break
 
         # Invalid entrance

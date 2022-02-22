@@ -44,20 +44,10 @@ def predictionToVideo(video_path, video_out_path, profile):
         if(not fileManagement.videoCheck(cap)):
             return
 
-        has_frame, image = cap.read()
-        fps = int(cap.get(cv2.CAP_PROP_FPS))
-        n_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        frame_width = image.shape[0]
-        frame_height = image.shape[1]
-        cap.release() 
-
-        fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        fourcc = cv2.VideoWriter_fourcc('M','J','P','G')
-
+        # Get video object
         cap = cv2.VideoCapture(video_path)
 
         # Create output video file
-        print(colors.RED, video_out_path, colors.RESET)
         out = fileManagement.createOutputVideoFile(video_out_path, cap)
 
         # Pass by each frame of the video and draw points and connections
@@ -93,6 +83,7 @@ def predictionToVideo(video_path, video_out_path, profile):
             drawing.draw_connections(frame, selected_joints, keypoint_pairings)
             drawing.draw_keypoints(frame,selected_joints)
 
+            # Write video to file
             out.write(frame)
             
             # Show image

@@ -27,24 +27,17 @@ def predictionToVideo(interpreter, video_path, video_out_path, profile):
     if(not fileManagement.videoCheck(cap)):
         return
 
-    has_frame, image = cap.read()
-    fps = int(cap.get(cv2.CAP_PROP_FPS))
-    n_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    frame_width = image.shape[0]
-    frame_height = image.shape[1]
-    cap.release() 
 
-    fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    fourcc = cv2.VideoWriter_fourcc('M','J','P','G')
+    # Create output video file
+    out = fileManagement.createOutputVideoFile(video_out_path, cap)
 
     cap = cv2.VideoCapture(video_path)
-
-    out = cv2.VideoWriter(video_out_path, fourcc, fps, (frame_width,frame_height))
 
     while True:
         ret, frame = cap.read()
         # frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
         if not ret:
+            print("Oi")
             break
         
         # Reshape image
@@ -62,6 +55,8 @@ def predictionToVideo(interpreter, video_path, video_out_path, profile):
         keypoints_with_scores = interpreter.get_tensor(output_details[0]['index'])
         
         # Key points
+        frame_width = frame.shape[0]
+        frame_height = frame.shape[1]
         keypoints = utils.transformDATA(keypoints_with_scores, TRASHHOLD, frame_width, frame_height)
 
         # Select correct pose 
@@ -78,6 +73,7 @@ def predictionToVideo(interpreter, video_path, video_out_path, profile):
         drawing.draw_connections(frame, selected_joints, keypoint_pairings)
         drawing.draw_keypoints(frame, selected_joints)
         
+        # Write video to file
         out.write(frame)
 
         cv2.imshow('MoveNet Lightning', frame)
