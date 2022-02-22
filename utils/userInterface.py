@@ -5,10 +5,10 @@ import fileManagement
 #-------------------------------------------------------------------------------------
 # Add new examples by selecter an interger key, a profile and it's path
 VIDEOS = {
-    1: ("right","/../examples/right-rafilsk1.mp4"),
-    2: ("frontal", "/../examples/frontal-girl.mp4"),
-    3: ("frontal", "/../examples/frontal-rafa.mp4"),
-    4: ("left", "/../examples/left-rafa.mp4"),
+    1: ("right","/../examples/right-rafilsk1", ".mp4"),
+    2: ("frontal", "/../examples/frontal-girl", ".mp4"),
+    3: ("frontal", "/../examples/frontal-rafa", ".mp4"),
+    4: ("left", "/../examples/left-rafa", ".mp4"),
 }
 
 #-------------------------------------------------------------------------------------
@@ -55,8 +55,12 @@ def initialMenu():
                 except :
                     print(colors.RED, "Valor inválido!", colors.RESET)
             
-            video_path = fileManagement.getAbsolutePath() + VIDEOS[selectedVideo][1]
-            video_out_path = video_path.split(".")[0] + "mnl.avi"
+            video_path = fileManagement.getAbsolutePath() + VIDEOS[selectedVideo][1] + VIDEOS[selectedVideo][2]
+
+            video_out_path = fileManagement.getAbsolutePath() + VIDEOS[selectedVideo][1] + "mnl.avi"
+
+            print(video_out_path, VIDEOS[selectedVideo][1].split(".")[0])
+            input()
             break
 
         # Invalid entrance

@@ -2,6 +2,7 @@ from PyQt5 import QtGui
 from PyQt5.QtWidgets import QWidget, QFileDialog
 from PyQt5.QtWidgets import QApplication
 import pickle
+import cv2
 
 import sys
 import colors
@@ -33,6 +34,19 @@ def videoCheck(video):
         print(colors.RED, "Couldn't open video!", colors.RESET)
         return False
     return True
+
+def createOutputVideoFile(video_out_path, video_capture):
+    has_frame, image = video_capture.read()
+    fps = int(video_capture.get(cv2.CAP_PROP_FPS))
+    n_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+    frame_width = image.shape[0]
+    frame_height = image.shape[1]
+    video_capture.release() 
+
+    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    fourcc = cv2.VideoWriter_fourcc('M','J','P','G')
+
+    return cv2.VideoWriter(video_out_path, fourcc, fps, (frame_width,frame_height))
 #-------------------------------------------------------------------------------------
 # Generate output file
 def save_to_file(data_dic, file_path):
@@ -40,7 +54,6 @@ def save_to_file(data_dic, file_path):
         for key in data_dic.keys():
             pickle.dump(key, f)
             pickle.dump(data_dic[key], f)
-
 
 #-------------------------------------------------------------------------------------
 
