@@ -104,55 +104,55 @@ JUMP_PROFILE_BLAZEPOSE = {
 
 #-------------------------------------------------------------------------------------
 # Function to get the parings of the desired joints
-def selectConnections(desired_kp, kp_dict, kp_pairings, neural_network):
-    new_kp_dict = {}
-    new_kp_pairings = {}
+def selectConnections(desired_keypoints, keypoints_dict, keypoints_connections, neural_network):
+    new_keypoints_dict = {}
+    new_keypoints_connections = {}
 
-    for kp_name in desired_kp:
+    for keypoint_name in desired_keypoints:
         if(neural_network == "movenet"):
-            new_kp_dict[kp_name] = kp_dict[kp_name]
+            new_keypoints_dict[keypoint_name] = keypoints_dict[keypoint_name]
         elif(neural_network == "blazepose"):
-            new_kp_dict[kp_name] = kp_dict[kp_name][0]
+            new_keypoints_dict[keypoint_name] = keypoints_dict[keypoint_name][0]
 
     if(neural_network=="movenet"):
-        for pos, color in kp_pairings.items():
+        for pos, color in keypoints_connections.items():
             p1, p2 = pos
-            if (p1 in list(new_kp_dict.values())) and (p2 in list(new_kp_dict.values())):
-                p1_tf = list(new_kp_dict.values()).index(p1)
-                p2_tf = list(new_kp_dict.values()).index(p2)
-                new_kp_pairings[(p1_tf, p2_tf)] = color
+            if (p1 in list(new_keypoints_dict.values())) and (p2 in list(new_keypoints_dict.values())):
+                p1_tf = list(new_keypoints_dict.values()).index(p1)
+                p2_tf = list(new_keypoints_dict.values()).index(p2)
+                new_keypoints_connections[(p1_tf, p2_tf)] = color
     if(neural_network=="blazepose"):
-        for p1, p2 in kp_pairings:
-            if (p1 in list(new_kp_dict.values())) and (p2 in list(new_kp_dict.values())):
-                p1_tf = list(new_kp_dict.values()).index(p1)
-                p2_tf = list(new_kp_dict.values()).index(p2)
-                new_kp_pairings[(p1_tf, p2_tf)] = "c"
+        for p1, p2 in keypoints_connections:
+            if (p1 in list(new_keypoints_dict.values())) and (p2 in list(new_keypoints_dict.values())):
+                p1_tf = list(new_keypoints_dict.values()).index(p1)
+                p2_tf = list(new_keypoints_dict.values()).index(p2)
+                new_keypoints_connections[(p1_tf, p2_tf)] = "c"
 
-    return new_kp_pairings
+    return new_keypoints_connections
 
 #-------------------------------------------------------------------------------------
 # Function to select only the desired joints
-def selectKeypoints(image, keypoints, desired_keypoints, kp_dict, neural_network):
-    image_height, image_width, _ = image.shape
+def selectKeypoints(frame, keypoints, desired_keypoints, keypoints_dict, neural_network):
+    frame_height, frame_width, _ = frame.shape
 
-    selected_joints = np.zeros([len(desired_keypoints), 2])
-    selected_joints[:] = np.NaN
+    selected_keypoints = np.zeros([len(desired_keypoints), 2])
+    selected_keypoints[:] = np.NaN
 
 
     if(type(keypoints) != None):
         for i in range(len(desired_keypoints)):
-            joint = desired_keypoints[i]
+            keypoint = desired_keypoints[i]
             
             if(neural_network == 'movenet'):
-                idx = list(kp_dict.keys()).index(joint)
-                selected_joints[i, :] = keypoints[idx, :]
+                idx = list(keypoints_dict.keys()).index(keypoint)
+                selected_keypoints[i, :] = keypoints[idx, :]
             elif(neural_network == 'blazepose'):
-                joint_object = kp_dict[desired_keypoints[i]][1]
-                selected_joints[i, :] = [
-                        keypoints.landmark[joint_object].x * image_width, 
-                        keypoints.landmark[joint_object].y * image_height
+                keypoint_object = keypoints_dict[desired_keypoints[i]][1]
+                selected_keypoints[i, :] = [
+                        keypoints.landmark[keypoint_object].x * frame_width, 
+                        keypoints.landmark[keypoint_object].y * frame_height
                 ]
-    return selected_joints
+    return selected_keypoints
 
 #-------------------------------------------------------------------------------------
 
