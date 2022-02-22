@@ -21,7 +21,7 @@ THRESHOLD = 0.3
 
 #-------------------------------------------------------------------------------------
 def predictionToVideo(interpreter, video_path, video_out_path, profile):
-    # get video
+    # Get video
     video_capture = cv2.VideoCapture(video_path)
     if(not fileManagement.videoCheck(video_capture)):
         return
@@ -67,11 +67,11 @@ def predictionToVideo(interpreter, video_path, video_out_path, profile):
         elif(profile == "right"):
             pose_selected = poses.JUMP_SAGITTAL_RIGHT
         
-        keypoints_connections = poses.selectConnections(pose_selected, poses.KEYPOINT_DICT, poses.EDGES, "movenet")
+        keypoint_connections = poses.selectConnections(pose_selected, poses.KEYPOINT_DICT, poses.EDGES, "movenet")
         selected_keypoints = poses.selectKeypoints(frame, keypoints, pose_selected, poses.KEYPOINT_DICT, 'movenet')
         
         # Draw the keypoints and pairings
-        drawing.drawConnections(frame, selected_keypoints, keypoints_connections)
+        drawing.drawConnections(frame, selected_keypoints, keypoint_connections)
         drawing.drawKeypoints(frame, selected_keypoints)
         
         # Write video to file
