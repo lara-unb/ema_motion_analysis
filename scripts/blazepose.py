@@ -75,7 +75,8 @@ def predictionToVideo(video_path, video_out_path, profile):
             output_video.write(frame)
             
             # Show image
-            cv2.imshow('MediaPipe Pose', frame) 
+            cv2.namedWindow('Blazepose Lite', cv2.WINDOW_NORMAL)
+            cv2.imshow('Blazepose Lite', frame) 
             if cv2.waitKey(5) & 0xFF == 27:
                 break
     
