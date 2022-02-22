@@ -74,6 +74,7 @@ def predictionToVideo(interpreter, video_path, video_out_path, profile):
         output_video.write(frame)
 
         # Show video frame
+        cv2.namedWindow('MoveNet Lightning', cv2.WINDOW_NORMAL) 
         cv2.imshow('MoveNet Lightning', frame)
 
         # ESC to leave

@@ -138,20 +138,18 @@ def selectKeypoints(frame, keypoints, desired_keypoints, keypoints_dict, neural_
     selected_keypoints = np.zeros([len(desired_keypoints), 2])
     selected_keypoints[:] = np.NaN
 
-
-    if(type(keypoints) != None):
-        for i in range(len(desired_keypoints)):
-            keypoint = desired_keypoints[i]
-            
-            if(neural_network == 'movenet'):
-                idx = list(keypoints_dict.keys()).index(keypoint)
-                selected_keypoints[i, :] = keypoints[idx, :]
-            elif(neural_network == 'blazepose'):
-                keypoint_object = keypoints_dict[desired_keypoints[i]][1]
-                selected_keypoints[i, :] = [
-                        keypoints.landmark[keypoint_object].x * frame_width, 
-                        keypoints.landmark[keypoint_object].y * frame_height
-                ]
+    for i in range(len(desired_keypoints)):
+        keypoint = desired_keypoints[i]
+        
+        if(neural_network == 'movenet'):
+            idx = list(keypoints_dict.keys()).index(keypoint)
+            selected_keypoints[i, :] = keypoints[idx, :]
+        elif(neural_network == 'blazepose' and keypoints != None):
+            keypoint_object = keypoints_dict[desired_keypoints[i]][1]
+            selected_keypoints[i, :] = [
+                    keypoints.landmark[keypoint_object].x * frame_width, 
+                    keypoints.landmark[keypoint_object].y * frame_height
+            ]
     return selected_keypoints
 
 #-------------------------------------------------------------------------------------
