@@ -60,15 +60,11 @@ def predictionToVideo(interpreter, video_path, video_out_path, profile):
         frame_height = frame.shape[1]
         keypoints = utils.transformDATA(keypoints_with_scores, THRESHOLD, frame_width, frame_height)
 
-        # Select correct pose 
-        pose_selected = poses.JUMP_FRONTAL
-        if(profile == "left"):
-            pose_selected = poses.JUMP_SAGITTAL_LEFT
-        elif(profile == "right"):
-            pose_selected = poses.JUMP_SAGITTAL_RIGHT
+        # Select correct pose profile
+        pose_selected = poses.JUMP_PROFILE_MOVENET[profile]
         
-        keypoint_connections = poses.selectConnections(pose_selected, poses.KEYPOINT_DICT, poses.EDGES, "movenet")
-        selected_keypoints = poses.selectKeypoints(frame, keypoints, pose_selected, poses.KEYPOINT_DICT, 'movenet')
+        keypoint_connections = poses.selectConnections(pose_selected, poses.KEYPOINT_DICT_MOVENET, poses.KEYPOINT_CONNECTIONS_MOVENET, "movenet")
+        selected_keypoints = poses.selectKeypoints(frame, keypoints, pose_selected, poses.KEYPOINT_DICT_MOVENET, 'movenet')
         
         # Draw the keypoints and pairings
         drawing.drawConnections(frame, selected_keypoints, keypoint_connections)
@@ -96,7 +92,8 @@ if __name__ == "__main__":
     # Start tensor flow
     interpreter = tf.lite.Interpreter(model_path='lite-model_movenet_singlepose_lightning_3.tflite')
     interpreter.allocate_tensors()
-    # Selec video
+
+    # Select video
     video_path, video_out_path, profile = userInterface.initialMenu()
 
     # Make predictions

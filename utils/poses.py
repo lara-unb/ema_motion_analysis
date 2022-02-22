@@ -9,7 +9,7 @@ mp_pose = mp.solutions.pose
 
 #-------------------------------------------------------------------------------------
 # Dictionary to map joints of body part
-KEYPOINT_DICT = {
+KEYPOINT_DICT_MOVENET = {
     'nose':0,
     'left_eye':1,
     'right_eye':2,
@@ -67,7 +67,7 @@ KEYPOINT_DICT_BLAZEPOSE = {
 
 #-------------------------------------------------------------------------------------
 # Joint parings 
-EDGES = {
+KEYPOINT_CONNECTIONS_MOVENET = {
     (0, 1): 'm',
     (0, 2): 'c',
     (1, 3): 'm',
@@ -90,13 +90,17 @@ EDGES = {
 
 #-------------------------------------------------------------------------------------
 # Different poses to be processed
+JUMP_PROFILE_MOVENET = {
+    "frontal" : ['right_hip', 'left_hip', 'right_knee', 'left_knee','right_ankle', 'left_ankle'],
+    "right": ['right_hip', 'right_knee', 'right_ankle'],
+    "left": ['left_hip', 'left_knee', 'left_ankle']
+}
 
-JUMP_SAGITTAL_LEFT = ['left_hip', 'left_knee', 'left_ankle']
-JUMP_SAGITTAL_LEFT_FULL = ['left_hip', 'left_knee', 'left_ankle', 'left_foot_index', 'left_heel']
-JUMP_SAGITTAL_RIGHT = ['right_hip', 'right_knee', 'right_ankle']
-JUMP_SAGITTAL_RIGHT_FULL = ['right_hip', 'right_knee', 'right_ankle', 'right_foot_index', 'right_heel']
-JUMP_FRONTAL = ['right_hip', 'left_hip', 'right_knee', 'left_knee','right_ankle', 'left_ankle']
-
+JUMP_PROFILE_BLAZEPOSE = {
+    "frontal" : ['right_hip', 'left_hip', 'right_knee', 'left_knee','right_ankle', 'left_ankle'],
+    "right": ['right_hip', 'right_knee', 'right_ankle', 'right_foot_index', 'right_heel'],
+    "left": ['left_hip', 'left_knee', 'left_ankle', 'left_foot_index', 'left_heel']
+}
 
 #-------------------------------------------------------------------------------------
 # Function to get the parings of the desired joints

@@ -6,14 +6,14 @@ import poses
 #-------------------------------------------------------------------------------------
 # get the keypoints above the trashhold and change vector to numpy array
 def transformDATA(kp_w_scores_vec, confidence_threshold, frame_width, frame_height):
-    keypoints_vec = np.zeros([len(list(poses.KEYPOINT_DICT.values())), 2])
+    keypoints_vec = np.zeros([len(list(poses.KEYPOINT_DICT_MOVENET.values())), 2])
     
     y, x, c = frame_width, frame_height, 3
     shaped = np.squeeze(np.multiply(kp_w_scores_vec, [y,x,1]))
     
     j = 0
     for i in range(len(shaped)):
-        if i in list(poses.KEYPOINT_DICT.values()):
+        if i in list(poses.KEYPOINT_DICT_MOVENET.values()):
             ky, kx, kp_conf = shaped[i]
             if kp_conf > confidence_threshold:
                 keypoints_vec[j, 0] = kx

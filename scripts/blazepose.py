@@ -60,12 +60,8 @@ def predictionToVideo(video_path, video_out_path, profile):
             frame.flags.writeable = True
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
-            # Select correct pose
-            pose_selected = poses.JUMP_FRONTAL
-            if(profile == "left"):
-                pose_selected = poses.JUMP_SAGITTAL_LEFT_FULL
-            elif(profile == "right"):
-                pose_selected = poses.JUMP_SAGITTAL_RIGHT_FULL
+            # Select correct pose profile
+            pose_selected = poses.JUMP_PROFILE_BLAZEPOSE[profile]
 
             # Get pairings of interest
             keypoint_connections = poses.selectConnections(pose_selected, poses.KEYPOINT_DICT_BLAZEPOSE, mp_pose.POSE_CONNECTIONS, neural_network="blazepose")
@@ -91,5 +87,8 @@ def predictionToVideo(video_path, video_out_path, profile):
 
 # Main functions, select video and apply blazepose algorithm
 if __name__ == "__main__":
+    # Select video
     video_path, video_out_path, profile = userInterface.initialMenu()
+
+    # Make predictions
     predictionToVideo(video_path, video_out_path, profile)
