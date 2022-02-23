@@ -97,7 +97,7 @@ def predictionToVideo(video_path, video_out_path, file_out_path,  profile):
 # Main functions, select video and apply blazepose algorithm
 if __name__ == "__main__":
     # Select video
-    video_path, video_out_path, file_out_path, profile = userInterface.initialMenu()
+    video_path, video_out_path, file_out_path, profile = userInterface.initialMenu("blazepose")
 
     # Make predictions
     predictionToVideo(video_path, video_out_path, file_out_path, profile)

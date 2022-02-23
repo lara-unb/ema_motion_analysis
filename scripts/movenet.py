@@ -103,7 +103,7 @@ if __name__ == "__main__":
     interpreter.allocate_tensors()
 
     # Select video
-    video_path, video_out_path, file_out_path, profile = userInterface.initialMenu()
+    video_path, video_out_path, file_out_path, profile = userInterface.initialMenu("movenet")
 
     # Make predictions
     predictionToVideo(interpreter, video_path, video_out_path, file_out_path, profile)

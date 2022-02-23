@@ -5,10 +5,10 @@ import fileManagement
 #-------------------------------------------------------------------------------------
 # Add new examples by selecter an interger key, a profile and it's path
 VIDEOS = {
-    1: ("right","/../examples/right-rafilsk1", ".mp4"),
-    2: ("frontal", "/../examples/frontal-girl", ".mp4"),
-    3: ("frontal", "/../examples/frontal-rafa", ".mp4"),
-    4: ("left", "/../examples/left-rafa", ".mp4"),
+    1: ("right","right-rafilsk1", ".mp4"),
+    2: ("frontal", "frontal-girl", ".mp4"),
+    3: ("frontal", "frontal-rafa", ".mp4"),
+    4: ("left", "left-rafa", ".mp4"),
 }
 
 #-------------------------------------------------------------------------------------
@@ -21,7 +21,7 @@ PROFILES = {
 
 #-------------------------------------------------------------------------------------
 # Function to show inicial menu
-def initialMenu():
+def initialMenu(neural_network):
     print(colors.BLUE, "\nMOTION ANALYSIS DEMO!\n", colors.RESET)
     print("\nVocê deseja:")
     print("1 - Select video from computer")
@@ -54,9 +54,7 @@ def initialMenu():
                 except :
                     print(colors.RED, "Valor inválido!", colors.RESET)
             
-            video_path = fileManagement.getAbsolutePath() + VIDEOS[selectedVideo][1] + VIDEOS[selectedVideo][2]
-            video_out_path = fileManagement.getAbsolutePath() + VIDEOS[selectedVideo][1] + "mnl.avi"
-            file_out_path = fileManagement.getAbsolutePath() + VIDEOS[selectedVideo][1] + "-json.data"
+            video_path, video_out_path, file_out_path = fileManagement.getOutputsPaths(VIDEOS[selectedVideo][1],VIDEOS[selectedVideo][2], neural_network)
             break
 
         # Invalid entrance

@@ -7,6 +7,8 @@ import json
 
 
 import sys
+
+from numpy import absolute
 import colors
 
 import os
@@ -17,6 +19,14 @@ def getAbsolutePath():
     absolute_main_path = os.path.dirname(os.path.abspath(__file__))
     return absolute_main_path
 
+def getOutputsPaths(video_name, video_input_format, neural_network_name):
+    absolute_path = getAbsolutePath()
+    outputs_folder = absolute_path + "/../outputs/"
+    examples_folder = absolute_path + "/../examples/"
+    video_path = examples_folder + video_name + video_input_format
+    video_out_path = outputs_folder + video_name + "-" +  neural_network_name + "-"+ "mnl.avi"
+    file_out_path = outputs_folder + video_name + "-" +  neural_network_name + ".data"
+    return video_path, video_out_path, file_out_path
 #-------------------------------------------------------------------------------------
 # Function to open file dialog to choose video
 def readFileDialog(title="Open File", file_type="All Files"):
