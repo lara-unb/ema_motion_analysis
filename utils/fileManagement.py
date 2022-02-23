@@ -3,6 +3,8 @@ from PyQt5.QtWidgets import QWidget, QFileDialog
 from PyQt5.QtWidgets import QApplication
 import pickle
 import cv2
+import json
+
 
 import sys
 import colors
@@ -47,7 +49,7 @@ def createOutputVideoFile(video_out_path, video_capture):
 
     return cv2.VideoWriter(video_out_path, fourcc, fps, (frame_width,frame_height))
 #-------------------------------------------------------------------------------------
-# Generate output file
+# Generate output file - ISSO AQUI NÃO ESTÁ SENDO USADO - APAGA ? 
 def save_to_file(data_dic, file_path):
     with open(file_path, 'wb') as f:
         for key in data_dic.keys():
@@ -55,5 +57,40 @@ def save_to_file(data_dic, file_path):
             pickle.dump(data_dic[key], f)
 
 #-------------------------------------------------------------------------------------
+# Set video metadata object
+def setMetadata(video_name, mapping, pairs, video_path, summary="None"):
+    # Open video
+    video_capture = cv2.VideoCapture(video_path)
+    videoCheck(video_capture)
 
+    length = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+    fps = int(video_capture.get(cv2.CAP_PROP_FPS))
+
+
+    has_frame, frame = video_capture.read()
     
+    frame_width = frame.shape[0]
+    frame_height = frame.shape[1]
+    
+    video_capture.set(2, 0.0)
+
+    video_capture.release()
+
+    file_metadata = {
+        'video_name': video_name,
+        'n_frames': length,
+        'n_points': len(mapping),
+        'frame_width': frame_width,
+        'frame_height': frame_height,
+        'fps': fps,
+        'keypoints_names': mapping,
+        'keypoints_pairs': pairs,
+        'summary': summary
+    }
+    
+    return file_metadata
+    
+def writeToJsonFile(file_path, data, write_mode='w'):
+    with open(file_path, write_mode) as f:
+        f.write(json.dumps(data))
+        f.write('\n')

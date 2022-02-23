@@ -56,13 +56,14 @@ def initialMenu():
             
             video_path = fileManagement.getAbsolutePath() + VIDEOS[selectedVideo][1] + VIDEOS[selectedVideo][2]
             video_out_path = fileManagement.getAbsolutePath() + VIDEOS[selectedVideo][1] + "mnl.avi"
+            file_out_path = fileManagement.getAbsolutePath() + VIDEOS[selectedVideo][1] + "-json.data"
             break
 
         # Invalid entrance
         else:
             print(colors.RED, "Valor inválido!", colors.RESET)
             continue
-    return video_path, video_out_path, profile
+    return video_path, video_out_path, file_out_path, profile
 
 #-------------------------------------------------------------------------------------
 
