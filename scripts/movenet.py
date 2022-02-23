@@ -106,6 +106,6 @@ if __name__ == "__main__":
     video_path, video_out_path, file_out_path, profile = userInterface.initialMenu()
 
     # Make predictions
-    predictionToVideo(interpreter, video_path, video_out_path,file_out_path, profile)
+    predictionToVideo(interpreter, video_path, video_out_path, file_out_path, profile)
 
 #-------------------------------------------------------------------------------------
