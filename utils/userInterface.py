@@ -40,7 +40,7 @@ def initialMenu(neural_network):
                     break
                 except:
                     print(colors.RED, "Valor inválido!", colors.RESET)
-            video_path, video_out_path = fileManagement.readFileDialog("Open video file")
+            video_name, video_path, video_out_path, file_out_path = fileManagement.readFileDialog(neural_network, "Open video file")
             break
         # Select video from examples
         elif escolha == 2:
@@ -55,13 +55,14 @@ def initialMenu(neural_network):
                     print(colors.RED, "Valor inválido!", colors.RESET)
             
             video_path, video_out_path, file_out_path = fileManagement.getOutputsPaths(VIDEOS[selectedVideo][1],VIDEOS[selectedVideo][2], neural_network)
+            video_name = VIDEOS[selectedVideo][1]
             break
 
         # Invalid entrance
         else:
             print(colors.RED, "Valor inválido!", colors.RESET)
             continue
-    return video_path, video_out_path, file_out_path, profile
+    return video_name, video_path, video_out_path, file_out_path, profile
 
 #-------------------------------------------------------------------------------------
 

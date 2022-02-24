@@ -26,7 +26,7 @@ mp_pose = mp.solutions.pose
 # Set confidence predictions and tracking threshold
 THRESHOLD = 0.3
 
-def predictionToVideo(video_path, video_out_path, file_out_path,  profile):
+def predictionToVideo(video_name, video_path, video_out_path, file_out_path,  profile):
     # Get video
     video_capture = cv2.VideoCapture(video_path)
     if(not fileManagement.videoCheck(video_capture)):
@@ -37,7 +37,7 @@ def predictionToVideo(video_path, video_out_path, file_out_path,  profile):
     video_capture.release()
 
     # Create output file data
-    file_metadata = fileManagement.setMetadata("RAFA FRONTAL", poses.KEYPOINT_DICT_MOVENET, poses.JUMP_PROFILE_MOVENET[profile], video_path)
+    file_metadata = fileManagement.setMetadata(video_name, poses.KEYPOINT_DICT_MOVENET, poses.JUMP_PROFILE_MOVENET[profile], video_path)
     fileManagement.writeToJsonFile(file_out_path, file_metadata, write_mode='w+')
 
     # Create video file to process
@@ -97,7 +97,7 @@ def predictionToVideo(video_path, video_out_path, file_out_path,  profile):
 # Main functions, select video and apply blazepose algorithm
 if __name__ == "__main__":
     # Select video
-    video_path, video_out_path, file_out_path, profile = userInterface.initialMenu("blazepose")
+    video_name, video_path, video_out_path, file_out_path, profile = userInterface.initialMenu("blazepose")
 
     # Make predictions
-    predictionToVideo(video_path, video_out_path, file_out_path, profile)
+    predictionToVideo(video_name, video_path, video_out_path, file_out_path, profile)

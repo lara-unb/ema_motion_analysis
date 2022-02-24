@@ -20,7 +20,7 @@ import userInterface
 THRESHOLD = 0.3
 
 #-------------------------------------------------------------------------------------
-def predictionToVideo(interpreter, video_path, video_out_path, file_out_path, profile):
+def predictionToVideo(interpreter, video_name, video_path, video_out_path, file_out_path, profile):
     # Get video
     video_capture = cv2.VideoCapture(video_path)
     if(not fileManagement.videoCheck(video_capture)):
@@ -31,7 +31,7 @@ def predictionToVideo(interpreter, video_path, video_out_path, file_out_path, pr
     video_capture.release()
 
     # Create output file data
-    file_metadata = fileManagement.setMetadata("RAFA FRONTAL", poses.KEYPOINT_DICT_MOVENET, poses.JUMP_PROFILE_MOVENET[profile], video_path)
+    file_metadata = fileManagement.setMetadata(video_name, poses.KEYPOINT_DICT_MOVENET, poses.JUMP_PROFILE_MOVENET[profile], video_path)
     fileManagement.writeToJsonFile(file_out_path, file_metadata, write_mode='w+')
 
     # Create video file to process
@@ -103,9 +103,9 @@ if __name__ == "__main__":
     interpreter.allocate_tensors()
 
     # Select video
-    video_path, video_out_path, file_out_path, profile = userInterface.initialMenu("movenet")
+    video_name, video_path, video_out_path, file_out_path, profile = userInterface.initialMenu("movenet")
 
     # Make predictions
-    predictionToVideo(interpreter, video_path, video_out_path, file_out_path, profile)
+    predictionToVideo(interpreter, video_name, video_path, video_out_path, file_out_path, profile)
 
 #-------------------------------------------------------------------------------------

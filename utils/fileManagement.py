@@ -29,15 +29,18 @@ def getOutputsPaths(video_name, video_input_format, neural_network_name):
     return video_path, video_out_path, file_out_path
 #-------------------------------------------------------------------------------------
 # Function to open file dialog to choose video
-def readFileDialog(title="Open File", file_type="All Files"):
+def readFileDialog(neural_network, title="Open File", file_type="All Files"):
     app = QApplication(sys.argv)
     qfd = QFileDialog()
     if file_type == "All Files":
         type_filter = "All Files (*)"
     else:
         type_filter = file_type + " (*." + file_type + ")"
-    file_path, _ = QFileDialog.getOpenFileName(qfd, title, "", type_filter)
-    return file_path, file_path.split(".")[0] + "_mnl.avi"
+    video_path, _ = QFileDialog.getOpenFileName(qfd, title, "", type_filter)
+    video_name = video_path.split("/")[-1].split(".")[0]
+    video_format = video_path.split("/")[-1].split(".")[1]
+    _, video_out_path, file_out_path = getOutputsPaths(video_name , video_format, neural_network)
+    return video_name, video_path, video_out_path, file_out_path
 
 #-------------------------------------------------------------------------------------
 # Function to check if the video was opend 
