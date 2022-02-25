@@ -1,4 +1,0 @@
-{"video_name": "RAFA FRONTAL", "n_frames": 431, "n_points": 17, "frame_width": 560, "frame_height": 560, "fps": 30, "keypoints_names": {"nose": 0, "left_eye": 1, "right_eye": 2, "left_ear": 3, "right_ear": 4, "left_shoulder": 5, "right_shoulder": 6, "left_elbow": 7, "right_elbow": 8, "left_wrist": 9, "right_wrist": 10, "left_hip": 11, "right_hip": 12, "left_knee": 13, "right_knee": 14, "left_ankle": 15, "right_ankle": 16}, "keypoints_pairs": ["right_hip", "right_knee", "right_ankle"], "summary": "None"}
-{"keypoints": [[278.5747003555298, 303.3381509780884], 
-[268.0213212966919, 413.53062629699707], 
-[259.5155191421509, 510.14288425445557]]}
