@@ -12,6 +12,8 @@ import drawing
 import utils
 import poses
 import userInterface
+import angles
+import colors
 
 
 #-------------------------------------------------------------------------------------
@@ -73,7 +75,12 @@ def predictionToVideo(interpreter, video_name, video_path, video_out_path, file_
         # Draw the keypoints and pairings
         drawing.drawConnections(frame, selected_keypoints, keypoint_connections)
         drawing.drawKeypoints(frame, selected_keypoints)
-        
+
+        print()
+        print(colors.RED, angles.getAngles(selected_keypoints), colors.RESET)
+        _angles = angles.getAngles(selected_keypoints)
+        cv2.putText(frame, str(round(_angles, 1)), (50,100), cv2.FONT_HERSHEY_PLAIN, 3, (128,0,255), 4)
+        # input()
         # Write video to file
         output_video.write(frame)
 
@@ -89,7 +96,7 @@ def predictionToVideo(interpreter, video_name, video_path, video_out_path, file_
         k = cv2.waitKey(25) & 0xFF
         if k == 27:
             break
-    
+
     # Finish exhibition
     video_capture.release()
     cv2.destroyAllWindows()

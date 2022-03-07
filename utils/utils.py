@@ -23,11 +23,3 @@ def transformDATA(kp_w_scores_vec, confidence_threshold, frame_width, frame_heig
                 keypoints_vec[j, 1] = np.nan
             j+=1
     return keypoints_vec
-
-
-#-------------------------------------------------------------------------------------
-# A GENTE TMB N TA USANDO ESSA
-
-# def writeToDATA(file_path, data, write_mode='w'):
-#     with open(file_path, write_mode) as f:
-#         json.dump(data, f)

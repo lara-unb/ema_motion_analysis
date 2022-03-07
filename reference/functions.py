@@ -810,3 +810,11 @@ def plotAllPhases(time, corrected_force, cropped_time, acel, vel, disp, init_mov
     fig.tight_layout()
     
     plt.show()
+
+
+#-------------------------------------------------------------------------------------
+# A GENTE TMB N TA USANDO ESSA
+
+# def writeToDATA(file_path, data, write_mode='w'):
+#     with open(file_path, write_mode) as f:
+#         json.dump(data, f)

@@ -33,8 +33,9 @@ Instale os seguintes pacotes com o comando conda (Windows e Linux):
 Exclusivo Linux
 - conda install -c conda-forge tensorflow=2.7.0
 - pip install opencv-python==4.5.2.54
+
 Exclusivo Windows
-- conda install -c conda-forge tensorflow=2.7.0
+- conda install -c conda-forge tensorflow=2.6.0
 - pip install opencv-python==4.5.1.48
 
 ## Execução dos programas
@@ -50,7 +51,7 @@ ou
 
 - python movenet.py
 
-Então será aberto um menu do usuário em que este pode escolher entre executar alguns dos exemplos prontos disponíveis ou carregar um exemplo próprio:
+Então será aberto um menu do usuário em que este pode escolher entre executar alguns dos exemplos prontos disponíveis ou carregar um exemplo próprio.
 
-- Nas pasta "outputs" serão salvos os arquivos com os dados do processamento (localização dos pontos para cada frame) e os vídeos com as identificações das poses.
+Nas pasta "outputs" serão salvos os arquivos com os dados do processamento (localização dos pontos para cada frame) e os vídeos com as identificações das poses.
 
