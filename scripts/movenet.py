@@ -4,8 +4,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 import cv2
 
-import sys
 
+import sys
 sys.path.append("../utils/")
 import fileManagement
 import drawing
