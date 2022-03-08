@@ -1,3 +1,4 @@
+from audioop import getsample
 from ctypes import util
 import tensorflow as tf
 import numpy as np
@@ -14,6 +15,7 @@ import poses
 import userInterface
 import angles
 import colors
+from data_monitor import DataMonitor # https://github.com/bhartl/data-monitor
 
 
 #-------------------------------------------------------------------------------------
@@ -41,61 +43,81 @@ def predictionToVideo(interpreter, video_name, video_path, video_out_path, file_
     if(not fileManagement.videoCheck(video_capture)):
         return
 
-    # Iterate through video frame
-    while True:
-        has_frame, frame = video_capture.read()
-        if not has_frame:
-            break
-        
-        # Reshape image
-        reshaped_frame = frame.copy()
-        reshaped_frame = tf.image.resize_with_pad(np.expand_dims(reshaped_frame, axis=0), 192,192)
-        processed_frame = tf.cast(reshaped_frame, dtype=tf.float32)
-        
-        # Setup input and output 
-        input_details = interpreter.get_input_details()
-        output_details = interpreter.get_output_details()
-        
-        # Make predictions 
-        interpreter.set_tensor(input_details[0]['index'], np.array(processed_frame))
-        interpreter.invoke() 
-        keypoints_with_scores = interpreter.get_tensor(output_details[0]['index'])
-        
-        # Key points
-        frame_width = frame.shape[0]
-        frame_height = frame.shape[1]
-        keypoints = utils.transformDATA(keypoints_with_scores, THRESHOLD, frame_width, frame_height)
+    # Angles plotting Configuration
+    frame_iterator = 0
+    angle_data = [(0, 0)]
+    # define meta-info for DataMonitor plotting (label of data-rows and coloring)
+    channels = [
+        {'label': 'Knee Angle', 'color': 'tab:pink'}
+    ]
+    # define plot format (dict of matplotlib.pyplot attributes and related (*args, **kwargs))
+    plt_kwargs = dict(
+        xlim=((0, file_metadata["n_frames"]), {}),
+        ylim=((0, 200), {}),
+        xlabel=(('Frame number', ), {}),
+        ylabel=(('Angles in degrees',), {}),
+    )
 
-        # Select correct pose profile
-        pose_selected = poses.JUMP_PROFILE_MOVENET[profile]
-        
-        keypoint_connections = poses.selectConnections(pose_selected, poses.KEYPOINT_DICT_MOVENET, poses.KEYPOINT_CONNECTIONS_MOVENET, "movenet")
-        selected_keypoints = poses.selectKeypoints(frame, keypoints, pose_selected, poses.KEYPOINT_DICT_MOVENET, 'movenet')
-        
-        # Draw the keypoints and pairings
-        drawing.drawConnections(frame, selected_keypoints, keypoint_connections)
-        drawing.drawKeypoints(frame, selected_keypoints)
+    with DataMonitor(channels=channels, ax_kwargs=plt_kwargs) as dm:
+        while True:
+            has_frame, frame = video_capture.read()
+            if not has_frame:
+                break
+            
+            # Reshape image
+            reshaped_frame = frame.copy()
+            reshaped_frame = tf.image.resize_with_pad(np.expand_dims(reshaped_frame, axis=0), 192,192)
+            processed_frame = tf.cast(reshaped_frame, dtype=tf.float32)
+            
+            # Setup input and output 
+            input_details = interpreter.get_input_details()
+            output_details = interpreter.get_output_details()
+            
+            # Make predictions 
+            interpreter.set_tensor(input_details[0]['index'], np.array(processed_frame))
+            interpreter.invoke() 
+            keypoints_with_scores = interpreter.get_tensor(output_details[0]['index'])
+            
+            # Key points
+            frame_width = frame.shape[0]
+            frame_height = frame.shape[1]
+            keypoints = utils.transformDATA(keypoints_with_scores, THRESHOLD, frame_width, frame_height)
 
-        print()
-        print(colors.RED, angles.getAngles(selected_keypoints), colors.RESET)
-        _angles = angles.getAngles(selected_keypoints)
-        cv2.putText(frame, str(round(_angles, 1)), (50,100), cv2.FONT_HERSHEY_PLAIN, 3, (128,0,255), 4)
-        # input()
-        # Write video to file
-        output_video.write(frame)
+            # Select correct pose profile
+            pose_selected = poses.JUMP_PROFILE_MOVENET[profile]
+            
+            keypoint_connections = poses.selectConnections(pose_selected, poses.KEYPOINT_DICT_MOVENET, poses.KEYPOINT_CONNECTIONS_MOVENET, "movenet")
+            selected_keypoints = poses.selectKeypoints(frame, keypoints, pose_selected, poses.KEYPOINT_DICT_MOVENET, 'movenet')
+            
+            # Draw the keypoints and pairings
+            drawing.drawConnections(frame, selected_keypoints, keypoint_connections)
+            drawing.drawKeypoints(frame, selected_keypoints)
 
-        # Write data to file
-        file_data = {'keypoints': selected_keypoints.tolist()}
-        fileManagement.writeToJsonFile(file_out_path, file_data, write_mode='a')
+            # Get angles and draw it in the  screen
+            _angles = angles.getAngles(selected_keypoints)
+            cv2.putText(frame, str(round(_angles, 1)), (50,100), cv2.FONT_HERSHEY_PLAIN, 3, (128,0,255), 4)
+            print(colors.RED, _angles, colors.RESET)
+            sample = (frame_iterator, _angles)
+            angle_data.append(sample)
+            dm.data = np.asarray(angle_data).T
+            frame_iterator+=1 
 
-        # Show video frame
-        cv2.namedWindow('MoveNet Lightning', cv2.WINDOW_NORMAL) 
-        cv2.imshow('MoveNet Lightning', frame)
 
-        # ESC to leave
-        k = cv2.waitKey(25) & 0xFF
-        if k == 27:
-            break
+            # Write video to file
+            output_video.write(frame)
+
+            # Write data to file
+            file_data = {'keypoints': selected_keypoints.tolist()}
+            fileManagement.writeToJsonFile(file_out_path, file_data, write_mode='a')
+
+            # Show video frame
+            cv2.namedWindow('MoveNet Lightning', cv2.WINDOW_NORMAL) 
+            cv2.imshow('MoveNet Lightning', frame)
+
+            # ESC to leave
+            k = cv2.waitKey(25) & 0xFF
+            if k == 27:
+                break
 
     # Finish exhibition
     video_capture.release()
