@@ -27,7 +27,7 @@ def getOutputsPaths(video_name, video_input_format, neural_network_name):
     examples_folder = absolute_path + "/../examples/"
     video_path = examples_folder + video_name + video_input_format
     video_out_path = outputs_folder + video_name + "-" +  neural_network_name + "-"+ "mnl.avi"
-    file_out_path = outputs_folder + video_name + "-" +  neural_network_name + ".data"
+    file_out_path = outputs_folder + video_name + "-" +  neural_network_name
     return video_path, video_out_path, file_out_path
 #-------------------------------------------------------------------------------------
 # Function to open file dialog to choose video
@@ -105,22 +105,21 @@ def setMetadata(video_name, mapping, pairs, video_path, summary="None"):
     
     return file_metadata
     
-def writeToJsonFile(file_path, data, write_mode='w'):
-    with open(file_path, write_mode) as f:
+def writeToJsonFile(file_out_path, data, write_mode='w'):
+    with open(file_out_path+".data", write_mode) as f:
         f.write(json.dumps(data))
         f.write('\n')
 
 #-------------------------------------------------------------------------------------
 
 def writePickleFile(file_out_path, file_dictionary):
-    print(colors.RED, "Saving Pickle", colors.RESET)    
-    with open("FILE.pickle", 'wb') as f:
+    with open(file_out_path+".pickle", 'wb') as f:
         pickle.dump(file_dictionary, f)
 
 #------------------------------------------------------------------------------------
 
 def readPickleFile(file_out_path):
-    with open('FILE.pickle', "rb") as f:
+    with open(file_out_path, "rb") as f:
         loaded_obj = pickle.load(f)
     return loaded_obj
 

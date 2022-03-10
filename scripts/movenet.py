@@ -116,7 +116,7 @@ def predictionToVideo(interpreter, video_name, video_path, video_out_path, file_
             fileManagement.writeToJsonFile(file_out_path, file_data, write_mode='a')
 
             # Show video frame
-            cv2.namedWindow('MoveNet Lightning', cv2.WINDOW_NORMAL) 
+            cv2.namedWindow('MoveNet Lightning', cv2.WINDOW_NORMAL)
             cv2.imshow('MoveNet Lightning', frame)
 
             # ESC to leave
@@ -125,7 +125,7 @@ def predictionToVideo(interpreter, video_name, video_path, video_out_path, file_
                 break
     
     # Create pickle output data
-    pickle_output_data = {"data": pickle_output_list}
+    pickle_output_data = {"header": file_metadata, "data": pickle_output_list}
     fileManagement.writePickleFile(file_out_path, pickle_output_data)
 
     # Finish exhibition
@@ -140,9 +140,12 @@ if __name__ == "__main__":
     interpreter = tf.lite.Interpreter(model_path='lite-model_movenet_singlepose_lightning_3.tflite')
     interpreter.allocate_tensors()
 
+
     # Select video
     video_name, video_path, video_out_path, file_out_path, profile = userInterface.initialMenu("movenet")
 
+    print(fileManagement.readPickleFile(file_out_path+".pickle"))
+    input()
     # Make predictions
     predictionToVideo(interpreter, video_name, video_path, video_out_path, file_out_path, profile)
 
