@@ -144,8 +144,6 @@ if __name__ == "__main__":
     # Select video
     video_name, video_path, video_out_path, file_out_path, profile = userInterface.initialMenu("movenet")
 
-    print(fileManagement.readPickleFile(file_out_path+".pickle"))
-    input()
     # Make predictions
     predictionToVideo(interpreter, video_name, video_path, video_out_path, file_out_path, profile)
 

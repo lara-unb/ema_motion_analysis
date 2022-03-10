@@ -40,6 +40,9 @@ def predictionToVideo(video_name, video_path, video_out_path, file_out_path,  pr
     file_metadata = fileManagement.setMetadata(video_name, poses.KEYPOINT_DICT_MOVENET, poses.JUMP_PROFILE_MOVENET[profile], video_path)
     fileManagement.writeToJsonFile(file_out_path, file_metadata, write_mode='w+')
 
+    # Initialize pickle output list
+    pickle_output_list = []
+
     # Create video file to process
     video_capture = cv2.VideoCapture(video_path)
     if(not fileManagement.videoCheck(video_capture)):
@@ -78,6 +81,9 @@ def predictionToVideo(video_name, video_path, video_out_path, file_out_path,  pr
             # Write video to file
             output_video.write(frame)
 
+            # Save video to pickle
+            pickle_output_list.append({'keypoints': selected_keypoints.tolist()})
+
             # Write data to file
             file_data = {'keypoints': selected_keypoints.tolist()}
             fileManagement.writeToJsonFile(file_out_path, file_data, write_mode='a')
@@ -88,6 +94,10 @@ def predictionToVideo(video_name, video_path, video_out_path, file_out_path,  pr
             if cv2.waitKey(5) & 0xFF == 27:
                 break
     
+    # Create pickle output data
+    pickle_output_data = {"header": file_metadata, "data": pickle_output_list}
+    fileManagement.writePickleFile(file_out_path, pickle_output_data)
+
     # Finish exhibition
     video_capture.release()
     cv2.destroyAllWindows()
