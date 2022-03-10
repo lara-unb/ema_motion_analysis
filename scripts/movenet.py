@@ -38,6 +38,9 @@ def predictionToVideo(interpreter, video_name, video_path, video_out_path, file_
     file_metadata = fileManagement.setMetadata(video_name, poses.KEYPOINT_DICT_MOVENET, poses.JUMP_PROFILE_MOVENET[profile], video_path)
     fileManagement.writeToJsonFile(file_out_path, file_metadata, write_mode='w+')
 
+    # Initialize pickle output list
+    pickle_output_list = []
+
     # Create video file to process
     video_capture = cv2.VideoCapture(video_path)
     if(not fileManagement.videoCheck(video_capture)):
@@ -96,7 +99,6 @@ def predictionToVideo(interpreter, video_name, video_path, video_out_path, file_
             # Get angles and draw it in the  screen
             _angles = angles.getAngles(selected_keypoints)
             cv2.putText(frame, str(round(_angles, 1)), (50,100), cv2.FONT_HERSHEY_PLAIN, 3, (128,0,255), 4)
-            print(colors.RED, _angles, colors.RESET)
             sample = (frame_iterator, _angles)
             angle_data.append(sample)
             dm.data = np.asarray(angle_data).T
@@ -105,6 +107,9 @@ def predictionToVideo(interpreter, video_name, video_path, video_out_path, file_
 
             # Write video to file
             output_video.write(frame)
+
+            # Save video to pickle
+            pickle_output_list.append({'keypoints': selected_keypoints.tolist()})
 
             # Write data to file
             file_data = {'keypoints': selected_keypoints.tolist()}
@@ -118,6 +123,10 @@ def predictionToVideo(interpreter, video_name, video_path, video_out_path, file_
             k = cv2.waitKey(25) & 0xFF
             if k == 27:
                 break
+    
+    # Create pickle output data
+    pickle_output_data = {"data": pickle_output_list}
+    fileManagement.writePickleFile(file_out_path, pickle_output_data)
 
     # Finish exhibition
     video_capture.release()
