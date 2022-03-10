@@ -24,11 +24,7 @@ def getAngleLimited(A, B, O, allow_neg=False):
     return ang
 
 def getAngles(kp_vec):
-    print(kp_vec)
     kp_vec = np.array(kp_vec)
-    print(kp_vec.shape)
-    print(len(kp_vec))
     angles = np.zeros(len(kp_vec))
-    #for i in range(len(kp_vec)):
     angles = getAngleLimited(kp_vec[0], kp_vec[2], kp_vec[1])
     return angles

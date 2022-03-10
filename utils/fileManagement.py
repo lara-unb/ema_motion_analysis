@@ -4,6 +4,8 @@ from PyQt5.QtWidgets import QApplication
 import pickle
 import cv2
 import json
+import pickle
+
 
 
 import sys
@@ -107,3 +109,18 @@ def writeToJsonFile(file_path, data, write_mode='w'):
     with open(file_path, write_mode) as f:
         f.write(json.dumps(data))
         f.write('\n')
+
+#-------------------------------------------------------------------------------------
+
+def writePickleFile(file_out_path, file_dictionary):
+    print(colors.RED, "Saving Pickle", colors.RESET)    
+    with open("FILE.pickle", 'wb') as f:
+        pickle.dump(file_dictionary, f)
+
+#------------------------------------------------------------------------------------
+
+def readPickleFile(file_out_path):
+    with open('FILE.pickle', "rb") as f:
+        loaded_obj = pickle.load(f)
+    return loaded_obj
+
