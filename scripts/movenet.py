@@ -97,7 +97,8 @@ def predictionToVideo(interpreter, video_name, video_path, video_out_path, file_
             drawing.drawKeypoints(frame, selected_keypoints)
 
             # Get angles and draw it in the  screen
-            _angles = angles.getAngles(selected_keypoints)
+            _angles = angles.getAngles(selected_keypoints, poses.ANGLES_MOVENET, profile, pose_selected)
+
             cv2.putText(frame, str(round(_angles, 1)), (50,100), cv2.FONT_HERSHEY_PLAIN, 3, (128,0,255), 4)
             sample = (frame_iterator, _angles)
             angle_data.append(sample)

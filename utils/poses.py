@@ -1,3 +1,4 @@
+from turtle import right
 import numpy as np
 
 import mediapipe as mp
@@ -100,6 +101,26 @@ JUMP_PROFILE_BLAZEPOSE = {
     "frontal" : ['right_hip', 'left_hip', 'right_knee', 'left_knee','right_ankle', 'left_ankle'],
     "right": ['right_hip', 'right_knee', 'right_ankle', 'right_foot_index', 'right_heel'],
     "left": ['left_hip', 'left_knee', 'left_ankle', 'left_foot_index', 'left_heel']
+}
+
+ANGLES_MOVENET = {
+    "right" : {
+        "knee_angle": ['right_hip', 'right_knee', "right_ankle"],
+    },
+    "left": {
+        "knee_angle": ['left_hip', 'left_knee', "left_ankle"]
+    }
+}
+
+ANGLES_BLAZEPOSE = {
+        "right": {
+            "knee_angle": ['right_hip', 'right_knee', "right_ankle"],
+            "ankle_angle": ['right_knee', 'right_ankle', "right_foot_index"]
+        },
+        "left": {
+            "knee_angle": ['left_hip', 'left_knee', "left_ankle"],
+            "ankle_angle": ['left_knee', 'left_ankle', "left_foot_index"],
+        }
 }
 
 #-------------------------------------------------------------------------------------
