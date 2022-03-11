@@ -17,6 +17,7 @@ import fileManagement
 import drawing
 import poses
 import userInterface
+import angles
 
 # Simplify mediapipe variables
 mp_drawing = mp.solutions.drawing_utils
@@ -77,6 +78,16 @@ def predictionToVideo(video_name, video_path, video_out_path, file_out_path,  pr
             # Draw joints and pairings
             drawing.drawConnections(frame, selected_keypoints, keypoint_connections)
             drawing.drawKeypoints(frame,selected_keypoints)
+
+            # Get angles and draw it in the  screen
+            _angles = angles.getAngles(selected_keypoints, poses.ANGLES_BLAZEPOSE, profile, pose_selected)
+
+            cv2.putText(frame, str(round(_angles[0], 1)), (50,100), cv2.FONT_HERSHEY_PLAIN, 3, (128,0,255), 4)
+            cv2.putText(frame, str(round(_angles[1], 1)), (50,150), cv2.FONT_HERSHEY_PLAIN, 3, (128,0,255), 4)
+            # sample = (frame_iterator, _angles[0])
+            # angle_data.append(sample)
+            # dm.data = np.asarray(angle_data).T
+            # frame_iterator+=1 
 
             # Write video to file
             output_video.write(frame)
