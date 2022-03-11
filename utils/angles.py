@@ -32,12 +32,13 @@ def getAngles(selected_keypoints, dict_angles, profile, pose_selected):
     print(dict_angles)
     print(profile)
     print(pose_selected)
-    angle_points = []
+    angles = []
     for angle in dict_angles[profile].keys():
+        angle_points = []   
         for point in dict_angles[profile][angle]:
             index_keypoints = pose_selected.index(point)
             angle_points.append(selected_keypoints[index_keypoints])
     
-    angles = getAngleLimited(angle_points[0], angle_points[2], angle_points[1])
+        angles.append(getAngleLimited(angle_points[0], angle_points[2], angle_points[1]))
 
     return angles
