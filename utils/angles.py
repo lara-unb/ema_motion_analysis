@@ -24,22 +24,16 @@ def getAngleLimited(A, B, O, allow_neg=False):
     return ang
 
 def getAngles(selected_keypoints, dict_angles, profile, pose_selected):
-
     selected_keypoints = np.array(selected_keypoints)
     angles = np.zeros(len(selected_keypoints))
-
-    print(selected_keypoints)
-    print(dict_angles)
-    print(profile)
-    print(pose_selected)
     angles = []
+
     for angle in dict_angles[profile].keys():
         angle_points = []   
         for point in dict_angles[profile][angle]:
             index_keypoints = pose_selected.index(point)
             angle_points.append(selected_keypoints[index_keypoints])
         
-        # print(colors.RED, angle, colors.RESET)
         angles.append(getAngleLimited(angle_points[0], angle_points[2], angle_points[1]))
 
     return angles
