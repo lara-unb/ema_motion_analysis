@@ -28,6 +28,9 @@ conda install -c anaconda numpy=1.21.2
 pip install matplotlib==3.5.1
 pip install mediapipe==0.8.9.1
 pip install PyQt5==5.12.3
+pip install pyserial==3.5
+pip install pyqtgraph
+pip install pyquaternion
 ```
 
 Exclusivo Linux
