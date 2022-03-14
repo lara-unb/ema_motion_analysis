@@ -31,7 +31,24 @@ import threading
 import os
 from ctypes import c_char_p
 import matplotlib.pyplot as plt
+import numpy as np
 
+sys.path.append("../utils/")
+from data_monitor import DataMonitor
+
+# define meta-info for DataMonitor plotting (label of data-rows and coloring)
+channels = [
+    {'label': 'Knee Angle', 'color': 'tab:pink'}
+]
+# define plot format (dict of matplotlib.pyplot attributes and related (*args, **kwargs))
+n_frames = 1000
+plt_kwargs = dict(
+    xlim=((0, n_frames), {}),
+    ylim=((0, 1), {}),
+    xlabel=(('Frame number', ), {}),
+    ylabel=(('Angles in degrees',), {}),
+)
+angle_data = [(0, 0)]
 
 class GetFolderToLoad(QWidget):
 
@@ -224,15 +241,17 @@ def do_stuff(client, source, t, ang, fes, start_time, running, imu_data):
 
     server_data = []
 
-    imu_data_plot = []
+    iterator = 0
     try:
-        while running.value:
-            data = client.recv()
-            if not data == '':
-                print(data) # DADO QUE CHEGA DAS IMU'S
-                imu_data_plot.append(data[-1])
-                plt.plot(imu_data_plot)
-                plt.show(block=False)
+        with DataMonitor(channels=channels, ax_kwargs=plt_kwargs) as dm:
+            while running.value:
+                data = client.recv()
+                if not data == '':
+                    iterator += 1
+                    print(data) # DADO QUE CHEGA DAS IMU'S
+                    sample = data[-1]
+                    angle_data.append((iterator, sample))
+                    dm.data = np.asarray(angle_data).T
 
 
     except Exception as e:
