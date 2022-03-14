@@ -30,6 +30,8 @@ import json
 import threading
 import os
 from ctypes import c_char_p
+import matplotlib.pyplot as plt
+
 
 class GetFolderToLoad(QWidget):
 
@@ -222,26 +224,16 @@ def do_stuff(client, source, t, ang, fes, start_time, running, imu_data):
 
     server_data = []
 
+    imu_data_plot = []
     try:
         while running.value:
             data = client.recv()
             if not data == '':
                 print(data) # DADO QUE CHEGA DAS IMU'S
-                server_data.append([time.time(), data])
-                imu_data[data[1]] = data[:]+['|']
-                # print('received stim data')
-                if real_time_plot:
-                    update_plot()
-            if (source == 'imus'):
-                if new_file_imus.value:
-                    new_file_imus.value = 0
-                    save_data()
-            if (source == 'stim'):
-                if new_file_stim.value:
-                    new_file_stim.value = 0
-                    save_data()
+                imu_data_plot.append(data[-1])
+                plt.plot(imu_data_plot)
+                plt.show(block=False)
 
-        save_data()
 
     except Exception as e:
         print('Exception raised: ', str(e), ', on line ', str(sys.exc_info()[2].tb_lineno))
@@ -394,11 +386,13 @@ def start_next():
 # imu_json = multiprocessing.Value()
 
 if __name__ == '__main__':
+
     manager = multiprocessing.Manager()
     imu_data = manager.dict()
 
     app1 = QApplication(sys.argv)
     target_folder = GetFolderToLoad()
+    
     folder_path = target_folder.foldername
     with open("folder_path.txt", "w") as f:
         f.write(folder_path)
