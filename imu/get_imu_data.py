@@ -15,21 +15,38 @@ from multiprocessing.connection import Client
 import serial.tools.list_ports
 import sys
 
+sys.path.append("../utils/")
+from data_monitor import DataMonitor
+
+# define meta-info for DataMonitor plotting (label of data-rows and coloring)
+channels = [
+    {'label': 'Knee Angle', 'color': 'tab:pink'}
+]
+# define plot format (dict of matplotlib.pyplot attributes and related (*args, **kwargs))
+n_frames = 1000
+plt_kwargs = dict(
+    xlim=((0, n_frames), {}),
+    ylim=((-1, 1), {}),
+    xlabel=(('Frame number', ), {}),
+    ylabel=(('Angles in degrees',), {}),
+)
+angle_data = [(0, 0)]
+
 #TODO stop IMUs and close connection to serial port and server on exit
 
 # Connect to the server
 connection = True
 calib = False
 
-try:
-    address = ('localhost', 50001)
-    # server = socket.socket()
-    # server.connect(address)
-    server = Client(address)
-    server.send('imus')
-    connection = True
-except:
-    print('No server found in address {}'.format(address))
+# try:
+#     address = ('localhost', 50001)
+#     # server = socket.socket()
+#     # server.connect(address)
+#     server = Client(address)
+#     server.send('imus')
+#     connection = True
+# except:
+#     print('No server found in address {}'.format(address))
 
 addresses = [1,2,3,4,5,6,7,8]
 
@@ -126,7 +143,9 @@ for i in range(len(addresses)):
 
 print('Start')
 
+
 def read_sensors(portIMU):
+    timer = time.time()
     print("Oi")
     global x,y,z, running, counters
     t0 = time.time()
@@ -134,70 +153,79 @@ def read_sensors(portIMU):
     id = 0
     now = time.time()
     try:
-        while running:
-            # print('waiting...')
-            bytes_to_read = serial_port.inWaiting()
-            # print(bytes_to_read)
-            if bytes_to_read > 0:
-                print('reading...')
-                data = serial_port.read(bytes_to_read)
-                print('Full raw data: ' + str(data))
-                # print(data[0])
-                if len(data) <= 3 or data[0] != 0:
-                    continue
-                data2 = data.decode().replace('\r\n',' ')
-                # data2 = ''.join(chr(i) for i in data.encode() if ord(chr(i)) > 31 and ord(chr(i)) < 128 )
-                data3 = data2.split(' ')
-                data3 = list(filter(None, data3))
-                # print(data3)
+        with DataMonitor(channels=channels, ax_kwargs=plt_kwargs) as dm:
+            iterator = 0
+            while running:
+                # print('waiting...')
+                bytes_to_read = serial_port.inWaiting()
+                # print(bytes_to_read)
+                if bytes_to_read > 0:
+                    # print('reading...')
+                    data = serial_port.read(bytes_to_read)
+                    # print('Full raw data: ' + str(data))
+                    # print(data[0])
+                    if len(data) <= 3 or data[0] != 0:
+                        continue
+                    data2 = data.decode().replace('\r\n',' ')
+                    # data2 = ''.join(chr(i) for i in data.encode() if ord(chr(i)) > 31 and ord(chr(i)) < 128 )
+                    data3 = data2.split(' ')
+                    data3 = list(filter(None, data3))
+                    # print(data3)
 
-                info = data3[0][0:3]
+                    info = data3[0][0:3]
 
-                id = int.from_bytes(info[1].encode(), sys.byteorder)
+                    id = int.from_bytes(info[1].encode(), sys.byteorder)
 
-                ################################################################
-                ################################################################
-                # get data
-                quaternion = data3[0][3:]
-                accel = data3[1]
-                # id = int.from_bytes(temp[1].encode(), sys.byteorder)
-                # print('Final data: ' + str(temp))
-                # print('Quaternion: ' + str(quaternion))
-                # print('Accel: ' + str(accel))
-                # print(temp[1].encode())
-                # print(id)
-                # print(quaternion)
+                    ################################################################
+                    ################################################################
+                    # get data
+                    quaternion = data3[0][3:]
+                    accel = data3[1]
+                    # id = int.from_bytes(temp[1].encode(), sys.byteorder)
+                    # print('Final data: ' + str(temp))
+                    # print('Quaternion: ' + str(quaternion))
+                    # print('Accel: ' + str(accel))
+                    # print(temp[1].encode())
+                    # print(id)
+                    # print(quaternion)
 
-                quaternion = quaternion.split(',')
-                quaternion = np.array(quaternion).astype(np.float)
+                    quaternion = quaternion.split(',')
+                    quaternion = np.array(quaternion).astype(np.float)
 
-                accel = accel.split(',')
-                accel = np.array(accel).astype(np.float)
-
-
-                x = quaternion[0]
-                y = quaternion[1]
-                z = quaternion[2]
-                w = quaternion[3]
-                acc_x = accel[0]
-                acc_y = accel[1]
-                acc_z = accel[2]
-
-                ################################################################
-                ################################################################
+                    accel = accel.split(',')
+                    accel = np.array(accel).astype(np.float)
 
 
-                # Send data to server
-                out = [time.time(), id, w, x, y, z, acc_x, acc_y, acc_z]
-                if connection:
-                    server.send(out)
-                    print(out)
-                now = time.time()
+                    x = quaternion[0]
+                    y = quaternion[1]
+                    z = quaternion[2]
+                    w = quaternion[3]
+                    acc_x = accel[0]
+                    acc_y = accel[1]
+                    acc_z = accel[2]
 
-            else:
-                # print("No data")
-                # time.sleep(0.1)
-                pass
+                    ################################################################
+                    ################################################################
+
+
+                    # Send data to server
+                    out = [time.time(), id, w, x, y, z, acc_x, acc_y, acc_z]
+                    # server.send(out)
+
+
+                    interval = time.time() - timer
+                    if interval > 0.1:
+                        iterator += 1
+                        sample = out[-1]
+                        angle_data.append((iterator, sample))
+                        dm.data = np.asarray(angle_data).T
+                        timer = time.time()
+                    
+
+                else:
+                    # print("No data")
+                    # time.sleep(0.1)
+                    pass
 
 
     except Exception as e:

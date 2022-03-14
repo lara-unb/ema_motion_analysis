@@ -1,1 +1,1 @@
-C:/Users/rafer/Documents/TG1/ema_motion_analysis/imu
+/Users/admin/Documents/GitHub/ema_motion_analysis/imu

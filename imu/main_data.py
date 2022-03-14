@@ -44,7 +44,7 @@ channels = [
 n_frames = 1000
 plt_kwargs = dict(
     xlim=((0, n_frames), {}),
-    ylim=((0, 1), {}),
+    ylim=((0, 0.01), {}),
     xlabel=(('Frame number', ), {}),
     ylabel=(('Angles in degrees',), {}),
 )
