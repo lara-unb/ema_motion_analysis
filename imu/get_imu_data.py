@@ -18,12 +18,15 @@ import sys
 sys.path.append("../utils/")
 from data_monitor import DataMonitor
 
+
+# --------------------------------------------------------- DATA MONITOR CONFIG
 # define meta-info for DataMonitor plotting (label of data-rows and coloring)
 channels = [
-    {'label': 'Knee Angle', 'color': 'tab:pink'}
+    {'label': 'Imu data', 'color': 'tab:pink'}
 ]
+
 # define plot format (dict of matplotlib.pyplot attributes and related (*args, **kwargs))
-n_frames = 1000
+n_frames = 1000 # Hard-coded -> see if it's possible to use it dynamically
 plt_kwargs = dict(
     xlim=((0, n_frames), {}),
     ylim=((-1, 1), {}),
@@ -31,25 +34,55 @@ plt_kwargs = dict(
     ylabel=(('Angles in degrees',), {}),
 )
 angle_data = [(0, 0)]
+# --------------------------------------------------------- DATA MONITOR CONFIG
 
-#TODO stop IMUs and close connection to serial port and server on exit
 
-# Connect to the server
-connection = True
-calib = False
 
-# try:
-#     address = ('localhost', 50001)
-#     # server = socket.socket()
-#     # server.connect(address)
-#     server = Client(address)
-#     server.send('imus')
-#     connection = True
-# except:
-#     print('No server found in address {}'.format(address))
 
+
+# --------------------------------------------------------- IMU CONFIGURATION
+# Understand and comment each line 
+
+
+
+# Find and open serial port for the IMU dongle
+list_ports_info = serial.tools.list_ports.comports()
+for port_info in list_ports_info:
+    print("\tPort:", port_info.device, "\tSerial#:", port_info.serial_number, "\tDesc:", port_info.description, 'PID', port_info.pid)
+    # Aparently it's functional to only one dongle, maybe this is why we cannot use the small imu dongle
+    if port_info.pid == 4128: # small IMU dongle
+        portIMU = port_info.device
+
+
+# Initialize serial port object 
+serial_port = serial.Serial(port=portIMU, baudrate=115200, timeout=0.01)
+# time.sleep(0.1) # Commented to see if this is really necessary
+serial_port.flush()                # Flush of file like objects. In this case, wait until all data is written.
+serial_port.reset_input_buffer()   # Changed bc flushInput is depracated
+serial_port.reset_output_buffer()  # Changed bc flushOutpu is depracated
+# time.sleep(0.1) # Commented to see if this is really necessary 
+
+
+
+
+# Stop streaming - I think that this stops reading imu in order to configure
 addresses = [1,2,3,4,5,6,7,8]
+for i in range(len(addresses)):
+    serial_port.write(('>'+str(addresses[i])+',86\n').encode())
+    time.sleep(0.1)
+    while serial_port.inWaiting():
+        out = '>> ' + serial_port.read(serial_port.inWaiting()).decode()
 
+
+# Manual flush. Might not be necessary - Comment it later to see if it's or not
+while not serial_port.inWaiting() == 0:
+    serial_port.read(serial_port.inWaiting())
+    time.sleep(0.1)
+
+
+
+
+print('Starting configuration')
 # Command the IMUs are to perform
 command = [255, 255, 255, 255, 255, 255, 255, 255]
 command[0] = 0
@@ -60,37 +93,6 @@ command[4] = 255
 command[5] = 255
 command[6] = 255
 command[7] = 255
-
-# Find and open serial port for the IMU dongle
-a = serial.tools.list_ports.comports()
-for w in a:
-    print("\tPort:", w.device, "\tSerial#:", w.serial_number, "\tDesc:", w.description, 'PID', w.pid)
-    if w.pid == 4128: # small IMU dongle
-        portIMU = w.device
-# portIMU = '/dev/tty.usbmodem14101' # rPi
-# portIMU = "COM7"
-serial_port = serial.Serial(port=portIMU, baudrate=115200, timeout=0.01)
-time.sleep(0.1)
-serial_port.flush()
-serial_port.flushInput()
-serial_port.flushOutput()
-time.sleep(0.1)
-
-
-# Stop streaming
-for i in range(len(addresses)):
-    serial_port.write(('>'+str(addresses[i])+',86\n').encode())
-    time.sleep(0.1)
-    while serial_port.inWaiting():
-        out = '>> ' + serial_port.read(serial_port.inWaiting()).decode()
-    # print(out)
-
-# Manual flush. Might not be necessary
-while not serial_port.inWaiting() == 0:
-    serial_port.read(serial_port.inWaiting())
-    time.sleep(0.1)
-
-print('Starting configuration')
 # Set streaming slots
 for i in range(len(addresses)):
     msg = '>' + str(addresses[i]) + ',80,' + str(command[0]) + ',' + \
@@ -118,6 +120,7 @@ for i in range(len(addresses)):
         out = '>> ' + serial_port.read(serial_port.inWaiting()).decode()
 
 # Gyro autocalibration
+calib = False
 if calib:
     for i in range(len(addresses)):
         serial_port.write(('>'+str(addresses[i])+',165\n').encode())
@@ -133,6 +136,9 @@ for i in range(len(addresses)):
         out = '>> ' + serial_port.read(serial_port.inWaiting()).decode()
     # print(out)
 
+
+print('Ending configuration')
+
 # Start streaming
 for i in range(len(addresses)):
     serial_port.write(('>'+str(addresses[i])+',85\n').encode())
@@ -141,7 +147,8 @@ for i in range(len(addresses)):
         out = '>> ' + serial_port.read(serial_port.inWaiting()).decode()
     # print(out)
 
-print('Start')
+# --------------------------------------------------------- IMU CONFIGURATION
+
 
 
 def read_sensors(portIMU):
