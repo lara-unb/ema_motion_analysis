@@ -22,18 +22,21 @@ from data_monitor import DataMonitor
 # --------------------------------------------------------- DATA MONITOR CONFIG
 # define meta-info for DataMonitor plotting (label of data-rows and coloring)
 channels = [
-    {'label': 'Imu data', 'color': 'tab:pink'}
+    {'label': 'Imu data x', 'color': 'tab:pink', 'linewidth': 2},
+    {'label': 'Imu data y', 'color': 'tab:cyan', 'linewidth': 2},
+    {'label': 'Imu data z', 'color': 'tab:orange', 'linewidth': 2}
+
 ]
 
 # define plot format (dict of matplotlib.pyplot attributes and related (*args, **kwargs))
 n_frames = 1000 # Hard-coded -> see if it's possible to use it dynamically
 plt_kwargs = dict(
     xlim=((0, n_frames), {}),
-    ylim=((-1, 1), {}),
+    ylim=((-10, 10), {}),
     xlabel=(('Frame number', ), {}),
     ylabel=(('Angles in degrees',), {}),
 )
-angle_data = [(0, 0)]
+angle_data = [(0, 0, 0, 0)]
 # --------------------------------------------------------- DATA MONITOR CONFIG
 
 
@@ -56,11 +59,11 @@ for port_info in list_ports_info:
 
 # Initialize serial port object 
 serial_port = serial.Serial(port=portIMU, baudrate=115200, timeout=0.01)
-# time.sleep(0.1) # Commented to see if this is really necessary
+time.sleep(0.1) # Commented to see if this is really necessary
 serial_port.flush()                # Flush of file like objects. In this case, wait until all data is written.
 serial_port.reset_input_buffer()   # Changed bc flushInput is depracated
 serial_port.reset_output_buffer()  # Changed bc flushOutpu is depracated
-# time.sleep(0.1) # Commented to see if this is really necessary 
+time.sleep(0.1) # Commented to see if this is really necessary 
 
 
 
@@ -85,7 +88,7 @@ while not serial_port.inWaiting() == 0:
 print('Starting configuration')
 # Command the IMUs are to perform
 command = [255, 255, 255, 255, 255, 255, 255, 255]
-command[0] = 0
+command[0] = 0     
 command[1] = 41
 command[2] = 255
 command[3] = 255
@@ -93,6 +96,7 @@ command[4] = 255
 command[5] = 255
 command[6] = 255
 command[7] = 255
+
 # Set streaming slots
 for i in range(len(addresses)):
     msg = '>' + str(addresses[i]) + ',80,' + str(command[0]) + ',' + \
@@ -128,13 +132,13 @@ if calib:
         while serial_port.inWaiting():
             out = '>> ' + serial_port.read(serial_port.inWaiting()).decode()
 
-# Tare
-for i in range(len(addresses)):
-    serial_port.write(('>'+str(addresses[i])+',96\n').encode())
-    time.sleep(0.1)
-    while serial_port.inWaiting():
-        out = '>> ' + serial_port.read(serial_port.inWaiting()).decode()
-    # print(out)
+# # Tare
+# for i in range(len(addresses)):
+#     serial_port.write(('>'+str(addresses[i])+',96\n').encode())
+#     time.sleep(0.1)
+#     while serial_port.inWaiting():
+#         out = '>> ' + serial_port.read(serial_port.inWaiting()).decode()
+#     # print(out)
 
 
 print('Ending configuration')
@@ -197,10 +201,10 @@ def read_sensors(portIMU):
                     # print(quaternion)
 
                     quaternion = quaternion.split(',')
-                    quaternion = np.array(quaternion).astype(np.float)
+                    quaternion = np.array(quaternion).astype(np.float64)
 
                     accel = accel.split(',')
-                    accel = np.array(accel).astype(np.float)
+                    accel = np.array(accel).astype(np.float64)
 
 
                     x = quaternion[0]
@@ -223,8 +227,8 @@ def read_sensors(portIMU):
                     interval = time.time() - timer
                     if interval > 0.1:
                         iterator += 1
-                        sample = out[-1]
-                        angle_data.append((iterator, sample))
+                        #sample = out[-1]
+                        angle_data.append((iterator, acc_x+5, acc_y, acc_z-5))
                         dm.data = np.asarray(angle_data).T
                         timer = time.time()
                     
