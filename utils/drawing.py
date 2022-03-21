@@ -32,3 +32,10 @@ def drawConnections(frame, selected_joints, keypoints_connections):
             cv2.line(frame, (int(x1), int(y1)), (int(x2), int(y2)), (128,0,255), linewidth)
 
 #-------------------------------------------------------------------------------------
+def writeAnglesLegends(frame, _angles, dict_profile_angles):
+    height_offset = 0
+    for index in range(len(dict_profile_angles.keys())):
+        text = list(dict_profile_angles.keys())[index] +" : " +str(round(_angles[index], 1))
+        cv2.putText(frame, text, (40,50 + height_offset), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1.5, (128,0,255), 2)
+        height_offset += 40
+        
