@@ -15,8 +15,8 @@ import poses
 import userInterface
 import angles
 import colors
-from data_monitor import DataMonitor # https://github.com/bhartl/data-monitor
-
+# from data_monitor import DataMonitor # https://github.com/bhartl/data-monitor
+from RealTimeDataMonitor import DataMonitor
 
 #-------------------------------------------------------------------------------------
 
@@ -49,6 +49,7 @@ def predictionToVideo(interpreter, video_name, video_path, video_out_path, file_
     # Angles plotting Configuration
     frame_iterator = 0
     angle_data = [(0, 0)]
+
     # define meta-info for DataMonitor plotting (label of data-rows and coloring)
     channels = [
         {'label': 'Knee Angle', 'color': 'tab:pink'}
@@ -61,7 +62,7 @@ def predictionToVideo(interpreter, video_name, video_path, video_out_path, file_
         ylabel=(('Angles in degrees',), {}),
     )
 
-    with DataMonitor(channels=channels, ax_kwargs=plt_kwargs) as dm:
+    with DataMonitor() as dm:
         while True:
             has_frame, frame = video_capture.read()
             if not has_frame:
@@ -100,10 +101,11 @@ def predictionToVideo(interpreter, video_name, video_path, video_out_path, file_
             _angles = angles.getAngles(selected_keypoints, poses.ANGLES_MOVENET, profile, pose_selected)
 
             cv2.putText(frame, str(round(_angles[0], 1)), (50,100), cv2.FONT_HERSHEY_PLAIN, 3, (128,0,255), 4)
-            sample = (frame_iterator, _angles[0])
-            angle_data.append(sample)
-            dm.data = np.asarray(angle_data).T
-            frame_iterator+=1 
+            # sample = (frame_iterator, _angles[0])
+            # angle_data.append(sample)
+            # dm.data = np.asarray(angle_data).T
+            # frame_iterator+=1 
+            dm.data = _angles[0]
 
 
             # Write video to file
