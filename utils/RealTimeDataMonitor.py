@@ -102,7 +102,8 @@ class DataMonitor(object):
         self.p2.setLabel('left', "Angles(deg)")
         self.p1.setLabel('bottom', "Time(s)")
         self.p2.setLabel('bottom', "Time(s)")
-        # self.p1.showGrid(x=True, y=True)
+        self.p1.setYRange(0, 360)
+        self.p2.setYRange(0, -360)
               
         # Define ploting line styles
         pen1 =pg.mkPen('cyan', width=2, style=QtCore.Qt.DashLine, label="angle 1")
