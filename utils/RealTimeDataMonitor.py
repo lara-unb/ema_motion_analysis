@@ -1,18 +1,10 @@
 from multiprocessing import Process, Queue, TimeoutError
 from multiprocessing.connection import Connection
 from queue import Empty
-
 import time
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtGui, QtCore
 import numpy as np
-import sys
-import math
-
-sys.path.append("../utils/")
-import colors
-
-
 class DataMonitor(object):
     """ Data Monitoring of externally manipulated data
         The data-monitor runs matplotlib in an extra multiprocessing.Process.
@@ -30,11 +22,13 @@ class DataMonitor(object):
         self._data = data
         self.data_vector = []
 
+        # Initialize graph vectors
         size_of_graph = 1000
         self.curve1_plot = [0]*size_of_graph
         self.curve2_plot = [0]*size_of_graph
         self.t = [0]*size_of_graph
 
+        # Initialize timer
         self.start_time = time.time()
 
 
@@ -51,7 +45,7 @@ class DataMonitor(object):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-
+        print("Exit real time data monitor.")
         if self._show_process is not None:
             if exc_type is not None:
                 try:
@@ -85,9 +79,13 @@ class DataMonitor(object):
 
     def show(self, data_queue: Connection):
         """ Creates the matplotlib FuncAnimation and creates the plot (blocking) """
-        
+        # 
         self._data_queue = data_queue
         self.app = QtGui.QApplication([])
+
+        # Define background and foreground colors
+        pg.setConfigOption('background', 'w')
+        pg.setConfigOption('foreground', 'k')
         self.win = pg.GraphicsWindow()
 
         self.p1 = self.win.addPlot(colspan=2)
@@ -95,22 +93,28 @@ class DataMonitor(object):
         self.p2 = self.win.addPlot(colspan=2)
         self.win.nextRow()
 
-        self.curve1 = self.p1.plot()
-        self.curve2 = self.p2.plot()
+        # https://pyqtgraph.readthedocs.io/en/latest/introduction.html
+        # https://linuxhint.com/use-pyqtgraph/
+        # Add title or labels
+        self.p1.setTitle("Angle 1")
+        self.p2.setTitle("Angle 2")
+        self.p1.setLabel('left', "Angles(deg)")
+        self.p2.setLabel('left', "Angles(deg)")
+        self.p1.setLabel('bottom', "Time(s)")
+        self.p2.setLabel('bottom', "Time(s)")
+        # self.p1.showGrid(x=True, y=True)
+              
+        # Define ploting line styles
+        pen1 =pg.mkPen('cyan', width=2, style=QtCore.Qt.DashLine, label="angle 1")
+        pen2 =pg.mkPen('pink', width=2, style=QtCore.Qt.DashLine)
+        self.curve1 = self.p1.plot(pen=pen1, labels='Angle 1' )
+        self.curve2 = self.p2.plot(pen=pen2, title='Angle 2')
 
         graphUpdateSpeedMs = 1
         timer = QtCore.QTimer()#to create a thread that calls a function at intervals
         timer.timeout.connect(self.animate)#the update function keeps getting called at intervals
         timer.start(graphUpdateSpeedMs)   
         QtGui.QApplication.instance().exec_()
-
-
-        print(data_queue)
-        # Colocar função do QT aqui
-
-        # self.apply_plt_kwargs()
-        # plt.tight_layout()
-        # plt.show()
 
     @property
     def data(self):
@@ -164,7 +168,7 @@ class DataMonitor(object):
 if __name__ == '__main__':
     with DataMonitor() as dm:
         for i in range(20):
-            dm.data = i
-            time.sleep(1);
+            dm.data = np.random.rand()
+            time.sleep(0.5);
 
         
