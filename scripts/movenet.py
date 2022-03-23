@@ -1,8 +1,5 @@
-from audioop import getsample
-from ctypes import util
 import tensorflow as tf
 import numpy as np
-from matplotlib import pyplot as plt
 import cv2
 
 
@@ -15,7 +12,6 @@ import poses
 import userInterface
 import angles
 import colors
-# from data_monitor import DataMonitor # https://github.com/bhartl/data-monitor
 from RealTimeDataMonitor import DataMonitor
 
 #-------------------------------------------------------------------------------------

@@ -4,7 +4,6 @@
 
 # General imports
 import sys
-from turtle import color
 import cv2
 import mediapipe as mp
 import numpy as np
@@ -49,10 +48,6 @@ def predictionToVideo(video_name, video_path, video_out_path, file_out_path,  pr
     video_capture = cv2.VideoCapture(video_path)
     if(not fileManagement.videoCheck(video_capture)):
         return
-
-    # Angles plotting Configuration
-    frame_iterator = 0
-    angle_data = [(0, 0, 0)]
 
     # define info for DataMonitor plotting
     channels = [
