@@ -50,19 +50,12 @@ def predictionToVideo(interpreter, video_name, video_path, video_out_path, file_
     frame_iterator = 0
     angle_data = [(0, 0)]
 
-    # define meta-info for DataMonitor plotting (label of data-rows and coloring)
+    # define info for DataMonitor plotting 
     channels = [
-        {'label': 'Knee Angle', 'color': 'tab:pink'}
+        {'title': "Knee Angle", 'color': 'pink', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2}
     ]
-    # define plot format (dict of matplotlib.pyplot attributes and related (*args, **kwargs))
-    plt_kwargs = dict(
-        xlim=((0, file_metadata["n_frames"]), {}),
-        ylim=((0, 200), {}),
-        xlabel=(('Frame number', ), {}),
-        ylabel=(('Angles in degrees',), {}),
-    )
 
-    with DataMonitor() as dm:
+    with DataMonitor(channels=channels) as dm:
         while True:
             has_frame, frame = video_capture.read()
             if not has_frame:
@@ -98,15 +91,13 @@ def predictionToVideo(interpreter, video_name, video_path, video_out_path, file_
             drawing.drawKeypoints(frame, selected_keypoints)
 
             # Get angles and draw it in the  screen
-            _angles = angles.getAngles(selected_keypoints, poses.ANGLES_MOVENET, profile, pose_selected)
+            poses_angles = angles.getAngles(selected_keypoints, poses.ANGLES_MOVENET, profile, pose_selected)
 
-            cv2.putText(frame, str(round(_angles[0], 1)), (50,100), cv2.FONT_HERSHEY_PLAIN, 3, (128,0,255), 4)
-            # sample = (frame_iterator, _angles[0])
-            # angle_data.append(sample)
-            # dm.data = np.asarray(angle_data).T
-            # frame_iterator+=1 
-            dm.data = _angles[0]
+            # Draw angle to the screen
+            drawing.writeAnglesLegends(frame, poses_angles, poses.ANGLES_MOVENET[profile])
 
+            # Update real time graphics
+            dm.data = poses_angles   
 
             # Write video to file
             output_video.write(frame)

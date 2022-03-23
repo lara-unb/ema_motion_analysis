@@ -18,7 +18,7 @@ import drawing
 import poses
 import userInterface
 import angles
-from data_monitor import DataMonitor
+from RealTimeDataMonitor import DataMonitor
 
 # Simplify mediapipe variables
 mp_drawing = mp.solutions.drawing_utils
@@ -53,23 +53,18 @@ def predictionToVideo(video_name, video_path, video_out_path, file_out_path,  pr
     # Angles plotting Configuration
     frame_iterator = 0
     angle_data = [(0, 0, 0)]
-    # define meta-info for DataMonitor plotting (label of data-rows and coloring)
+
+    # define info for DataMonitor plotting
     channels = [
-        {'label': 'Knee Angle', 'color': 'tab:pink', 'linewidth': 3},
-        {'label': 'Feet Angle', 'color': 'tab:cyan', 'linewidth': 3}
+        {'title': "Knee Angle", 'color': 'pink', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2},
+        {'title': "Feet Angle", 'color': 'cyan', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2}
     ]
-    # define plot format (dict of matplotlib.pyplot attributes and related (*args, **kwargs))
-    plt_kwargs = dict(
-        xlim=((0, file_metadata["n_frames"]), {}),
-        ylim=((0, 200), {}),
-        xlabel=(('Frame number', ), {}),
-        ylabel=(('Angles in degrees',), {}),
-    )
+
 
     # Apply blazepose network
     with mp_pose.Pose(min_detection_confidence=THRESHOLD, min_tracking_confidence=THRESHOLD) as pose: 
         # Pass by each frame of the video and draw points and connections
-        with DataMonitor(channels=channels, ax_kwargs=plt_kwargs) as data_monitor_object:
+        with DataMonitor(channels=channels) as dm:
             while video_capture.isOpened():
                 has_frame, frame = video_capture.read()
                 if not has_frame:
@@ -98,16 +93,13 @@ def predictionToVideo(video_name, video_path, video_out_path, file_out_path,  pr
                 drawing.drawKeypoints(frame,selected_keypoints)
 
                 # Get angles and draw it in the  screen
-                _angles = angles.getAngles(selected_keypoints, poses.ANGLES_BLAZEPOSE, profile, pose_selected)
+                poses_angles = angles.getAngles(selected_keypoints, poses.ANGLES_BLAZEPOSE, profile, pose_selected)
 
                 # Write angles data in the screen
-                drawing.writeAnglesLegends(frame, _angles, poses.ANGLES_BLAZEPOSE[profile])
+                drawing.writeAnglesLegends(frame, poses_angles, poses.ANGLES_BLAZEPOSE[profile])
 
                 # Update realtime angle graphics
-                sample = (frame_iterator, _angles[0], _angles[1])
-                angle_data.append(sample)
-                data_monitor_object.data = np.asarray(angle_data).T
-                frame_iterator+=1 
+                dm.data = poses_angles
 
                 # Write video to file
                 output_video.write(frame)

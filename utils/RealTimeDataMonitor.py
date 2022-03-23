@@ -2,12 +2,16 @@ from multiprocessing import Process, Queue, TimeoutError
 from multiprocessing.connection import Connection
 from queue import Empty
 import time
+from turtle import width
+
+from click import style
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtGui, QtCore
 import numpy as np
+
 class DataMonitor(object):
     """ Data Monitoring of externally manipulated data
-        The data-monitor runs matplotlib in an extra multiprocessing.Process.
+        The data-monitor runs QtCore.QTimer() in an extra multiprocessing.Process.
         For a clean subprocess handling it is recommended to use DataMonitor in the with environment:
         > with DataMonitor(channels=..., ...) as dm:
         >     while True:
@@ -15,7 +19,7 @@ class DataMonitor(object):
         >         <do something else>
     """
 
-    def __init__(self, data = None):
+    def __init__(self, data = None, channels = [{}], size_of_graph=1000):
         """ Constructs a DataMonitor instance
         """
         # data handling
@@ -23,17 +27,23 @@ class DataMonitor(object):
         self.data_vector = []
 
         # Initialize graph vectors
-        size_of_graph = 1000
-        self.curve1_plot = [0]*size_of_graph
-        self.curve2_plot = [0]*size_of_graph
+        self.channels = []
+        index = 0
+        for channel in channels:
+            aux_channel = {
+                **channel, 
+                'data': [0]*size_of_graph,
+                'index':index
+            }
+            self.channels.append(aux_channel)
+            index+=1
         self.t = [0]*size_of_graph
+
 
         # Initialize timer
         self.start_time = time.time()
 
-
         # animation handling
-        self._func_animation = None
         self.update_rate = 0.1
 
         # multiprocess handling
@@ -67,18 +77,18 @@ class DataMonitor(object):
             self._data_queue = None
 
     def start(self):
-        """ Starts the matplotlib FuncAnimation as subprocess (non-blocking, queue communication) """
+        """ Starts the QtCore.QTimer() as subprocess (non-blocking, queue communication) """
         self._data_queue = Queue()
         self._show_process = Process(name='animate', target=self.show, args=(self._data_queue, ))
         self._show_process.start()
 
     def stop(self):
-        """ Stop a potentially running matplotlib FuncAnimation as subprocess """
+        """ Stop a potentially running QtCore.QTimer() as subprocess """
         if self._show_process is not None:
             self.__exit__(None, None, None)
 
     def show(self, data_queue: Connection):
-        """ Creates the matplotlib FuncAnimation and creates the plot (blocking) """
+        """ Creates the QtCore.QTimer() and creates the plot (blocking) """
         # 
         self._data_queue = data_queue
         self.app = QtGui.QApplication([])
@@ -88,28 +98,19 @@ class DataMonitor(object):
         pg.setConfigOption('foreground', 'k')
         self.win = pg.GraphicsWindow()
 
-        self.p1 = self.win.addPlot(colspan=2)
-        self.win.nextRow()
-        self.p2 = self.win.addPlot(colspan=2)
-        self.win.nextRow()
+        
+        # Create plots automatically
+        for channel in self.channels:
+            channel['plot'] = self.win.addPlot(colspan=2)
+            self.win.nextRow()
 
-        # https://pyqtgraph.readthedocs.io/en/latest/introduction.html
-        # https://linuxhint.com/use-pyqtgraph/
-        # Add title or labels
-        self.p1.setTitle("Angle 1")
-        self.p2.setTitle("Angle 2")
-        self.p1.setLabel('left', "Angles(deg)")
-        self.p2.setLabel('left', "Angles(deg)")
-        self.p1.setLabel('bottom', "Time(s)")
-        self.p2.setLabel('bottom', "Time(s)")
-        self.p1.setYRange(0, 360)
-        self.p2.setYRange(0, -360)
-              
-        # Define ploting line styles
-        pen1 =pg.mkPen('cyan', width=2, style=QtCore.Qt.DashLine, label="angle 1")
-        pen2 =pg.mkPen('pink', width=2, style=QtCore.Qt.DashLine)
-        self.curve1 = self.p1.plot(pen=pen1, labels='Angle 1' )
-        self.curve2 = self.p2.plot(pen=pen2, title='Angle 2')
+        # Add title or labels color and width - https://linuxhint.com/use-pyqtgraph/
+        for channel in self.channels:
+            channel['plot'].setTitle(channel['title'])
+            channel['plot'].setLabel('left', channel['y_label'])
+            channel['plot'].setLabel('bottom', channel['x_label'])
+            pen = pg.mkPen(channel['color'], width=channel['width'], style=QtCore.Qt.SolidLine)
+            channel['curve'] = channel['plot'].plot(pen = pen)
 
         graphUpdateSpeedMs = 1
         timer = QtCore.QTimer()#to create a thread that calls a function at intervals
@@ -153,23 +154,34 @@ class DataMonitor(object):
         if data is None:
             return
 
-        self.curve1_plot[0:-1] = self.curve1_plot[1:]
-        self.curve1_plot[-1] = data
-        self.curve2_plot[0:-1] = self.curve2_plot[1:]
-        self.curve2_plot[-1] = -data
+        # Set data for each plot
+        for channel in self.channels:
+            channel['data'][0:-1] = channel['data'][1:]
+            channel['data'][-1] = data[channel['index']]
 
         self.t[0:-1] = self.t[1:]
         self.t[-1] = time.time() - self.start_time
 
-        self.curve1.setData(self.t, self.curve1_plot)
-        self.curve2.setData(self.t, self.curve2_plot)
+
+        for channel in self.channels:
+            channel['curve'].setData(self.t, channel['data'])
+
         self.app.processEvents()  
 
 
+# Run this function to understand this module usage
 if __name__ == '__main__':
-    with DataMonitor() as dm:
+
+    # Define amount of channels and it's caracteristics
+    channels = [
+        {'title': "Angle 1", 'color': 'cyan', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2}, 
+        {'title': 'Angle2', 'color': 'pink','y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2},
+        {'title': 'Angle3', 'color': 'blue','y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 4}
+    ]
+    with DataMonitor(channels=channels) as dm:
         for i in range(20):
-            dm.data = np.random.rand()
-            time.sleep(0.5);
+            # update data monitored
+            dm.data = (2*np.random.rand(), np.random.rand(), np.random.rand())
+            time.sleep(1);
 
         
