@@ -1,5 +1,4 @@
 
-import platform, multiprocessing
 
 from multiprocessing import Process, Queue, TimeoutError
 from multiprocessing.connection import Connection
@@ -178,10 +177,6 @@ class DataMonitor(object):
 # Run this function to understand this module usage
 if __name__ == '__main__':
 
-    # ISSO AQUI FAZ FUNCIONAR NO MEU PC - SE EU CONSEGUIR ATUALIZAR 
-    # O PYTHON ACHO QUE NÃO VAI PRECISAR DISSO
-    if platform.system() == "Darwin":
-            multiprocessing.set_start_method('spawn')
 
     # Define amount of channels and it's caracteristics
     channels = [
