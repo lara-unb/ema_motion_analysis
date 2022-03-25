@@ -1,3 +1,6 @@
+
+import platform, multiprocessing
+
 from multiprocessing import Process, Queue, TimeoutError
 from multiprocessing.connection import Connection
 from queue import Empty
@@ -31,10 +34,12 @@ class DataMonitor(object):
         index = 0
         for channel in channels:
             aux_channel = {
-                **channel, 
+                # **channel, 
                 'data': [0]*size_of_graph,
                 'index':index
             }
+            for key in channel.keys():
+                aux_channel[key] = channel[key]
             self.channels.append(aux_channel)
             index+=1
         self.t = [0]*size_of_graph
@@ -172,6 +177,11 @@ class DataMonitor(object):
 
 # Run this function to understand this module usage
 if __name__ == '__main__':
+
+    # ISSO AQUI FAZ FUNCIONAR NO MEU PC - SE EU CONSEGUIR ATUALIZAR 
+    # O PYTHON ACHO QUE NÃO VAI PRECISAR DISSO
+    if platform.system() == "Darwin":
+            multiprocessing.set_start_method('spawn')
 
     # Define amount of channels and it's caracteristics
     channels = [
