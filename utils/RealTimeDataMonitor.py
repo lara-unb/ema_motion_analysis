@@ -154,6 +154,7 @@ class DataMonitor(object):
         if data is None:
             return
 
+        print("Data update", data)
         # Set data for each plot
         for channel in self.channels:
             channel['data'][0:-1] = channel['data'][1:]
@@ -182,6 +183,6 @@ if __name__ == '__main__':
         for i in range(20):
             # update data monitored
             dm.data = (2*np.random.rand(), np.random.rand(), np.random.rand())
-            time.sleep(1);
+            time.sleep(1)
 
         
