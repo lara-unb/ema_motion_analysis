@@ -119,68 +119,69 @@ for i in range(len(addresses)):
         out = '>> ' + serial_port.read(serial_port.inWaiting()).decode()
     # print(out)
 
-channels = [
-        {'title': "X Angle", 'color': 'pink', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2},
-        {'title': "Y Angle", 'color': 'cyan', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2},
-        {'title': "Z Angle", 'color': 'cyan', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2}
-    ]
 
-with DataMonitor(channels=channels) as dm:
-    i = 30
-    while(i > 0):
-        dm.data = (i, -i, 2)
-        i-=1
-        time.sleep(1)
-        # try:
-        #     id = 0
-        #     bytes_to_read = serial_port.inWaiting()
-        #     if bytes_to_read > 0:
-        #         data = serial_port.read(bytes_to_read)
-        #         if len(data) <= 3 or data[0] != 0:
-        #             break
-        #         data2 = data.decode().replace('\r\n',' ')
-        #         data3 = data2.split(' ')
-        #         data3 = list(filter(None, data3))
+if __name__ == '__main__':
 
-        #         info = data3[0][0:3]
 
-        #         id = int.from_bytes(info[1].encode(), sys.byteorder)
+    channels = [
+            {'title': "X Angle", 'color': 'pink', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2},
+            {'title': "Y Angle", 'color': 'cyan', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2},
+            {'title': "Z Angle", 'color': 'cyan', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2}
+        ]
 
-        #         quaternion = data3[0][3:]
-        #         accel = data3[1]
+    with DataMonitor(channels=channels) as dm:
+        while(True):
+            try:
+                id = 0
+                bytes_to_read = serial_port.inWaiting()
+                if bytes_to_read > 0:
+                    data = serial_port.read(bytes_to_read)
+                    if len(data) <= 3 or data[0] != 0:
+                        break
+                    data2 = data.decode().replace('\r\n',' ')
+                    data3 = data2.split(' ')
+                    data3 = list(filter(None, data3))
 
-        #         quaternion = quaternion.split(',')
-        #         quaternion = np.array(quaternion).astype(np.float)
+                    info = data3[0][0:3]
 
-        #         accel = accel.split(',')
-        #         accel = np.array(accel).astype(np.float)
+                    id = int.from_bytes(info[1].encode(), sys.byteorder)
 
-        #         x = quaternion[0]
-        #         y = quaternion[1]
-        #         z = quaternion[2]
-        #         w = quaternion[3]
-        #         acc_x = accel[0]
-        #         acc_y = accel[1]
-        #         acc_z = accel[2]
+                    quaternion = data3[0][3:]
+                    accel = data3[1]
 
-        #         out = [time.time(), id, w, x, y, z, acc_x, acc_y, acc_z]
-        #         print(out)
+                    quaternion = quaternion.split(',')
+                    quaternion = np.array(quaternion).astype(np.float)
 
-        #         euler = euler_from_quaternion(w, x, y, z)
+                    accel = accel.split(',')
+                    accel = np.array(accel).astype(np.float)
 
-        #         dm.data = (math.degrees(euler[0]), math.degrees(euler[1]), math.degrees(euler[2]))
+                    x = quaternion[0]
+                    y = quaternion[1]
+                    z = quaternion[2]
+                    w = quaternion[3]
+                    acc_x = accel[0]
+                    acc_y = accel[1]
+                    acc_z = accel[2]
 
-        #     else:
-        #         pass
+                    out = [time.time(), id, w, x, y, z, acc_x, acc_y, acc_z]
+                    print(out)
 
-        # except Exception as e:
+                    euler = euler_from_quaternion(w, x, y, z)
+                    print(euler)
 
-        #     print('Exception raised: ', str(e), ', on line ', str(sys.exc_info()[2].tb_lineno))
-        #     # Stop streaming
-        #     for i in range(len(addresses)):
-        #         serial_port.write(('>' + str(addresses[i]) + ',86\n').encode())
-        #         time.sleep(0.1)
-        #         while serial_port.inWaiting():
-        #             out = '>> ' + serial_port.read(serial_port.inWaiting()).decode()
-        #         # print(out)
-        #     serial_port.close()
+                    dm.data = (math.degrees(euler[0]), math.degrees(euler[1]), math.degrees(euler[2]))
+
+                else:
+                    pass
+
+            except Exception as e:
+
+                print('Exception raised: ', str(e), ', on line ', str(sys.exc_info()[2].tb_lineno))
+                # Stop streaming
+                for i in range(len(addresses)):
+                    serial_port.write(('>' + str(addresses[i]) + ',86\n').encode())
+                    time.sleep(0.1)
+                    while serial_port.inWaiting():
+                        out = '>> ' + serial_port.read(serial_port.inWaiting()).decode()
+                    # print(out)
+                serial_port.close()
