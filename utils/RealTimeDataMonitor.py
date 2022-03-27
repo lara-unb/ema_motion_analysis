@@ -113,6 +113,9 @@ class DataMonitor(object):
             channel['plot'].setTitle(channel['title'])
             channel['plot'].setLabel('left', channel['y_label'])
             channel['plot'].setLabel('bottom', channel['x_label'])
+            channel['plot'].setYRange(-200, 200, padding=0)
+
+
             pen = pg.mkPen(channel['color'], width=channel['width'], style=QtCore.Qt.SolidLine)
             channel['curve'] = channel['plot'].plot(pen = pen)
 

@@ -1,4 +1,6 @@
 import math
+import spatialmath
+from spatialmath import UnitQuaternion as UQ
 
 import time
 import sys
@@ -35,7 +37,7 @@ channels = [
 
 if __name__ == '__main__':
     with DataMonitor(channels=channels) as dm:
-        calibGyro = False
+        calibGyro = True
         addresses = [1,2,3,4,5,6,7,8]
 
         # Find and open serial port for the IMU dongle
@@ -46,7 +48,7 @@ if __name__ == '__main__':
         serial_port = serialOperations.stopStreaming(serial_port, addresses)
         # Manual flush. Might not be necessary
         serial_port = serialOperations.manualFlush(serial_port)
-
+ 
         print('Starting configuration')
 
         # Setting streaming slots, this means that while streaming sensors will send
@@ -63,7 +65,7 @@ if __name__ == '__main__':
         try:
             while True:
                 print("running...")
-                time.sleep(.1)
+                # time.sleep(.1)
                 bytes_to_read = serial_port.inWaiting()
                 if bytes_to_read > 0:
 
@@ -78,6 +80,16 @@ if __name__ == '__main__':
                         extracted_data['x'], extracted_data['y'],extracted_data['z'], extracted_data['w']
                     )
                     euler_angles_degree = list(map(lambda ang: math.degrees(ang), euler_angles_rad))
+                    
+                    # Convert quaternions to visual euler angles - using spatialmath library
+                    quaternion_SM = UQ([extracted_data['x'], extracted_data['y'],extracted_data['z'], extracted_data['w']])
+                    euler_angles_degree_SM = quaternion_SM.eul(unit='deg')
+
+                    # TA DIFERENTE N SEI PQ :(
+                    print('EULER VICTOR: ', euler_angles_degree)
+                    print('EULER SM: ', euler_angles_degree_SM)
+
+                    time.sleep(.5)
 
                     # Update data monitor
                     dm.data = euler_angles_degree
