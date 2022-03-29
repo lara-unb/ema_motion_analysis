@@ -1,6 +1,7 @@
 import math
 import spatialmath
 from spatialmath import UnitQuaternion as UQ
+from scipy.spatial.transform import Rotation as R
 
 import time
 import sys
@@ -30,9 +31,13 @@ def euler_from_quaternion(x, y, z, w):
 
 
 channels = [
-        {'title': "Y Angle", 'color': 'pink', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2},
-        {'title': "X Angle", 'color': 'cyan', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2},
+        {'title': "X Angle", 'color': 'pink', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2},
+        {'title': "Y Angle", 'color': 'cyan', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2},
         {'title': "Z Angle", 'color': 'red', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2}
+        # {'title': "X Angle Corke", 'color': 'pink', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2},
+        # {'title': "Y Angle Corke", 'color': 'cyan', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2},
+        # {'title': "Z Angle Corke", 'color': 'red', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2},
+        
     ]
 
 if __name__ == '__main__':
@@ -53,7 +58,7 @@ if __name__ == '__main__':
 
         # Setting streaming slots, this means that while streaming sensors will send
         # this data to the dongle: 0 - Quaternions; 41 - Raw accelerations; 255 - No data
-        commands = [0, 41, 255, 255, 255, 255, 255, 255]
+        commands = [0, 1, 255, 255, 255, 255, 255, 255]
         serial_port = serialOperations.setStreamingSlots(serial_port, addresses, commands)
 
         # Set magnetometer(explain it better), calibGyro if calibGyro=True and Tare sensor
@@ -82,17 +87,29 @@ if __name__ == '__main__':
                     euler_angles_degree = list(map(lambda ang: math.degrees(ang), euler_angles_rad))
                     
                     # Convert quaternions to visual euler angles - using spatialmath library
-                    quaternion_SM = UQ([extracted_data['x'], extracted_data['y'],extracted_data['z'], extracted_data['w']])
-                    euler_angles_degree_SM = quaternion_SM.eul(unit='deg')
+                    # quaternion_SM = UQ([extracted_data['x'], extracted_data['y'],extracted_data['z'], extracted_data['w']])
+                    # euler_angles_degree_SM = quaternion_SM.eul(unit='deg')
 
+                    rot = R.from_quat([extracted_data['x'], extracted_data['y'],extracted_data['z'], extracted_data['w']])
+                    euler_angles_scipy = rot.as_euler('xyz', degrees=True)
+
+                    print("ENTRADA: ",[extracted_data['x'], extracted_data['y'],extracted_data['z'], extracted_data['w']])
                     # TA DIFERENTE N SEI PQ :(
                     print('EULER VICTOR: ', euler_angles_degree)
-                    print('EULER SM: ', euler_angles_degree_SM)
+                    # print('EULER SM: ', euler_angles_degree_SM)
+                    print('EULER Scipy: ', euler_angles_scipy)
 
-                    time.sleep(.5)
+                    # input()
+                    # time.sleep(.5)
 
                     # Update data monitor
-                    dm.data = euler_angles_degree
+                    # dm.data = (euler_angles_scipy[0], euler_angles_scipy[1], euler_angles_scipy[2])
+                    dm.data = (
+                        math.degrees(extracted_data['acc_x']), 
+                        math.degrees(extracted_data['acc_y']), 
+                        math.degrees(extracted_data['acc_z'])
+                    )
+
 
                 else:
                     # Did not receive data, wait 0.1 sec and continue
