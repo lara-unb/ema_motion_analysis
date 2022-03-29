@@ -10,6 +10,7 @@ sys.path.append("../utils/")
 from colors import *
 from RealTimeDataMonitor import DataMonitor
 import serialOperations
+import math
 
 # Transform quaternions to euler angles
 def euler_from_quaternion(x, y, z, w):
@@ -41,8 +42,7 @@ channels = [
 
 if __name__ == '__main__':
     with DataMonitor(channels=channels) as dm:
-        calibGyro = True
-        addresses = [0,1,2,3,4,5,6,7,8]
+        addresses = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
 
         # Find and open serial port for the IMU dongle
         serial_port = serialOperations.getDongleObject()
@@ -61,11 +61,15 @@ if __name__ == '__main__':
         # 0 - Quaternions; 
         # 41 - Raw accelerations; 
         # 255 - No data
-        commands = [0, 41, 255, 255, 255, 255, 255, 255]
+        commands = [0, 1, 255, 255, 255, 255, 255, 255]
         serial_port = serialOperations.setStreamingSlots(serial_port, addresses, commands)
 
         # Set magnetometer(explain it better), calibGyro if calibGyro=True and Tare sensor
-        serial_port = serialOperations.calibrateSensor(serial_port, addresses, calibGyro)
+        calibGyro = False
+        serial_port = serialOperations.configureSensor(serial_port, addresses, calibGyro)
+        
+        # Show some sensor configuration
+        serialOperations.getSensorInformation(serial_port, addresses)
 
         # Start streaming
         serial_port = serialOperations.startStreaming(serial_port, addresses)
@@ -101,12 +105,13 @@ if __name__ == '__main__':
 
                     # Update data monitor
                     dm.data = (euler_angles_degree[0], euler_angles_degree[1], euler_angles_degree[2],
-                                euler_angles_degree_SM[0], euler_angles_degree_SM[1], euler_angles_degree_SM[2] )
+                                math.degrees(extracted_data['acc_x']), math.degrees(extracted_data['acc_y']), math.degrees(extracted_data['acc_z']) )
 
 
                 else:
                     # Did not receive data, wait 0.1 sec and continue
                     time.sleep(0.1)
+                    print("No data")
                     pass
         except Exception as e:
             print(RED, "Unexpected exception ocurred: ", RESET)

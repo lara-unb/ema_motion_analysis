@@ -4,6 +4,8 @@ import sys
 import numpy as np
 
 
+# If permission denied error occurs in Linux try:
+# sudo chmod 666 /dev/ttyACM0 -> with the correspondent COM port
 def getDongleObject():
     ports_list = serial.tools.list_ports.comports()
     for wire in ports_list:
@@ -52,7 +54,6 @@ def setStreamingSlots(serial_port, addresses, commands):
                                                 str(commands[5]) + ',' + \
                                                 str(commands[6]) + ',' + \
                                                 str(commands[7]) + '\n'
-        print(msg)
         serial_port.write(msg.encode())
         time.sleep(0.1)
         out = ''
@@ -60,10 +61,31 @@ def setStreamingSlots(serial_port, addresses, commands):
             out += '>> ' + serial_port.read(serial_port.inWaiting()).decode()
     return serial_port
 
-def calibrateSensor(serial_port, addresses, calibGyro):
-    # Set mag on(1)/off(0)
+def configureSensor(serial_port, addresses, calibGyro):
+    # Enable gyroscope
     for i in range(len(addresses)):
-        serial_port.write(('>'+str(addresses[i])+',109, 0\n').encode())
+        serial_port.write(('>'+str(addresses[i])+',107,1\n').encode())
+        time.sleep(0.1)
+        while serial_port.inWaiting():
+            out = '>> ' + serial_port.read(serial_port.inWaiting()).decode()
+    
+    # Enable accelerometer
+    for i in range(len(addresses)):
+        serial_port.write(('>'+str(addresses[i])+',108,1\n').encode())
+        time.sleep(0.1)
+        while serial_port.inWaiting():
+            out = '>> ' + serial_port.read(serial_port.inWaiting()).decode()
+
+    # Unable compass
+    for i in range(len(addresses)):
+        serial_port.write(('>'+str(addresses[i])+',109,0\n').encode())
+        time.sleep(0.1)
+        while serial_port.inWaiting():
+            out = '>> ' + serial_port.read(serial_port.inWaiting()).decode()
+    
+    # Set filter mode to Kalman
+    for i in range(len(addresses)):
+        serial_port.write(('>'+str(addresses[i])+',123,1\n').encode())
         time.sleep(0.1)
         while serial_port.inWaiting():
             out = '>> ' + serial_port.read(serial_port.inWaiting()).decode()
@@ -84,6 +106,24 @@ def calibrateSensor(serial_port, addresses, calibGyro):
             out = '>> ' + serial_port.read(serial_port.inWaiting()).decode()
     
     return serial_port
+
+def getSensorInformation(serial_port, addresses):
+    # Current Filter Mode 
+    for i in range(len(addresses)):
+        serial_port.write(('>'+str(addresses[i])+',152\n').encode())
+        time.sleep(0.1)
+        while serial_port.inWaiting():
+            out = serial_port.read(serial_port.inWaiting()).decode()
+            if(out[0] == "0"):
+                print("Current Filter Mode: >> ", out)
+    # Current accelerometer trust values
+    for i in range(len(addresses)):
+        serial_port.write(('>'+str(addresses[i])+',130\n').encode())
+        time.sleep(0.1)
+        while serial_port.inWaiting():
+            out = serial_port.read(serial_port.inWaiting()).decode()
+            if(out[0] == "0"):
+                print("Current Accelerometer Trust Values: >> ", out)
 
 # Get the expected output/this works for the corresponding 
 # streaming slots setted previously
@@ -113,3 +153,5 @@ def extractResponse(data):
     extracted_data['acc_z'] = accel[2]
     
     return extracted_data
+
+
