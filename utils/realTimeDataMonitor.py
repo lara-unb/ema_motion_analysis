@@ -113,7 +113,9 @@ class DataMonitor(object):
             channel['plot'].setTitle(channel['title'])
             channel['plot'].setLabel('left', channel['y_label'])
             channel['plot'].setLabel('bottom', channel['x_label'])
-            channel['plot'].setYRange(-200, 200, padding=0)
+            if('y_limit' in channel):
+                channel['plot'].setYRange(channel['y_limit'][0], channel['y_limit'][1], padding=0)
+            
 
 
             pen = pg.mkPen(channel['color'], width=channel['width'], style=QtCore.Qt.SolidLine)
@@ -165,10 +167,10 @@ class DataMonitor(object):
         # Set data for each plot
         for channel in self.channels:
             channel['data'][0:-1] = channel['data'][1:]
-            channel['data'][-1] = data[channel['index']]
+            channel['data'][-1] = data['data'][channel['index']]
 
         self.t[0:-1] = self.t[1:]
-        self.t[-1] = time.time() - self.start_time
+        self.t[-1] = data['time']
 
 
         for channel in self.channels:
@@ -188,9 +190,14 @@ if __name__ == '__main__':
         {'title': 'Angle3', 'color': 'blue','y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 4}
     ]
     with DataMonitor(channels=channels) as dm:
+        time.sleep(3)
+        startTime = time.time()
         for i in range(20):
             # update data monitored
-            dm.data = (2*np.random.rand(), np.random.rand(), np.random.rand())
+            dm.data = {
+                "data": (2*np.random.rand(), np.random.rand(), np.random.rand()),
+                "time": time.time() - startTime
+            }
             time.sleep(1)
 
         

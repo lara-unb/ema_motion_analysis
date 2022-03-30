@@ -9,7 +9,7 @@ import traceback
 import numpy as np
 sys.path.append("../utils/")
 from colors import *
-from RealTimeDataMonitor import DataMonitor
+from realTimeDataMonitor import DataMonitor
 import serialOperations
 
 # Transform quaternions to euler angles

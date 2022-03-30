@@ -8,7 +8,7 @@ import traceback
 import numpy as np
 sys.path.append("../utils/")
 from colors import *
-from RealTimeDataMonitor import DataMonitor
+from realTimeDataMonitor import DataMonitor
 import serialOperations
 import math
 
@@ -31,7 +31,14 @@ def euler_from_quaternion(x, y, z, w):
 
 
 channels = [
-        {'title': "X Angle", 'color': 'pink', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2},
+        {
+            'title': "X Angle", 
+            'color': 'pink', 
+            'y_label': 'Angle(deg)', 
+            'x_label': "Time(s)", 
+            "width": 2,
+            "y_limit" : (-200, 200)
+        },
         {'title': "Y Angle", 'color': 'cyan', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2},
         {'title': "Z Angle", 'color': 'red', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2},
         {'title': "X Angle Corke", 'color': 'pink', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2},
@@ -75,6 +82,7 @@ if __name__ == '__main__':
         serial_port = serialOperations.startStreaming(serial_port, addresses)
         
         try:
+            startTime = time.time()
             while True:
                 print("running...")
                 # time.sleep(.1)
@@ -104,8 +112,17 @@ if __name__ == '__main__':
                     # time.sleep(.5)
 
                     # Update data monitor
-                    dm.data = (euler_angles_degree[0], euler_angles_degree[1], euler_angles_degree[2],
-                                math.degrees(extracted_data['acc_x']), math.degrees(extracted_data['acc_y']), math.degrees(extracted_data['acc_z']) )
+                    dm.data = {
+                        "data": (
+                            euler_angles_degree[0], 
+                            euler_angles_degree[1], 
+                            euler_angles_degree[2],
+                            math.degrees(extracted_data['roll']), 
+                            math.degrees(extracted_data['pitch']), 
+                            math.degrees(extracted_data['yaw'])
+                        ),
+                        "time": time.time() - startTime
+                    }
 
 
                 else:

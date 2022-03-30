@@ -8,6 +8,7 @@ import cv2
 import mediapipe as mp
 import numpy as np
 import matplotlib.pyplot as plt
+import time
 
 # Ema motion analysis imports
 sys.path.append("../utils/")
@@ -17,7 +18,7 @@ import drawing
 import poses
 import userInterface
 import angles
-from RealTimeDataMonitor import DataMonitor
+from realTimeDataMonitor import DataMonitor
 
 # Simplify mediapipe variables
 mp_drawing = mp.solutions.drawing_utils
@@ -60,6 +61,7 @@ def predictionToVideo(video_name, video_path, video_out_path, file_out_path,  pr
     with mp_pose.Pose(min_detection_confidence=THRESHOLD, min_tracking_confidence=THRESHOLD) as pose: 
         # Pass by each frame of the video and draw points and connections
         with DataMonitor(channels=channels) as dm:
+            startTime = time.time()
             while video_capture.isOpened():
                 has_frame, frame = video_capture.read()
                 if not has_frame:
@@ -94,7 +96,10 @@ def predictionToVideo(video_name, video_path, video_out_path, file_out_path,  pr
                 drawing.writeAnglesLegends(frame, poses_angles, poses.ANGLES_BLAZEPOSE[profile])
 
                 # Update realtime angle graphics
-                dm.data = poses_angles
+                dm.data = {
+                    "data": poses_angles,
+                    "time": time.time() - startTime
+                }
 
                 # Write video to file
                 output_video.write(frame)

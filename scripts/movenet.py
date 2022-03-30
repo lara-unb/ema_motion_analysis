@@ -12,7 +12,8 @@ import poses
 import userInterface
 import angles
 import colors
-from RealTimeDataMonitor import DataMonitor
+from realTimeDataMonitor import DataMonitor
+import time
 
 #-------------------------------------------------------------------------------------
 
@@ -52,6 +53,7 @@ def predictionToVideo(interpreter, video_name, video_path, video_out_path, file_
     ]
 
     with DataMonitor(channels=channels) as dm:
+        startTime = time.time()
         while True:
             has_frame, frame = video_capture.read()
             if not has_frame:
@@ -93,7 +95,10 @@ def predictionToVideo(interpreter, video_name, video_path, video_out_path, file_
             drawing.writeAnglesLegends(frame, poses_angles, poses.ANGLES_MOVENET[profile])
 
             # Update real time graphics
-            dm.data = poses_angles   
+            dm.data = {
+                "data": poses_angles,
+                "time": time.time() - startTime
+            }
 
             # Write video to file
             output_video.write(frame)
