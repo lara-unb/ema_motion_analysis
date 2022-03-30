@@ -139,18 +139,18 @@ def extractResponse(data):
 
     # Extracting quaternions and aceleration
     quaternion = data3[0][3:]
-    accel = data3[1]
+    euler = data3[1]
     quaternion = quaternion.split(',')
     quaternion = np.array(quaternion, dtype=np.float64)
-    accel = accel.split(',')
-    accel = np.array(accel).astype(np.float)
+    euler = euler.split(',')
+    euler = np.array(euler).astype(np.float)
     extracted_data['x'] = quaternion[0]
     extracted_data['y'] = quaternion[1]
     extracted_data['z'] = quaternion[2]
     extracted_data['w'] = quaternion[3]
-    extracted_data['acc_x'] = accel[0]
-    extracted_data['acc_y'] = accel[1]
-    extracted_data['acc_z'] = accel[2]
+    extracted_data['roll'] = euler[0]
+    extracted_data['pitch'] = euler[1]
+    extracted_data['yaw'] = euler[2]
     
     return extracted_data
 
