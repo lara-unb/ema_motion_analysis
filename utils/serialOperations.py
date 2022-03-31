@@ -120,27 +120,25 @@ def getSensorInformation(serial_port, addresses):
 # Get the expected output/this works for the corresponding 
 # streaming slots setted previously
 def extractResponse(data):
-    extracted_data = {}
-
     # Clean data
     list_data = data.decode().replace('\r\n',' ').split(' ')
     cleaned_list_data = list(filter(None, list_data))
 
     # Extracting quaternions and aceleration
-    quaternion = cleaned_list_data[0][3:]
-    euler = cleaned_list_data[1]
-    quaternion = quaternion.split(',')
+    quaternion = cleaned_list_data[0][3:].split(',')
+    euler = cleaned_list_data[1].split(",")
     quaternion = np.array(quaternion, dtype=np.float64)
-    euler = euler.split(',')
-    euler = np.array(euler).astype(np.float)
-    extracted_data['x'] = quaternion[0]
-    extracted_data['y'] = quaternion[1]
-    extracted_data['z'] = quaternion[2]
-    extracted_data['w'] = quaternion[3]
-    extracted_data['roll'] = euler[0]
-    extracted_data['pitch'] = euler[1]
-    extracted_data['yaw'] = euler[2]
-    
+    euler = np.array(euler, dtype=np.float64)
+
+    extracted_data = {
+        'x': quaternion[0],
+        'y': quaternion[1],
+        'z': quaternion[2],
+        'w': quaternion[3],
+        'roll': euler[0],
+        'pitch': euler[1],
+        'yaw': euler[2]
+    }   
     return extracted_data
 
 
