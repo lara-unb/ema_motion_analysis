@@ -43,6 +43,7 @@ def createIMUCommandString(logical_id, command_number, arguments = []):
 
 def applyCommand(serial_port, commandString, showResponse=False):
     serial_port.write(commandString)
+    time.sleep(0.1)
     if(showResponse):
         time.sleep(0.1)
         while serial_port.inWaiting():

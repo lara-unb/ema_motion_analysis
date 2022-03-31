@@ -30,7 +30,20 @@ cube_points[5] = [[SIZE_X],[-SIZE_Y],[-SIZE_Z]]
 cube_points[6] = [[SIZE_X],[SIZE_Y],[-SIZE_Z]]
 cube_points[7] = [[-SIZE_X],[SIZE_Y],[-SIZE_Z]]
 
-def connect_points(i, j, points):
+def connect_points(points, pygame):
+        connect_point(0, 1, points, pygame)
+        connect_point(0, 3, points, pygame)
+        connect_point(0, 4, points, pygame)
+        connect_point(1, 2, points, pygame)
+        connect_point(1, 5, points, pygame)
+        connect_point(2, 6, points, pygame)
+        connect_point(2, 3, points, pygame)
+        connect_point(3, 7, points, pygame)
+        connect_point(4, 5, points, pygame)
+        connect_point(4, 7, points, pygame)
+        connect_point(6, 5, points, pygame)
+        connect_point(6, 7, points, pygame)
+def connect_point(i, j, points, pygame):
     pygame.draw.line(window, (255, 255, 255), (points[i][0], points[i][1]) , (points[j][0], points[j][1]))
 
 def get_rotation_matrices(angle_x, angle_y, angle_z):
@@ -56,17 +69,17 @@ def get_rotation_matrices(angle_x, angle_y, angle_z):
 # End - Set visual configurations ---------------------------------------------------------------------------
 
 
-addresses = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
+logical_ids = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
 
 # Find and open serial port for the IMU dongle
 serial_port = serialOperations.getDongleObject()
 
 
 # Stop streaming
-serial_port = serialOperations.stopStreaming(serial_port, addresses)
+serial_port = serialOperations.stopStreaming(serial_port, logical_ids)
 
 # Manual flush. Might not be necessary
-serial_port = serialOperations.manualFlush(serial_port)
+# serial_port = serialOperations.manualFlush(serial_port)
 
 print('Starting configuration')
 
@@ -76,17 +89,21 @@ print('Starting configuration')
 # 41 - Raw accelerations; 
 # 255 - No data
 commands = [0, 1, 255, 255, 255, 255, 255, 255]
-serial_port = serialOperations.setStreamingSlots(serial_port, addresses, commands)
+serial_port = serialOperations.setStreamingSlots(serial_port, logical_ids, commands)
 
 # Set magnetometer(explain it better), calibGyro if calibGyro=True and Tare sensor
-calibGyro = False
-serial_port = serialOperations.configureSensor(serial_port, addresses, calibGyro)
-
-# Show some sensor configuration
-# serialOperations.getSensorInformation(serial_port, addresses)
+configDict = {
+            "unableCompass": True,
+            "unableGyro": False,
+            "unableAccelerometer": False,
+            "gyroAutoCalib": True,
+            "filterMode": 1,
+            "tareSensor": True
+}
+serial_port = serialOperations.configureSensor(serial_port, logical_ids, configDict)
 
 # Start streaming
-serial_port = serialOperations.startStreaming(serial_port, addresses)
+serial_port = serialOperations.startStreaming(serial_port, logical_ids)
 
 # Main Loop
 scale = 100
@@ -98,24 +115,8 @@ while True:
         clock.tick(60)
         window.fill((0,0,0))
 
-        # rotate_x, rotate_y, rotate_z = get_rotation_matrices(angle_x, angle_y, angle_z)
-        rotation_x = [
-        [1, 0, 0],
-        [0, cos(angle_x), -sin(angle_x)],
-        [0, sin(angle_x), cos(angle_x)]
-        ]
+        rotation_x, rotation_y, rotation_z = get_rotation_matrices(angle_x, angle_y, angle_z)
 
-        rotation_y = [
-            [cos(angle_y), 0, sin(angle_y)],
-            [0, 1, 0],
-            [-sin(angle_y), 0, cos(angle_y)]
-        ]
-
-        rotation_z = [
-            [cos(angle_z), -sin(angle_z), 0],
-            [sin(angle_z), cos(angle_z), 0],
-            [0, 0, 1]
-        ]
         points = [0 for _ in range(len(cube_points))]
         i = 0
 
@@ -133,19 +134,8 @@ while True:
             i += 1
             pygame.draw.circle(window, (255, 0, 0), (x, y), 5)
 
-        connect_points(0, 1, points)
-        connect_points(0, 3, points)
-        connect_points(0, 4, points)
-        connect_points(1, 2, points)
-        connect_points(1, 5, points)
-        connect_points(2, 6, points)
-        connect_points(2, 3, points)
-        connect_points(3, 7, points)
-        connect_points(4, 5, points)
-        connect_points(4, 7, points)
-        connect_points(6, 5, points)
-        connect_points(6, 7, points)
-
+        # Draw lines between points
+        connect_points(points, pygame)
 
         print("running...")
         bytes_to_read = serial_port.inWaiting()
@@ -197,4 +187,4 @@ while True:
     except KeyboardInterrupt:
         print(CYAN, "Keyboard finished execution.", RESET)
         print(RED, "Stop streaming.", RESET)
-        serial_port = serialOperations.stopStreaming(serial_port, addresses)
+        serial_port = serialOperations.stopStreaming(serial_port, logical_ids)

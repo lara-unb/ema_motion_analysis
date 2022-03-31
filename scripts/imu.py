@@ -63,14 +63,14 @@ channels = [
 
 if __name__ == '__main__':
     with DataMonitor(channels=channels) as dm:
-        addresses = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
+        logical_ids = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
 
         # Find and open serial port for the IMU dongle
         serial_port = serialOperations.getDongleObject()
 
 
         # Stop streaming
-        serial_port = serialOperations.stopStreaming(serial_port, addresses)
+        serial_port = serialOperations.stopStreaming(serial_port, logical_ids)
 
         # Manual flush. Might not be necessary
         serial_port = serialOperations.manualFlush(serial_port)
@@ -83,7 +83,7 @@ if __name__ == '__main__':
         # 41 - Raw accelerations; 
         # 255 - No data
         commands = [0, 1, 255, 255, 255, 255, 255, 255]
-        serial_port = serialOperations.setStreamingSlots(serial_port, addresses, commands)
+        serial_port = serialOperations.setStreamingSlots(serial_port, logical_ids, commands)
 
         # Configure dictionary
         configDict = {
@@ -94,13 +94,13 @@ if __name__ == '__main__':
             "filterMode": 1,
             "tareSensor": True
         }
-        serial_port = serialOperations.configureSensor(serial_port, addresses, configDict)
+        serial_port = serialOperations.configureSensor(serial_port, logical_ids, configDict)
         
         # Show some sensor configuration
-        serialOperations.getSensorInformation(serial_port, addresses)
+        serialOperations.getSensorInformation(serial_port, logical_ids)
 
         # Start streaming
-        serial_port = serialOperations.startStreaming(serial_port, addresses)
+        serial_port = serialOperations.startStreaming(serial_port, logical_ids)
         
         try:
             startTime = time.time()
@@ -142,8 +142,8 @@ if __name__ == '__main__':
             print(RED, "Unexpected exception ocurred: ", RESET)
             print(traceback.format_exc())
             print(GREEN, "Stoping streaming.", RESET)
-            serial_port = serialOperations.stopStreaming(serial_port, addresses)
+            serial_port = serialOperations.stopStreaming(serial_port, logical_ids)
         except KeyboardInterrupt:
             print(CYAN, "Keyboard finished execution.", RESET)
             print(RED, "Stop streaming.", RESET)
-            serial_port = serialOperations.stopStreaming(serial_port, addresses)
+            serial_port = serialOperations.stopStreaming(serial_port, logical_ids)

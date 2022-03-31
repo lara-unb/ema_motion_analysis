@@ -181,8 +181,6 @@ class DataMonitor(object):
 
 # Run this function to understand this module usage
 if __name__ == '__main__':
-
-
     # Define amount of channels and it's caracteristics
     channels = [
         {'title': "Angle 1", 'color': 'cyan', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2}, 
@@ -190,7 +188,6 @@ if __name__ == '__main__':
         {'title': 'Angle3', 'color': 'blue','y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 4}
     ]
     with DataMonitor(channels=channels) as dm:
-        time.sleep(3)
         startTime = time.time()
         for i in range(20):
             # update data monitored
