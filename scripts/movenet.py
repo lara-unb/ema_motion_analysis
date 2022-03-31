@@ -43,10 +43,6 @@ def predictionToVideo(interpreter, video_name, video_path, video_out_path, file_
     if(not fileManagement.videoCheck(video_capture)):
         return
 
-    # Angles plotting Configuration
-    frame_iterator = 0
-    angle_data = [(0, 0)]
-
     # define info for DataMonitor plotting 
     channels = [
         {'title': "Knee Angle", 'color': 'pink', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2}
@@ -134,7 +130,6 @@ if __name__ == "__main__":
     # Start tensor flow
     interpreter = tf.lite.Interpreter(model_path='lite-model_movenet_singlepose_lightning_3.tflite')
     interpreter.allocate_tensors()
-
 
     # Select video
     video_name, video_path, video_out_path, file_out_path, profile = userInterface.initialMenu("movenet")

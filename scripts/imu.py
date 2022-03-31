@@ -1,34 +1,14 @@
 import math
-import spatialmath
-from spatialmath import UnitQuaternion as UQ
-
 import time
 import sys
 import traceback
-import numpy as np
+from scipy.spatial.transform import Rotation as R
+
 sys.path.append("../utils/")
 from colors import *
 from realTimeDataMonitor import DataMonitor
 import serialOperations
 import math
-
-# Transform quaternions to euler angles
-def euler_from_quaternion(x, y, z, w):
-    t0 = +2.0 * (w * x + y * z)
-    t1 = +1.0 - 2.0 * (x * x + y * y)
-    roll_x = math.atan2(t0, t1)
-    
-    t2 = +2.0 * (w * y - z * x)
-    t2 = +1.0 if t2 > +1.0 else t2
-    t2 = -1.0 if t2 < -1.0 else t2
-    pitch_y = math.asin(t2)
-    
-    t3 = +2.0 * (w * z + x * y)
-    t4 = +1.0 - 2.0 * (y * y + z * z)
-    yaw_z = math.atan2(t3, t4)
-    
-    return roll_x, pitch_y, yaw_z 
-
 
 channels = [
         {
@@ -39,13 +19,47 @@ channels = [
             "width": 2,
             "y_limit" : (-200, 200)
         },
-        {'title': "Y Angle", 'color': 'cyan', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2},
-        {'title': "Z Angle", 'color': 'red', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2},
-        {'title': "X Angle Corke", 'color': 'pink', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2},
-        {'title': "Y Angle Corke", 'color': 'cyan', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2},
-        {'title': "Z Angle Corke", 'color': 'red', 'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2},
-        
-    ]
+        {
+            'title': "Y Angle", 
+            'color': 'cyan', 
+            'y_label': 'Angle(deg)', 
+            'x_label': "Time(s)", 
+            "width": 2,
+            "y_limit" : (-200, 200)
+        },
+        {
+            'title': "Z Angle", 
+            'color': 'red', 
+            'y_label': 'Angle(deg)', 
+            'x_label': "Time(s)", 
+            "width": 2,
+            "y_limit" : (-200, 200)
+        },
+        {
+            'title': "X Angle Corke", 
+            'color': 'pink', 
+            'y_label': 'Angle(deg)', 
+            'x_label': "Time(s)", 
+            "width": 2,
+            "y_limit" : (-200, 200)
+        },
+        {
+            'title': "Y Angle Corke",
+            'color': 'cyan', 
+            'y_label': 'Angle(deg)', 
+            'x_label': "Time(s)", 
+            "width": 2,
+            "y_limit" : (-200, 200)
+        },
+        {
+            'title': "Z Angle Corke", 
+            'color': 'red', 
+            'y_label': 'Angle(deg)', 
+            'x_label': "Time(s)", 
+            "width": 2,
+            "y_limit" : (-200, 200)
+        }, 
+]
 
 if __name__ == '__main__':
     with DataMonitor(channels=channels) as dm:
@@ -71,9 +85,16 @@ if __name__ == '__main__':
         commands = [0, 1, 255, 255, 255, 255, 255, 255]
         serial_port = serialOperations.setStreamingSlots(serial_port, addresses, commands)
 
-        # Set magnetometer(explain it better), calibGyro if calibGyro=True and Tare sensor
-        calibGyro = False
-        serial_port = serialOperations.configureSensor(serial_port, addresses, calibGyro)
+        # Configure dictionary
+        configDict = {
+            "unableCompass": True,
+            "unableGyro": False,
+            "unableAccelerometer": False,
+            "gyroAutoCalib": True,
+            "filterMode": 1,
+            "tareSensor": True
+        }
+        serial_port = serialOperations.configureSensor(serial_port, addresses, configDict)
         
         # Show some sensor configuration
         serialOperations.getSensorInformation(serial_port, addresses)
@@ -96,34 +117,21 @@ if __name__ == '__main__':
                     extracted_data = serialOperations.extractResponse(data)
 
                     # Convert quaternions to visual euler angles
-                    euler_angles_rad = euler_from_quaternion(
-                        extracted_data['x'], extracted_data['y'],extracted_data['z'], extracted_data['w']
-                    )
-                    euler_angles_degree = list(map(lambda ang: math.degrees(ang), euler_angles_rad))
-                    
-                    # Convert quaternions to visual euler angles - using spatialmath library
-                    quaternion_SM = UQ([extracted_data['x'], extracted_data['y'],extracted_data['z'], extracted_data['w']])
-                    euler_angles_degree_SM = quaternion_SM.eul(unit='deg')
-
-                    # TA DIFERENTE N SEI PQ :(
-                    print('EULER VICTOR: ', euler_angles_degree)
-                    print('EULER SM: ', euler_angles_degree_SM)
-
-                    # time.sleep(.5)
+                    rot = R.from_quat([extracted_data['x'], extracted_data['y'],extracted_data['z'], extracted_data['w']])
+                    euler_angles_scipy = rot.as_euler('xyz', degrees=True)
 
                     # Update data monitor
                     dm.data = {
                         "data": (
-                            euler_angles_degree[0], 
-                            euler_angles_degree[1], 
-                            euler_angles_degree[2],
+                            euler_angles_scipy[0], 
+                            euler_angles_scipy[1], 
+                            euler_angles_scipy[2],
                             math.degrees(extracted_data['roll']), 
                             math.degrees(extracted_data['pitch']), 
                             math.degrees(extracted_data['yaw'])
                         ),
                         "time": time.time() - startTime
                     }
-
 
                 else:
                     # Did not receive data, wait 0.1 sec and continue

@@ -1,3 +1,4 @@
+from re import I
 import serial.tools.list_ports
 import time
 import sys
@@ -27,83 +28,74 @@ def manualFlush(serial_port):
         time.sleep(0.1)
     return serial_port
 
-def stopStreaming(serial_port, addresses):
-    for i in range(len(addresses)):
-        serial_port.write(('>'+str(addresses[i])+',86\n').encode())
+def createIMUCommandString(logical_id, command_number, arguments = []):
+    # Create command
+    command = ">"+str(logical_id)+","+str(command_number)
+    if(len(arguments) != 0):
+        arguments_string = ","
+        for  argument in arguments:
+            arguments_string += str(argument)
+            arguments_string += ","
+        arguments_string = arguments_string[:-1]
+        command += arguments_string
+    command += '\n'
+    return command.encode()
+
+def applyCommand(serial_port, commandString, showResponse=False):
+    serial_port.write(commandString)
+    if(showResponse):
         time.sleep(0.1)
         while serial_port.inWaiting():
             out = '>> ' + serial_port.read(serial_port.inWaiting()).decode()
+        print(out)
+
+def stopStreaming(serial_port, logical_ids):
+    for id in logical_ids:
+        commandString = createIMUCommandString(id, 86)
+        applyCommand(serial_port, commandString)
     return serial_port
 
-def startStreaming(serial_port, addresses):
-    # Start streaming
-    for i in range(len(addresses)):
-        serial_port.write(('>'+str(addresses[i])+',85\n').encode())
-        time.sleep(0.1)
-        while serial_port.inWaiting():
-            out = '>> ' + serial_port.read(serial_port.inWaiting()).decode()
+def startStreaming(serial_port, logical_ids):
+    for id in logical_ids:
+        commandString = createIMUCommandString(id, 85)
+        applyCommand(serial_port, commandString)
     return serial_port
 
-def setStreamingSlots(serial_port, addresses, commands):
-    for i in range(len(addresses)):
-        msg = '>' + str(addresses[i]) + ',80,' + str(commands[0]) + ',' + \
-                                                str(commands[1]) + ',' + \
-                                                str(commands[2]) + ',' + \
-                                                str(commands[3]) + ',' + \
-                                                str(commands[4]) + ',' + \
-                                                str(commands[5]) + ',' + \
-                                                str(commands[6]) + ',' + \
-                                                str(commands[7]) + '\n'
-        serial_port.write(msg.encode())
-        time.sleep(0.1)
-        out = ''
-        while serial_port.inWaiting():
-            out += '>> ' + serial_port.read(serial_port.inWaiting()).decode()
+def setStreamingSlots(serial_port, logical_ids, commands):
+    for id in logical_ids:
+        commandString = createIMUCommandString(id, 85, commands)
+        applyCommand(serial_port, commandString)
     return serial_port
 
-def configureSensor(serial_port, addresses, calibGyro):
-    # Enable gyroscope
-    for i in range(len(addresses)):
-        serial_port.write(('>'+str(addresses[i])+',107,1\n').encode())
-        time.sleep(0.1)
-        while serial_port.inWaiting():
-            out = '>> ' + serial_port.read(serial_port.inWaiting()).decode()
-    
-    # Enable accelerometer
-    for i in range(len(addresses)):
-        serial_port.write(('>'+str(addresses[i])+',108,1\n').encode())
-        time.sleep(0.1)
-        while serial_port.inWaiting():
-            out = '>> ' + serial_port.read(serial_port.inWaiting()).decode()
+# Explain configDict
+def configureSensor(serial_port, logical_ids, configDict):
+    if(configDict["unableGyro"]):
+        for id in logical_ids:
+            commandString = createIMUCommandString(id, 107)
+            applyCommand(serial_port, commandString)
+    if(configDict["unableAccelerometer"]):
+        for id in logical_ids:
+            commandString = createIMUCommandString(id, 108)
+            applyCommand(serial_port, commandString)
+    if(configDict["unableCompass"]):
+        for id in logical_ids:
+            commandString = createIMUCommandString(id, 109)
+            applyCommand(serial_port, commandString)
+    # Set filter mode
+    filterMode = configDict["filterMode"]
+    for id in logical_ids:
+        commandString = createIMUCommandString(id, 123, [filterMode])
+        applyCommand(serial_port, commandString)
 
-    # Unable compass
-    for i in range(len(addresses)):
-        serial_port.write(('>'+str(addresses[i])+',109,0\n').encode())
-        time.sleep(0.1)
-        while serial_port.inWaiting():
-            out = '>> ' + serial_port.read(serial_port.inWaiting()).decode()
-    
-    # Set filter mode to Kalman
-    for i in range(len(addresses)):
-        serial_port.write(('>'+str(addresses[i])+',123,1\n').encode())
-        time.sleep(0.1)
-        while serial_port.inWaiting():
-            out = '>> ' + serial_port.read(serial_port.inWaiting()).decode()
+    if configDict["gyroAutoCalib"]:
+        for id in logical_ids:
+            commandString = createIMUCommandString(id, 165)
+            applyCommand(serial_port, commandString)
 
-    # Gyro autocalibration
-    if calibGyro:
-        for i in range(len(addresses)):
-            serial_port.write(('>'+str(addresses[i])+',165\n').encode())
-            time.sleep(0.1)
-            while serial_port.inWaiting():
-                out = '>> ' + serial_port.read(serial_port.inWaiting()).decode()
-
-    # Tare
-    for i in range(len(addresses)):
-        serial_port.write(('>'+str(addresses[i])+',96\n').encode())
-        time.sleep(0.1)
-        while serial_port.inWaiting():
-            out = '>> ' + serial_port.read(serial_port.inWaiting()).decode()
+    if configDict["tareSensor"]:
+        for id in logical_ids:
+            commandString = createIMUCommandString(id, 96)
+            applyCommand(serial_port, commandString)
     
     return serial_port
 
@@ -130,16 +122,13 @@ def getSensorInformation(serial_port, addresses):
 def extractResponse(data):
     extracted_data = {}
 
-    data2 = data.decode().replace('\r\n',' ')
-    data3 = data2.split(' ')
-    data3 = list(filter(None, data3))
-
-    info = data3[0][0:3]
-    id = int.from_bytes(info[1].encode(), sys.byteorder)
+    # Clean data
+    list_data = data.decode().replace('\r\n',' ').split(' ')
+    cleaned_list_data = list(filter(None, list_data))
 
     # Extracting quaternions and aceleration
-    quaternion = data3[0][3:]
-    euler = data3[1]
+    quaternion = cleaned_list_data[0][3:]
+    euler = cleaned_list_data[1]
     quaternion = quaternion.split(',')
     quaternion = np.array(quaternion, dtype=np.float64)
     euler = euler.split(',')
