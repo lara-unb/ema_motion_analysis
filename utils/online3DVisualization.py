@@ -7,7 +7,7 @@ from scipy.spatial.transform import Rotation as R
 from colors import *
 
 # Start - Set visual configurations ---------------------------------------------------------------------------
-WINDOW_SIZE =  800
+WINDOW_SIZE =  600
 ROTATE_SPEED = 0.02
 window = pygame.display.set_mode( (WINDOW_SIZE, WINDOW_SIZE) )
 clock = pygame.time.Clock()
@@ -29,12 +29,19 @@ cube_points[5] = [[SIZE_X],[-SIZE_Y],[-SIZE_Z]]
 cube_points[6] = [[SIZE_X],[SIZE_Y],[-SIZE_Z]]
 cube_points[7] = [[-SIZE_X],[SIZE_Y],[-SIZE_Z]]
 
+# center -> orientation_points[0]
+# x axis -> orientation_points[1]
+# y axis -> orientation_points[2]
+# z axis -> orientation_points[3]
+# first vector: end of orientation arrow
+# second, third and fourth vectors: points to draw the arrow
 orientation_points = [n for n in range(4)]
-orientation_points[0] = [[0], [0], [0]], [[0], [0], [0]], [[0], [0], [0]], [[0], [0], [0]]
-orientation_points[1] = [[2], [0], [0]], [[2-0.07], [0.05], [0]], [[2-0.07], [-0.05], [0]], [[2-0.07], [0], [-0.05]]
-orientation_points[2] = [[0], [-2], [0]], [[0], [-2+0.07], [-0.05]], [[0], [-2+0.07], [0.05]], [[-0.05], [-2+0.07], [0]]
-orientation_points[3] = [[0], [0], [-2]], [[0.05], [0], [-2+0.07]], [[-0.05], [0], [-2+0.07]], [[0], [-0.05], [-2+0.07]]
+orientation_points[0] = [[0], [0], [0]], [[0], [0], [0]], [[0], [0], [0]], [[0], [0], [0]] #center
+orientation_points[1] = [[2], [0], [0]], [[2-0.07], [0.05], [0]], [[2-0.07], [-0.05], [0]], [[2-0.07], [0], [-0.05]]       # x axis
+orientation_points[2] = [[0], [-2], [0]], [[0], [-2+0.07], [-0.05]], [[0], [-2+0.07], [0.05]], [[-0.05], [-2+0.07], [0]]   # y axis
+orientation_points[3] = [[0], [0], [-2]], [[0.05], [0], [-2+0.07]], [[-0.05], [0], [-2+0.07]], [[0], [-0.05], [-2+0.07]]   # z axis
 
+#draw cube connections
 def connect_points(points, pygame, color):
         connect_point(0, 1, points, pygame, color)
         connect_point(0, 3, points, pygame, color)
@@ -49,19 +56,19 @@ def connect_points(points, pygame, color):
         connect_point(6, 5, points, pygame, color)
         connect_point(6, 7, points, pygame, color)
 
+#draw orientation arrows conections
 def connect_orientation_points(points, pygame, colors):
         connect_point(0, 1, points, pygame, colors[0])
         connect_point(0, 2, points, pygame, colors[1])
         connect_point(0, 3, points, pygame, colors[2])
 
-
+# connect 2 points
 def connect_point(i, j, points, pygame, color):
     pygame.draw.line(window, color, (points[i][0], points[i][1]) , (points[j][0], points[j][1]))
 
+# End - Set visual configurations ----------------------------------------------------------------------
 
-# End - Set visual configurations ---------------------------------------------------------------------------
-
-
+# Start - IMU configurations ---------------------------------------------------------------------------
 logical_ids = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
 
 # Find and open serial port for the IMU dongle
@@ -81,7 +88,7 @@ print('Starting configuration')
 # 0 - Differential quaternions; 
 # 1 - tared orientation as euler angles; 
 # 255 - No data
-commands = [0, 1, 2, 255, 255, 255, 255, 255]
+commands = [0, 1, 255, 255, 255, 255, 255, 255]
 serial_port = serialOperations.setStreamingSlots(serial_port, logical_ids, commands)
 
 # Set magnetometer(explain it better), calibGyro if calibGyro=True and Tare sensor
@@ -98,9 +105,23 @@ serial_port = serialOperations.configureSensor(serial_port, logical_ids, configD
 # Start streaming
 serial_port = serialOperations.startStreaming(serial_port, logical_ids)
 
+# End - IMU configurations ---------------------------------------------------------------------------
+
 # Main Loop
 scale = 100
 angle_x = angle_y = angle_z = 0
+
+# set the pygame window name
+pygame.display.set_caption('IMU 3D Visualization')
+display_surface = pygame.display.set_mode((600, 600))
+
+
+# create a font object.
+pygame.font.init()
+Font = pygame.font.SysFont('didot.ttc',  30)
+
+
+
 
 # rot = np.identity(3, dtype=float)
 # isso ta aq so pra iniciar mas ta feio
@@ -108,11 +129,22 @@ rot = R.from_euler('x', angle_x)
 while True:
 
     try:
+
         clock.tick(60)
         window.fill((0,0,0))
 
+        # create a text surface object,
+        # on which text is drawn on it.
+        text1 = Font.render('X axis', True, (255, 0, 0))
+        text2 = Font.render('Y axis', True, (0, 255, 0))
+        text3 = Font.render('Z axis', True, (0, 0, 255))
+
+        window.blit(text1, (20, 20))
+        window.blit(text2, (20, 50))
+        window.blit(text3, (20, 80))
+    
         
-        #drew cube points
+        #draw cube points
         points = [0 for _ in range(len(cube_points))]
         i = 0
         for point in cube_points:
@@ -125,7 +157,7 @@ while True:
 
             points[i] = (x,y)
             i += 1
-            pygame.draw.circle(window, (255, 0, 0), (x, y), 5)
+            pygame.draw.circle(window, (0, 255, 255), (x, y), 5)
 
         # draw orientation points
         orientation_colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255)] #rgb
@@ -133,10 +165,9 @@ while True:
         i = 0
         for point in orientation_points:
             
-            
+            #center and edge points
             rotated_point = np.matmul(rot.as_matrix(), point[0])
             point_2d = np.matmul(projection_matrix, rotated_point)
-        
             x = (point_2d[0][0] * scale) + WINDOW_SIZE/2
             y = (point_2d[1][0] * scale) + WINDOW_SIZE/2
 
@@ -160,8 +191,10 @@ while True:
             # END - points to draw the arrow --------------------------
 
             o_points[i] = (x,y)
+            #draw the arow polygon
             if i > 0:
                 pygame.draw.polygon(window, orientation_colors[i-1], [(x, y), (x1, y1), (x2, y2), (x3, y3)], width=0)
+            
             i += 1
 
         # Draw lines between points
