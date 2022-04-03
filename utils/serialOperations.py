@@ -125,9 +125,11 @@ def extractResponse(data):
     list_data = data.decode().replace('\r\n',' ').split(' ')
     cleaned_list_data = list(filter(None, list_data))
 
+
     # Extracting quaternions and aceleration
     quaternion = cleaned_list_data[0][3:].split(',')
     euler = cleaned_list_data[1].split(",")
+    # rotation_matrix = cleaned_list_data[2].split(",")
     quaternion = np.array(quaternion, dtype=np.float64)
     euler = np.array(euler, dtype=np.float64)
 
@@ -139,6 +141,7 @@ def extractResponse(data):
         'roll': euler[0],
         'pitch': euler[1],
         'yaw': euler[2]
+        # 'rotation_matrix': rotation_matrix
     }   
     return extracted_data
 

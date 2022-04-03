@@ -32,7 +32,7 @@ cube_points[7] = [[-SIZE_X],[SIZE_Y],[-SIZE_Z]]
 orientation_points = [n for n in range(4)]
 orientation_points[0] = [[0], [0], [0]], [[0], [0], [0]], [[0], [0], [0]], [[0], [0], [0]]
 orientation_points[1] = [[2], [0], [0]], [[2-0.07], [0.05], [0]], [[2-0.07], [-0.05], [0]], [[2-0.07], [0], [-0.05]]
-orientation_points[2] = [[0], [2], [0]], [[0], [2-0.07], [-0.05]], [[0], [2-0.07], [0.05]], [[-0.05], [2-0.07], [0]]
+orientation_points[2] = [[0], [-2], [0]], [[0], [-2+0.07], [-0.05]], [[0], [-2+0.07], [0.05]], [[-0.05], [-2+0.07], [0]]
 orientation_points[3] = [[0], [0], [-2]], [[0.05], [0], [-2+0.07]], [[-0.05], [0], [-2+0.07]], [[0], [-0.05], [-2+0.07]]
 
 def connect_points(points, pygame, color):
@@ -79,9 +79,9 @@ print('Starting configuration')
 # Setting streaming slots, this means that while streaming sensors will send
 # this data to the dongle as in page 29 - User manual: 
 # 0 - Differential quaternions; 
-# 41 - Raw accelerations; 
+# 1 - tared orientation as euler angles; 
 # 255 - No data
-commands = [0, 1, 255, 255, 255, 255, 255, 255]
+commands = [0, 1, 2, 255, 255, 255, 255, 255]
 serial_port = serialOperations.setStreamingSlots(serial_port, logical_ids, commands)
 
 # Set magnetometer(explain it better), calibGyro if calibGyro=True and Tare sensor
@@ -102,26 +102,23 @@ serial_port = serialOperations.startStreaming(serial_port, logical_ids)
 scale = 100
 angle_x = angle_y = angle_z = 0
 
+# rot = np.identity(3, dtype=float)
+# isso ta aq so pra iniciar mas ta feio
+rot = R.from_euler('x', angle_x)
 while True:
 
     try:
         clock.tick(60)
         window.fill((0,0,0))
 
-    
-        rotation_x = R.from_euler('x', angle_x)
-        rotation_y = R.from_euler('y', angle_y)
-        rotation_z = R.from_euler('z', angle_z)
-
+        
+        #drew cube points
         points = [0 for _ in range(len(cube_points))]
         i = 0
-
         for point in cube_points:
 
-            rotate_x = np.matmul(rotation_x.as_matrix(), point)
-            rotate_y = np.matmul(rotation_y.as_matrix(), rotate_x)
-            rotate_z = np.matmul(rotation_z.as_matrix(), rotate_y)
-            point_2d = np.matmul(projection_matrix, rotate_z)
+            rotated_point = np.matmul(rot.as_matrix(), point)
+            point_2d = np.matmul(projection_matrix, rotated_point)
         
             x = (point_2d[0][0] * scale) + WINDOW_SIZE/2
             y = (point_2d[1][0] * scale) + WINDOW_SIZE/2
@@ -131,53 +128,36 @@ while True:
             pygame.draw.circle(window, (255, 0, 0), (x, y), 5)
 
         # draw orientation points
-        i = 0
-        orientation_colors = [(0, 0, 255), (0, 255, 0), (255, 0, 0)]
+        orientation_colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255)] #rgb
         o_points = [0 for _ in range(len(orientation_points))]
+        i = 0
         for point in orientation_points:
             
-            # print(point[0][0])
-            # print(point[1][0])
-            # print(point[2][0])
-
-            rotate_x = np.matmul(rotation_x.as_matrix(), point[0])
-            rotate_y = np.matmul(rotation_y.as_matrix(), rotate_x)
-            rotate_z = np.matmul(rotation_z.as_matrix(), rotate_y)
-            point_2d = np.matmul(projection_matrix, rotate_z)
+            
+            rotated_point = np.matmul(rot.as_matrix(), point[0])
+            point_2d = np.matmul(projection_matrix, rotated_point)
         
             x = (point_2d[0][0] * scale) + WINDOW_SIZE/2
             y = (point_2d[1][0] * scale) + WINDOW_SIZE/2
 
 
-            rotate_x = np.matmul(rotation_x.as_matrix(), point[1])
-            rotate_y = np.matmul(rotation_y.as_matrix(), rotate_x)
-            rotate_z = np.matmul(rotation_z.as_matrix(), rotate_y)
-            point_2d = np.matmul(projection_matrix, rotate_z)
-        
+            # points to draw the arrow -------------------------------
+            rotated_point = np.matmul(rot.as_matrix(), point[1])
+            point_2d = np.matmul(projection_matrix, rotated_point)
             x1 = (point_2d[0][0] * scale) + WINDOW_SIZE/2
             y1 = (point_2d[1][0] * scale) + WINDOW_SIZE/2
 
 
-            rotate_x = np.matmul(rotation_x.as_matrix(), point[2])
-            rotate_y = np.matmul(rotation_y.as_matrix(), rotate_x)
-            rotate_z = np.matmul(rotation_z.as_matrix(), rotate_y)
-            point_2d = np.matmul(projection_matrix, rotate_z)
-        
+            rotated_point = np.matmul(rot.as_matrix(), point[2])
+            point_2d = np.matmul(projection_matrix, rotated_point)
             x2 = (point_2d[0][0] * scale) + WINDOW_SIZE/2
             y2 = (point_2d[1][0] * scale) + WINDOW_SIZE/2
 
-            rotate_x = np.matmul(rotation_x.as_matrix(), point[3])
-            rotate_y = np.matmul(rotation_y.as_matrix(), rotate_x)
-            rotate_z = np.matmul(rotation_z.as_matrix(), rotate_y)
-            point_2d = np.matmul(projection_matrix, rotate_z)
-        
+            rotated_point = np.matmul(rot.as_matrix(), point[3])
+            point_2d = np.matmul(projection_matrix, rotated_point)
             x3 = (point_2d[0][0] * scale) + WINDOW_SIZE/2
             y3 = (point_2d[1][0] * scale) + WINDOW_SIZE/2
-
-            # x1 = x+5
-            # y1 = y+7
-            # x2 = x-5
-            # y2 = y+7
+            # END - points to draw the arrow --------------------------
 
             o_points[i] = (x,y)
             if i > 0:
@@ -200,13 +180,15 @@ while True:
 
             extracted_data = serialOperations.extractResponse(data)
 
+            # rot = extracted_data['rotation_matrix']
+
             rot = R.from_quat([extracted_data['x'], extracted_data['y'],extracted_data['z'], extracted_data['w']])
-            euler_angles_scipy = rot.as_euler('xyz', degrees=False)
+            # euler_angles_scipy = rot.as_euler('xyz', degrees=False)
             
-            # Coment this to debug
-            angle_x = euler_angles_scipy[0]
-            angle_y = euler_angles_scipy[1]
-            angle_z = euler_angles_scipy[2]
+            # # Coment this to debug
+            # angle_x = euler_angles_scipy[0]
+            # angle_y = euler_angles_scipy[1]
+            # angle_z = euler_angles_scipy[2]
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
