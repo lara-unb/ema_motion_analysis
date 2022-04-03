@@ -87,9 +87,9 @@ if __name__ == '__main__':
 
         # Configure dictionary
         configDict = {
-            "unableCompass": True,
-            "unableGyro": False,
-            "unableAccelerometer": False,
+            "disableCompass": True,
+            "disableGyro": False,
+            "disableAccelerometer": False,
             "gyroAutoCalib": True,
             "filterMode": 1,
             "tareSensor": True

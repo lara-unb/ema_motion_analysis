@@ -70,15 +70,15 @@ def setStreamingSlots(serial_port, logical_ids, commands):
 
 # Explain configDict
 def configureSensor(serial_port, logical_ids, configDict):
-    if(configDict["unableGyro"]):
+    if(configDict["disableGyro"]):
         for id in logical_ids:
             commandString = createIMUCommandString(id, 107)
             applyCommand(serial_port, commandString)
-    if(configDict["unableAccelerometer"]):
+    if(configDict["disableAccelerometer"]):
         for id in logical_ids:
             commandString = createIMUCommandString(id, 108)
             applyCommand(serial_port, commandString)
-    if(configDict["unableCompass"]):
+    if(configDict["disableCompass"]):
         for id in logical_ids:
             commandString = createIMUCommandString(id, 109)
             applyCommand(serial_port, commandString)

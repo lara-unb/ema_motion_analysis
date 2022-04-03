@@ -7,7 +7,7 @@ from scipy.spatial.transform import Rotation as R
 from colors import *
 
 # Start - Set visual configurations ---------------------------------------------------------------------------
-WINDOW_SIZE =  600
+WINDOW_SIZE =  800
 ROTATE_SPEED = 0.02
 window = pygame.display.set_mode( (WINDOW_SIZE, WINDOW_SIZE) )
 clock = pygame.time.Clock()
@@ -93,9 +93,9 @@ serial_port = serialOperations.setStreamingSlots(serial_port, logical_ids, comma
 
 # Set magnetometer(explain it better), calibGyro if calibGyro=True and Tare sensor
 configDict = {
-            "unableCompass": True,
-            "unableGyro": False,
-            "unableAccelerometer": False,
+            "disableCompass": True,
+            "disableGyro": False,
+            "disableAccelerometer": False,
             "gyroAutoCalib": True,
             "filterMode": 1,
             "tareSensor": True
@@ -113,15 +113,10 @@ angle_x = angle_y = angle_z = 0
 
 # set the pygame window name
 pygame.display.set_caption('IMU 3D Visualization')
-display_surface = pygame.display.set_mode((600, 600))
-
 
 # create a font object.
 pygame.font.init()
 Font = pygame.font.SysFont('didot.ttc',  30)
-
-
-
 
 # rot = np.identity(3, dtype=float)
 # isso ta aq so pra iniciar mas ta feio
@@ -129,7 +124,6 @@ rot = R.from_euler('x', angle_x)
 while True:
 
     try:
-
         clock.tick(60)
         window.fill((0,0,0))
 
@@ -139,6 +133,8 @@ while True:
         text2 = Font.render('Y axis', True, (0, 255, 0))
         text3 = Font.render('Z axis', True, (0, 0, 255))
 
+        # copying the text surface object to the display surface object
+        # at the specified coodinate
         window.blit(text1, (20, 20))
         window.blit(text2, (20, 50))
         window.blit(text3, (20, 80))
