@@ -98,7 +98,7 @@ JUMP_PROFILE_MOVENET = {
 }
 
 JUMP_PROFILE_BLAZEPOSE = {
-    "frontal" : ['right_hip', 'left_hip', 'right_knee', 'left_knee','right_ankle', 'left_ankle'],
+    "frontal" : ['right_hip', 'left_hip', 'right_knee', 'left_knee','right_ankle', 'left_ankle', 'right_foot_index', 'right_heel', 'left_foot_index', 'left_heel'],
     "right": ['right_hip', 'right_knee', 'right_ankle', 'right_foot_index', 'right_heel'],
     "left": ['left_hip', 'left_knee', 'left_ankle', 'left_foot_index', 'left_heel']
 }
@@ -109,7 +109,8 @@ ANGLES_MOVENET = {
     },
     "left": {
         "knee_angle": ['left_hip', 'left_knee', "left_ankle"]
-    }
+    },
+    "frontal": {}
 }
 
 ANGLES_BLAZEPOSE = {
@@ -120,7 +121,8 @@ ANGLES_BLAZEPOSE = {
         "left": {
             "knee_angle": ['left_hip', 'left_knee', "left_ankle"],
             "ankle_angle": ['left_knee', 'left_ankle', "left_foot_index"],
-        }
+        },
+        "frontal": {}
 }
 
 #-------------------------------------------------------------------------------------
