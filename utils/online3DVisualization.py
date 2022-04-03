@@ -1,3 +1,4 @@
+from turtle import width
 import pygame
 from math import *
 import numpy as np
@@ -28,21 +29,34 @@ cube_points[5] = [[SIZE_X],[-SIZE_Y],[-SIZE_Z]]
 cube_points[6] = [[SIZE_X],[SIZE_Y],[-SIZE_Z]]
 cube_points[7] = [[-SIZE_X],[SIZE_Y],[-SIZE_Z]]
 
-def connect_points(points, pygame):
-        connect_point(0, 1, points, pygame)
-        connect_point(0, 3, points, pygame)
-        connect_point(0, 4, points, pygame)
-        connect_point(1, 2, points, pygame)
-        connect_point(1, 5, points, pygame)
-        connect_point(2, 6, points, pygame)
-        connect_point(2, 3, points, pygame)
-        connect_point(3, 7, points, pygame)
-        connect_point(4, 5, points, pygame)
-        connect_point(4, 7, points, pygame)
-        connect_point(6, 5, points, pygame)
-        connect_point(6, 7, points, pygame)
-def connect_point(i, j, points, pygame):
-    pygame.draw.line(window, (255, 255, 255), (points[i][0], points[i][1]) , (points[j][0], points[j][1]))
+orientation_points = [n for n in range(4)]
+orientation_points[0] = [[0], [0], [0]], [[0], [0], [0]], [[0], [0], [0]], [[0], [0], [0]]
+orientation_points[1] = [[2], [0], [0]], [[2-0.07], [0.05], [0]], [[2-0.07], [-0.05], [0]], [[2-0.07], [0], [-0.05]]
+orientation_points[2] = [[0], [2], [0]], [[0], [2-0.07], [-0.05]], [[0], [2-0.07], [0.05]], [[-0.05], [2-0.07], [0]]
+orientation_points[3] = [[0], [0], [-2]], [[0.05], [0], [-2+0.07]], [[-0.05], [0], [-2+0.07]], [[0], [-0.05], [-2+0.07]]
+
+def connect_points(points, pygame, color):
+        connect_point(0, 1, points, pygame, color)
+        connect_point(0, 3, points, pygame, color)
+        connect_point(0, 4, points, pygame, color)
+        connect_point(1, 2, points, pygame, color)
+        connect_point(1, 5, points, pygame, color)
+        connect_point(2, 6, points, pygame, color)
+        connect_point(2, 3, points, pygame, color)
+        connect_point(3, 7, points, pygame, color)
+        connect_point(4, 5, points, pygame, color)
+        connect_point(4, 7, points, pygame, color)
+        connect_point(6, 5, points, pygame, color)
+        connect_point(6, 7, points, pygame, color)
+
+def connect_orientation_points(points, pygame, colors):
+        connect_point(0, 1, points, pygame, colors[0])
+        connect_point(0, 2, points, pygame, colors[1])
+        connect_point(0, 3, points, pygame, colors[2])
+
+
+def connect_point(i, j, points, pygame, color):
+    pygame.draw.line(window, color, (points[i][0], points[i][1]) , (points[j][0], points[j][1]))
 
 
 # End - Set visual configurations ---------------------------------------------------------------------------
@@ -99,8 +113,6 @@ while True:
         rotation_y = R.from_euler('y', angle_y)
         rotation_z = R.from_euler('z', angle_z)
 
-        print('ROTATION MATRIX X: ', rotation_x.as_matrix())
-
         points = [0 for _ in range(len(cube_points))]
         i = 0
 
@@ -118,8 +130,64 @@ while True:
             i += 1
             pygame.draw.circle(window, (255, 0, 0), (x, y), 5)
 
+        # draw orientation points
+        i = 0
+        orientation_colors = [(0, 0, 255), (0, 255, 0), (255, 0, 0)]
+        o_points = [0 for _ in range(len(orientation_points))]
+        for point in orientation_points:
+            
+            # print(point[0][0])
+            # print(point[1][0])
+            # print(point[2][0])
+
+            rotate_x = np.matmul(rotation_x.as_matrix(), point[0])
+            rotate_y = np.matmul(rotation_y.as_matrix(), rotate_x)
+            rotate_z = np.matmul(rotation_z.as_matrix(), rotate_y)
+            point_2d = np.matmul(projection_matrix, rotate_z)
+        
+            x = (point_2d[0][0] * scale) + WINDOW_SIZE/2
+            y = (point_2d[1][0] * scale) + WINDOW_SIZE/2
+
+
+            rotate_x = np.matmul(rotation_x.as_matrix(), point[1])
+            rotate_y = np.matmul(rotation_y.as_matrix(), rotate_x)
+            rotate_z = np.matmul(rotation_z.as_matrix(), rotate_y)
+            point_2d = np.matmul(projection_matrix, rotate_z)
+        
+            x1 = (point_2d[0][0] * scale) + WINDOW_SIZE/2
+            y1 = (point_2d[1][0] * scale) + WINDOW_SIZE/2
+
+
+            rotate_x = np.matmul(rotation_x.as_matrix(), point[2])
+            rotate_y = np.matmul(rotation_y.as_matrix(), rotate_x)
+            rotate_z = np.matmul(rotation_z.as_matrix(), rotate_y)
+            point_2d = np.matmul(projection_matrix, rotate_z)
+        
+            x2 = (point_2d[0][0] * scale) + WINDOW_SIZE/2
+            y2 = (point_2d[1][0] * scale) + WINDOW_SIZE/2
+
+            rotate_x = np.matmul(rotation_x.as_matrix(), point[3])
+            rotate_y = np.matmul(rotation_y.as_matrix(), rotate_x)
+            rotate_z = np.matmul(rotation_z.as_matrix(), rotate_y)
+            point_2d = np.matmul(projection_matrix, rotate_z)
+        
+            x3 = (point_2d[0][0] * scale) + WINDOW_SIZE/2
+            y3 = (point_2d[1][0] * scale) + WINDOW_SIZE/2
+
+            # x1 = x+5
+            # y1 = y+7
+            # x2 = x-5
+            # y2 = y+7
+
+            o_points[i] = (x,y)
+            if i > 0:
+                pygame.draw.polygon(window, orientation_colors[i-1], [(x, y), (x1, y1), (x2, y2), (x3, y3)], width=0)
+            i += 1
+
         # Draw lines between points
-        connect_points(points, pygame)
+        connect_points(points, pygame, (255, 255, 255))
+        connect_orientation_points(o_points, pygame, orientation_colors)
+
 
         print("running...")
         bytes_to_read = serial_port.inWaiting()
