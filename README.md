@@ -22,7 +22,7 @@ Ative o ambiente de desenvolvimento com:
 ```
 conda activate ema_motion_env
 ```
-Instale os seguintes pacotes com o comando conda (Windows e Linux):
+Instale os seguintes pacotes com o comando conda (Windows, Linux e MacOS):
 ```
 conda install -c anaconda numpy=1.21.2
 pip install matplotlib==3.5.1
@@ -33,7 +33,7 @@ pip install pyqtgraph
 pip install pyquaternion
 ```
 
-Exclusivo Linux
+Exclusivo Linux e MacOs
 ```
 conda install -c conda-forge tensorflow=2.7.0
 pip install opencv-python==4.5.2.54
@@ -44,7 +44,7 @@ Exclusivo Windows
 conda install -c conda-forge tensorflow=2.6.0
 pip install opencv-python==4.5.1.48
 ```
-## Execução dos programas
+## Execução dos programas de deteção de pose
 
 Navegue para a pasta de scrpits:
 ```
@@ -66,3 +66,23 @@ Então será aberto um menu do usuário em que este pode escolher entre executar
 
 Nas pasta "outputs" serão salvos os arquivos com os dados do processamento (localização dos pontos para cada frame) e os vídeos com as identificações das poses.
 
+## Execução dos programas de IMU
+
+Navegue para a pasta de scrpits:
+```
+cd scripts
+```
+
+Para visualização dos gráficos de ângulos de Euler execute:
+```
+python imu.py
+```
+Para uma visualização 3D da IMU, execute:
+```
+python online3DVisualization.py
+```
+
+Para a execução dos programas da IMU certifique-se de que o dongle está conectado a seu computador e que a IMU a ser utilizada está ligada e com bateria
+
+Em caso de dúvidas leia o manual disponível em: 
+https://yostlabs.com/wp/wp-content/uploads/pdf/3-Space-Sensor-Users-Manual-1.pdf

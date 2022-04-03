@@ -2,9 +2,12 @@ from turtle import width
 import pygame
 from math import *
 import numpy as np
-import serialOperations
 from scipy.spatial.transform import Rotation as R
+import sys
+
+sys.path.append("../utils/")
 from colors import *
+import serialOperations
 
 # Start - Set visual configurations ---------------------------------------------------------------------------
 WINDOW_SIZE =  800
@@ -12,10 +15,12 @@ ROTATE_SPEED = 0.02
 window = pygame.display.set_mode( (WINDOW_SIZE, WINDOW_SIZE) )
 clock = pygame.time.Clock()
 
+# matrix to project 3D element in 2D
 projection_matrix = [[1,0,0],
                      [0,1,0],
                      [0,0,0]]
 
+# cube points inicial location
 SIZE_X = 1
 SIZE_Y = 0.5
 SIZE_Z = 1.5
