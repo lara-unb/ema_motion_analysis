@@ -22,8 +22,6 @@ cube_points = [n for n in range(8)]
 cube_points[0] = [[-SIZE_X], [-SIZE_Y], [SIZE_Z]]
 cube_points[1] = [[SIZE_X],[-SIZE_Y],[SIZE_Z]]
 cube_points[2] = [[SIZE_X],[SIZE_Y],[SIZE_Z]]
-
-
 cube_points[3] = [[-SIZE_X],[SIZE_Y],[SIZE_Z]]
 cube_points[4] = [[-SIZE_X],[-SIZE_Y],[-SIZE_Z]]
 cube_points[5] = [[SIZE_X],[-SIZE_Y],[-SIZE_Z]]
@@ -46,25 +44,6 @@ def connect_points(points, pygame):
 def connect_point(i, j, points, pygame):
     pygame.draw.line(window, (255, 255, 255), (points[i][0], points[i][1]) , (points[j][0], points[j][1]))
 
-def get_rotation_matrices(angle_x, angle_y, angle_z):
-    rotation_x = [
-        [1, 0, 0],
-        [0, cos(angle_x), -sin(angle_x)],
-        [0, sin(angle_x), cos(angle_x)]
-    ]
-
-    rotation_y = [
-        [cos(angle_y), 0, sin(angle_y)],
-        [0, 1, 0],
-        [-sin(angle_y), 0, cos(angle_y)]
-    ]
-
-    rotation_z = [
-        [cos(angle_z), -sin(angle_z), 0],
-        [sin(angle_z), cos(angle_z), 0],
-        [0, 0, 1]
-    ]
-    return rotation_x, rotation_y, rotation_z
 
 # End - Set visual configurations ---------------------------------------------------------------------------
 
@@ -115,16 +94,21 @@ while True:
         clock.tick(60)
         window.fill((0,0,0))
 
-        rotation_x, rotation_y, rotation_z = get_rotation_matrices(angle_x, angle_y, angle_z)
+    
+        rotation_x = R.from_euler('x', angle_x)
+        rotation_y = R.from_euler('y', angle_y)
+        rotation_z = R.from_euler('z', angle_z)
+
+        print('ROTATION MATRIX X: ', rotation_x.as_matrix())
 
         points = [0 for _ in range(len(cube_points))]
         i = 0
 
         for point in cube_points:
 
-            rotate_x = np.matmul(rotation_x, point)
-            rotate_y = np.matmul(rotation_y, rotate_x)
-            rotate_z = np.matmul(rotation_z, rotate_y)
+            rotate_x = np.matmul(rotation_x.as_matrix(), point)
+            rotate_y = np.matmul(rotation_y.as_matrix(), rotate_x)
+            rotate_z = np.matmul(rotation_z.as_matrix(), rotate_y)
             point_2d = np.matmul(projection_matrix, rotate_z)
         
             x = (point_2d[0][0] * scale) + WINDOW_SIZE/2
