@@ -34,7 +34,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 sys.path.append("../utils/")
-from data_monitor import DataMonitor
+from dataMonitor import DataMonitor
 
 # define meta-info for DataMonitor plotting (label of data-rows and coloring)
 channels = [
