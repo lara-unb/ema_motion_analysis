@@ -1,4 +1,3 @@
-from turtle import width
 import pygame
 from math import *
 import numpy as np
@@ -7,18 +6,20 @@ import sys
 
 sys.path.append("../utils/")
 from colors import *
-import serialOperations
+import serialOperations as serialOp
+import pygameOperations as pygameOp
 
 # Start - Set visual configurations ---------------------------------------------------------------------------
-WINDOW_SIZE =  800
-ROTATE_SPEED = 0.02
+WINDOW_SIZE =  600
 window = pygame.display.set_mode( (WINDOW_SIZE, WINDOW_SIZE) )
 clock = pygame.time.Clock()
 
 # matrix to project 3D element in 2D
-projection_matrix = [[1,0,0],
-                     [0,1,0],
-                     [0,0,0]]
+projection_matrix = [
+    [1,0,0],
+    [0,1,0],
+    [0,0,0]
+]
 
 # cube points inicial location
 SIZE_X = 1
@@ -46,6 +47,11 @@ orientation_points[1] = [[2], [0], [0]], [[2-0.07], [0.05], [0]], [[2-0.07], [-0
 orientation_points[2] = [[0], [-2], [0]], [[0], [-2+0.07], [-0.05]], [[0], [-2+0.07], [0.05]], [[-0.05], [-2+0.07], [0]]   # y axis
 orientation_points[3] = [[0], [0], [-2]], [[0.05], [0], [-2+0.07]], [[-0.05], [0], [-2+0.07]], [[0], [-0.05], [-2+0.07]]   # z axis
 
+RED_RGB = (255, 0, 0)
+GREEN_RGB = (0, 255, 0)
+CYAN_RGB = (0, 255, 255) 
+WHITE_RGB = (255, 255, 255) 
+
 #draw cube connections
 def connect_points(points, pygame, color):
         connect_point(0, 1, points, pygame, color)
@@ -71,46 +77,17 @@ def connect_orientation_points(points, pygame, colors):
 def connect_point(i, j, points, pygame, color):
     pygame.draw.line(window, color, (points[i][0], points[i][1]) , (points[j][0], points[j][1]))
 
-# End - Set visual configurations ----------------------------------------------------------------------
-
-# Start - IMU configurations ---------------------------------------------------------------------------
-logical_ids = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
-
-# Find and open serial port for the IMU dongle
-serial_port = serialOperations.getDongleObject()
-
-
-# Stop streaming
-serial_port = serialOperations.stopStreaming(serial_port, logical_ids)
-
-# Manual flush. Might not be necessary
-# serial_port = serialOperations.manualFlush(serial_port)
-
-print('Starting configuration')
-
-# Setting streaming slots, this means that while streaming sensors will send
-# this data to the dongle as in page 29 - User manual: 
-# 0 - Differential quaternions; 
-# 1 - tared orientation as euler angles; 
-# 255 - No data
-commands = [0, 1, 255, 255, 255, 255, 255, 255]
-serial_port = serialOperations.setStreamingSlots(serial_port, logical_ids, commands)
-
-# Set magnetometer(explain it better), calibGyro if calibGyro=True and Tare sensor
 configDict = {
-            "disableCompass": True,
-            "disableGyro": False,
-            "disableAccelerometer": False,
-            "gyroAutoCalib": True,
-            "filterMode": 1,
-            "tareSensor": True
+    "disableCompass": True,
+    "disableGyro": False,
+    "disableAccelerometer": False,
+    "gyroAutoCalib": True,
+    "filterMode": 1,
+    "tareSensor": True,
+    "logical_ids": [8],
+    "streaming_commands": [2, 255, 255, 255, 255, 255, 255, 255]
 }
-serial_port = serialOperations.configureSensor(serial_port, logical_ids, configDict)
-
-# Start streaming
-serial_port = serialOperations.startStreaming(serial_port, logical_ids)
-
-# End - IMU configurations ---------------------------------------------------------------------------
+serial_port = serialOeratserialOperations as serialOpp.initializeImu(configDict)
 
 # Main Loop
 scale = 100
@@ -123,9 +100,9 @@ pygame.display.set_caption('IMU 3D Visualization')
 pygame.font.init()
 Font = pygame.font.SysFont('didot.ttc',  30)
 
-# rot = np.identity(3, dtype=float)
-# isso ta aq so pra iniciar mas ta feio
-rot = R.from_euler('x', angle_x)
+# Initialize rotation matrix
+rotation_matrix = np.array([[0,0,0], [0,0,0], [0,0,0]])
+
 while True:
 
     try:
@@ -134,23 +111,25 @@ while True:
 
         # create a text surface object,
         # on which text is drawn on it.
-        text1 = Font.render('X axis', True, (255, 0, 0))
-        text2 = Font.render('Y axis', True, (0, 255, 0))
-        text3 = Font.render('Z axis', True, (0, 0, 255))
+        text1 = Font.render('X axis', True, RED_RGB)
+        text2 = Font.render('Y axis', True, GREEN_RGB)
+        text3 = Font.render('Z axis', True, CYAN_RGB)
+        text4 = Font.render('Press t to tare.', True, WHITE_RGB)
 
         # copying the text surface object to the display surface object
         # at the specified coodinate
         window.blit(text1, (20, 20))
         window.blit(text2, (20, 50))
         window.blit(text3, (20, 80))
+        window.blit(text4, (20, WINDOW_SIZE-40))
     
         
         #draw cube points
         points = [0 for _ in range(len(cube_points))]
         i = 0
-        for point in cube_points:
 
-            rotated_point = np.matmul(rot.as_matrix(), point)
+        for point in cube_points:
+            rotated_point = np.matmul(rotation_matrix, point)
             point_2d = np.matmul(projection_matrix, rotated_point)
         
             x = (point_2d[0][0] * scale) + WINDOW_SIZE/2
@@ -158,34 +137,34 @@ while True:
 
             points[i] = (x,y)
             i += 1
-            pygame.draw.circle(window, (0, 255, 255), (x, y), 5)
+            pygame.draw.circle(window, CYAN_RGB, (x, y), 5)
 
         # draw orientation points
-        orientation_colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255)] #rgb
+        orientation_colors = [RED_RGB, GREEN_RGB, CYAN_RGB]
         o_points = [0 for _ in range(len(orientation_points))]
         i = 0
         for point in orientation_points:
             
             #center and edge points
-            rotated_point = np.matmul(rot.as_matrix(), point[0])
+            rotated_point = np.matmul(rotation_matrix, point[0])
             point_2d = np.matmul(projection_matrix, rotated_point)
             x = (point_2d[0][0] * scale) + WINDOW_SIZE/2
             y = (point_2d[1][0] * scale) + WINDOW_SIZE/2
 
 
             # points to draw the arrow -------------------------------
-            rotated_point = np.matmul(rot.as_matrix(), point[1])
+            rotated_point = np.matmul(rotation_matrix, point[1])
             point_2d = np.matmul(projection_matrix, rotated_point)
             x1 = (point_2d[0][0] * scale) + WINDOW_SIZE/2
             y1 = (point_2d[1][0] * scale) + WINDOW_SIZE/2
 
 
-            rotated_point = np.matmul(rot.as_matrix(), point[2])
+            rotated_point = np.matmul(rotation_matrix, point[2])
             point_2d = np.matmul(projection_matrix, rotated_point)
             x2 = (point_2d[0][0] * scale) + WINDOW_SIZE/2
             y2 = (point_2d[1][0] * scale) + WINDOW_SIZE/2
 
-            rotated_point = np.matmul(rot.as_matrix(), point[3])
+            rotated_point = np.matmul(rotation_matrix, point[3])
             point_2d = np.matmul(projection_matrix, rotated_point)
             x3 = (point_2d[0][0] * scale) + WINDOW_SIZE/2
             y3 = (point_2d[1][0] * scale) + WINDOW_SIZE/2
@@ -199,30 +178,19 @@ while True:
             i += 1
 
         # Draw lines between points
-        connect_points(points, pygame, (255, 255, 255))
+        connect_points(points, pygame, WHITE_RGB)
         connect_orientation_points(o_points, pygame, orientation_colors)
-
 
         print("running...")
         bytes_to_read = serial_port.inWaiting()
-
+        print(bytes_to_read)
         if(bytes_to_read > 0):
-
             data = serial_port.read(bytes_to_read)
-            if len(data) <= 3 or data[0] != 0:
+            if data[0] != 0:
                 continue
 
-            extracted_data = serialOperations.extractResponse(data)
-
-            # rot = extracted_data['rotation_matrix']
-
-            rot = R.from_quat([extracted_data['x'], extracted_data['y'],extracted_data['z'], extracted_data['w']])
-            # euler_angles_scipy = rot.as_euler('xyz', degrees=False)
-            
-            # # Coment this to debug
-            # angle_x = euler_angles_scipy[0]
-            # angle_y = euler_angles_scipy[1]
-            # angle_z = euler_angles_scipy[2]
+            extracted_data = serialOeratserialOperations as serialOpp.extractRotationMatrix(data)
+            rotation_matrix = extracted_data['rotation_matrix']
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -231,28 +199,13 @@ while True:
             
             keys = pygame.key.get_pressed()
 
-            # Retorna o gráfico para posição inicial
-            if keys[pygame.K_r]:
-                angle_y = angle_x = angle_z = 0  
-            
-
-            # Uncoment this to debug
-
-            # if keys[pygame.K_a]:
-            #     angle_y += ROTATE_SPEED
-            # if keys[pygame.K_d]:
-            #     angle_y -= ROTATE_SPEED      
-            # if keys[pygame.K_w]:
-            #     angle_x += ROTATE_SPEED
-            # if keys[pygame.K_s]:
-            #     angle_x -= ROTATE_SPEED
-            # if keys[pygame.K_q]:
-            #     angle_z -= ROTATE_SPEED
-            # if keys[pygame.K_e]:
-            #     angle_z += ROTATE_SPEED 
+            # Tare sensor
+            if keys[pygame.K_t]:
+                serialOeratserialOperations as serialOpp.tareSensor(serial_port, configDict['logical_ids'])
             
         pygame.display.update()
     except KeyboardInterrupt:
         print(CYAN, "Keyboard finished execution.", RESET)
         print(RED, "Stop streaming.", RESET)
-        serial_port = serialOperations.stopStreaming(serial_port, logical_ids)
+        serial_port = serialOeratserialOperations as serialOpp.stopStreaming(serial_port, configDict['logical_ids'])
+        break
