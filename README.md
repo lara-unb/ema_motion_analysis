@@ -84,5 +84,5 @@ python online3DVisualization.py
 
 Para a execução dos programas da IMU certifique-se de que o dongle está conectado a seu computador e que a IMU a ser utilizada está ligada e com bateria
 
-Em caso de dúvidas leia o manual disponível em: 
+Em caso de dúvidas ler o manual disponível em: 
 https://yostlabs.com/wp/wp-content/uploads/pdf/3-Space-Sensor-Users-Manual-1.pdf
