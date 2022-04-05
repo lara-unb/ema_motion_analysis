@@ -83,9 +83,9 @@ def predictionToVideo(video_name, video_path,
     # define info for DataMonitor plotting
     channels = [
         {'title': "Knee Angle", 'color': 'pink', 
-        'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2},
+         'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2},
         {'title': "Feet Angle", 'color': 'cyan', 
-        'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2}
+         'y_label': 'Angle(deg)', 'x_label': "Time(s)", "width": 2}
     ]
 
 
