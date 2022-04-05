@@ -49,7 +49,7 @@ def predictionToVideo(interpreter, video_name, video_path,
 
     # Get video
     video_capture = cv2.VideoCapture(video_path)
-    if(not fileManagement.videoCheck(video_capture)):
+    if not fileManagement.videoCheck(video_capture):
         return
 
     # Create output video file
@@ -71,7 +71,7 @@ def predictionToVideo(interpreter, video_name, video_path,
 
     # Create video file to process
     video_capture = cv2.VideoCapture(video_path)
-    if(not fileManagement.videoCheck(video_capture)):
+    if not fileManagement.videoCheck(video_capture):
         return
 
     # define info for DataMonitor plotting 
