@@ -54,7 +54,7 @@ def predictionToVideo(video_name, video_path,
 
     # Get video
     video_capture = cv2.VideoCapture(video_path)
-    if(not fileManagement.videoCheck(video_capture)):
+    if not fileManagement.videoCheck(video_capture):
         return
 
     # Create output video file

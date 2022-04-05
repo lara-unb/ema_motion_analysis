@@ -1,15 +1,22 @@
+"""Poses functions and informations
+
+Functions and dicts used to select the key points, angles and connections
+of the pose to be predicted.
+
+"""
+
+#general imports
 from turtle import right
 import numpy as np
-
 import mediapipe as mp
 import sys
+
 sys.path.append("../utils/")
 import colors
 
 mp_pose = mp.solutions.pose
 
-#-------------------------------------------------------------------------------------
-# Dictionary to map joints of body part
+#Possible keypoints - movenet
 KEYPOINT_DICT_MOVENET = {
     'nose':0,
     'left_eye':1,
@@ -27,9 +34,10 @@ KEYPOINT_DICT_MOVENET = {
     'left_knee':13,
     'right_knee':14,
     'left_ankle':15,
-    'right_ankle':16
+    'right_ankle':16,
 } 
 
+#Possible keypoints - blazeposed
 KEYPOINT_DICT_BLAZEPOSE = {
     'nose': (0, mp_pose.PoseLandmark.NOSE),
     'left_eye_inner': (1, mp_pose.PoseLandmark.LEFT_EYE_INNER),
@@ -63,11 +71,11 @@ KEYPOINT_DICT_BLAZEPOSE = {
     'left_heel': (29, mp_pose.PoseLandmark.LEFT_HEEL),
     'right_heel': (30, mp_pose.PoseLandmark.RIGHT_HEEL),
     'left_foot_index': (31, mp_pose.PoseLandmark.LEFT_FOOT_INDEX),
-    'right_foot_index': (32, mp_pose.PoseLandmark.RIGHT_FOOT_INDEX)
+    'right_foot_index': (32, mp_pose.PoseLandmark.RIGHT_FOOT_INDEX),
 }
 
-#-------------------------------------------------------------------------------------
-# Joint parings 
+
+# Joint parings - movenet
 KEYPOINT_CONNECTIONS_MOVENET = {
     (0, 1): 'm',
     (0, 2): 'c',
@@ -86,21 +94,47 @@ KEYPOINT_CONNECTIONS_MOVENET = {
     (11, 13): 'm',
     (13, 15): 'm',
     (12, 14): 'c',
-    (14, 16): 'c'
+    (14, 16): 'c',
 }
 
-#-------------------------------------------------------------------------------------
+
 # Different poses to be processed
 JUMP_PROFILE_MOVENET = {
-    "frontal" : ['right_hip', 'left_hip', 'right_knee', 'left_knee','right_ankle', 'left_ankle'],
-    "right": ['right_hip', 'right_knee', 'right_ankle'],
-    "left": ['left_hip', 'left_knee', 'left_ankle']
+    "frontal" : ['right_hip', 
+                 'left_hip', 
+                 'right_knee', 
+                 'left_knee',
+                 'right_ankle', 
+                 'left_ankle'],
+    "right": ['right_hip', 
+              'right_knee', 
+              'right_ankle'],
+    "left": ['left_hip', 
+             'left_knee', 
+             'left_ankle'],
 }
 
 JUMP_PROFILE_BLAZEPOSE = {
-    "frontal" : ['right_hip', 'left_hip', 'right_knee', 'left_knee','right_ankle', 'left_ankle', 'right_foot_index', 'right_heel', 'left_foot_index', 'left_heel'],
-    "right": ['right_hip', 'right_knee', 'right_ankle', 'right_foot_index', 'right_heel'],
-    "left": ['left_hip', 'left_knee', 'left_ankle', 'left_foot_index', 'left_heel']
+    "frontal" : ['right_hip', 
+                 'left_hip', 
+                 'right_knee', 
+                 'left_knee',
+                 'right_ankle', 
+                 'left_ankle', 
+                 'right_foot_index', 
+                 'right_heel', 
+                 'left_foot_index', 
+                 'left_heel'],
+    "right": ['right_hip', 
+              'right_knee', 
+              'right_ankle', 
+              'right_foot_index', 
+              'right_heel'],
+    "left": ['left_hip', 
+             'left_knee', 
+             'left_ankle', 
+             'left_foot_index', 
+             'left_heel'],
 }
 
 ANGLES_MOVENET = {
@@ -122,29 +156,45 @@ ANGLES_BLAZEPOSE = {
             "knee_angle": ['left_hip', 'left_knee', "left_ankle"],
             "ankle_angle": ['left_knee', 'left_ankle', "left_foot_index"],
         },
-        "frontal": {}
+        "frontal": {},
 }
 
-#-------------------------------------------------------------------------------------
-# Function to get the parings of the desired joints
-def selectConnections(desired_keypoints, keypoints_dict, keypoints_connections, neural_network):
+
+
+def selectConnections(desired_keypoints, keypoints_dict, 
+                      keypoints_connections, neural_network):
+    """Select the connections for the desired joints
+    
+    Args:
+        desired_keypoints: dictionaty with  pose desired keypoints
+        keypoints_dict: dictionaty with all the possible keypoints for the
+            selected neural network
+        keypoints_connections: disctionary with the points connections
+        neural_network: neural network that will be used to make the pose 
+            prediction ('movenet' or 'blazepose')
+
+    Return:
+        new_keypoints_connections: dictionary with only de desired_keypoints 
+            connections
+    """
     new_keypoints_dict = {}
     new_keypoints_connections = {}
 
+
     for keypoint_name in desired_keypoints:
-        if(neural_network == "movenet"):
+        if neural_network == "movenet":
             new_keypoints_dict[keypoint_name] = keypoints_dict[keypoint_name]
-        elif(neural_network == "blazepose"):
+        elif neural_network == "blazepose":
             new_keypoints_dict[keypoint_name] = keypoints_dict[keypoint_name][0]
 
-    if(neural_network=="movenet"):
+    if neural_network=="movenet":
         for pos, color in keypoints_connections.items():
             p1, p2 = pos
             if (p1 in list(new_keypoints_dict.values())) and (p2 in list(new_keypoints_dict.values())):
                 p1_tf = list(new_keypoints_dict.values()).index(p1)
                 p2_tf = list(new_keypoints_dict.values()).index(p2)
                 new_keypoints_connections[(p1_tf, p2_tf)] = color
-    if(neural_network=="blazepose"):
+    if neural_network=="blazepose":
         for p1, p2 in keypoints_connections:
             if (p1 in list(new_keypoints_dict.values())) and (p2 in list(new_keypoints_dict.values())):
                 p1_tf = list(new_keypoints_dict.values()).index(p1)
@@ -153,9 +203,22 @@ def selectConnections(desired_keypoints, keypoints_dict, keypoints_connections, 
 
     return new_keypoints_connections
 
-#-------------------------------------------------------------------------------------
-# Function to select only the desired joints
 def selectKeypoints(frame, keypoints, desired_keypoints, keypoints_dict, neural_network):
+    """Select only the desired joints
+    
+    Args:
+        frame: frame of the video used in the predictions
+        keypoints: disctionary with all the possible keypoints
+        desired_keypoints: dictionaty with desired pose keypoints
+        keypoints_dict: dictionaty with all the possible keypoints for the
+            selected neural network
+        neural_network: neural network that will be used to make the pose 
+            prediction ('movenet' or 'blazepose')
+
+    Return:
+        selected_keypoints: vector with the (x, y) position of
+            each desired keypoints
+    """
     frame_height, frame_width, _ = frame.shape
 
     selected_keypoints = np.zeros([len(desired_keypoints), 2])
@@ -164,18 +227,18 @@ def selectKeypoints(frame, keypoints, desired_keypoints, keypoints_dict, neural_
     for i in range(len(desired_keypoints)):
         keypoint = desired_keypoints[i]
         
-        if(neural_network == 'movenet'):
+        if neural_network == 'movenet':
             idx = list(keypoints_dict.keys()).index(keypoint)
             selected_keypoints[i, :] = keypoints[idx, :]
-        elif(neural_network == 'blazepose' and keypoints != None):
+        elif neural_network == 'blazepose' and keypoints != None:
             keypoint_object = keypoints_dict[desired_keypoints[i]][1]
             selected_keypoints[i, :] = [
-                    keypoints.landmark[keypoint_object].x * frame_width, 
-                    keypoints.landmark[keypoint_object].y * frame_height
+                    keypoints.landmark[keypoint_object].x*frame_width, 
+                    keypoints.landmark[keypoint_object].y*frame_height,
             ]
     return selected_keypoints
 
-#-------------------------------------------------------------------------------------
+
 
 
 

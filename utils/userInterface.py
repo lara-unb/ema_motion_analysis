@@ -1,3 +1,6 @@
+"""User interface functions and dicts.
+
+"""
 
 import colors
 import fileManagement
@@ -25,7 +28,7 @@ def initialMenu(neural_network):
     be used in the pose prediction
     
     Args:
-        video_name: neural network that will be used to make the pose 
+        neural_network: neural network that will be used to make the pose 
             prediction ('movenet' or 'blazepose')
 
     Return:
