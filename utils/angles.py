@@ -1,3 +1,7 @@
+"""Functions to get the angles between joits.
+
+"""
+
 import numpy as np
 import math
 
@@ -34,6 +38,8 @@ def getAngles(selected_keypoints, dict_angles, profile, pose_selected):
             index_keypoints = pose_selected.index(point)
             angle_points.append(selected_keypoints[index_keypoints])
         
-        angles.append(getAngleLimited(angle_points[0], angle_points[2], angle_points[1]))
+        angles.append(getAngleLimited(angle_points[0], 
+                                      angle_points[2], 
+                                      angle_points[1]))
 
     return angles

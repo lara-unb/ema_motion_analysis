@@ -203,7 +203,8 @@ def selectConnections(desired_keypoints, keypoints_dict,
 
     return new_keypoints_connections
 
-def selectKeypoints(frame, keypoints, desired_keypoints, keypoints_dict, neural_network):
+def selectKeypoints(frame, keypoints, desired_keypoints,
+                    keypoints_dict, neural_network):
     """Select only the desired joints
     
     Args:

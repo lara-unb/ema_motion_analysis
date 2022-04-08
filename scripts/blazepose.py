@@ -30,7 +30,7 @@ mp_pose = mp.solutions.pose
 # Set confidence predictions and tracking threshold
 THRESHOLD = 0.3
 
-def predictionToVideo(video_name, video_path, 
+def prediction_to_video(video_name, video_path, 
                       video_out_path, file_out_path,  profile):
     """Predicts a pose for the person in the video
 
@@ -184,7 +184,7 @@ if __name__ == "__main__":
     video_name, video_path, video_out_path, file_out_path, profile = userInterface.initialMenu("blazepose")
 
     # Make predictions
-    predictionToVideo(video_name, 
+    prediction_to_video(video_name, 
                       video_path, 
                       video_out_path, 
                       file_out_path, 
