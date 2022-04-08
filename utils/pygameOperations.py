@@ -38,7 +38,7 @@ def get_3d_object_points(size_x, size_y, size_z):
 def get_orientation_points():
     orientation_points = [n for n in range(4)]
     orientation_points[0] = [[0], [0], [0]], [[0], [0], [0]], [[0], [0], [0]], [[0], [0], [0]] #center
-    orientation_points[1] = [[2], [0], [0]], [[2-0.07], [0.05], [0]], [[2-0.07], [-0.05], [0]], [[2-0.07], [0], [-0.05]]       # x axis
+    orientation_points[1] = [[-2], [0], [0]], [[-2+0.07], [0.05], [0]], [[-2+0.07], [-0.05], [0]], [[-2+0.07], [0], [-0.05]]   # x axis
     orientation_points[2] = [[0], [-2], [0]], [[0], [-2+0.07], [-0.05]], [[0], [-2+0.07], [0.05]], [[-0.05], [-2+0.07], [0]]   # y axis
     orientation_points[3] = [[0], [0], [-2]], [[0.05], [0], [-2+0.07]], [[-0.05], [0], [-2+0.07]], [[0], [-0.05], [-2+0.07]]   # z axis
     return orientation_points

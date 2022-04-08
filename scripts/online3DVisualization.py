@@ -3,6 +3,7 @@ from math import *
 import numpy as np
 from scipy.spatial.transform import Rotation as R
 import sys
+import time
 
 sys.path.append("../utils/")
 from colors import *
@@ -29,8 +30,8 @@ imuConfiguration = {
     "disableAccelerometer": False,
     "gyroAutoCalib": True,
     "filterMode": 1,
-    "tareSensor": True,
-    "logical_ids": [8],
+    "tareSensor": False,
+    "logical_ids": [7],
     "streaming_commands": [2, 255, 255, 255, 255, 255, 255, 255]
 }
 serial_port = serialOp.initializeImu(imuConfiguration)
@@ -101,6 +102,7 @@ while True:
 
         # Update rotation matrix if there are data
         print("running...")
+        time.sleep(0.1)
         bytes_to_read = serial_port.inWaiting()
         if(bytes_to_read > 0):
             data = serial_port.read(bytes_to_read)
@@ -129,8 +131,8 @@ while True:
         print(GREEN, "Stop streaming.", RESET)
         serial_port = serialOp.stopStreaming(serial_port, imuConfiguration['logical_ids'])
         break
-    except Exception:
-        print(RED, "Unexpected exception occured.", RESET)
-        print(GREEN, "Stop streaming.", RESET)
-        serial_port = serialOp.stopStreaming(serial_port, imuConfiguration['logical_ids'])
-        break
+    # except Exception:
+    #     print(RED, "Unexpected exception occured.", RESET)
+    #     print(GREEN, "Stop streaming.", RESET)
+    #     serial_port = serialOp.stopStreaming(serial_port, imuConfiguration['logical_ids'])
+    #     break
