@@ -15,12 +15,12 @@ import time
 # Ema motion analysis imports
 sys.path.append("../utils/")
 import colors
-import fileManagement
+import file_management
 import drawing
 import poses
-import userInterface
+import user_interface
 import angles
-from realTimeDataMonitor import DataMonitor
+from data_monitor import DataMonitor
 
 # Simplify mediapipe variables
 mp_drawing = mp.solutions.drawing_utils
@@ -54,21 +54,21 @@ def prediction_to_video(video_name, video_path,
 
     # Get video
     video_capture = cv2.VideoCapture(video_path)
-    if not fileManagement.videoCheck(video_capture):
+    if not file_management.videoCheck(video_capture):
         return
 
     # Create output video file
-    output_video = fileManagement.createOutputVideoFile(video_out_path,
+    output_video = file_management.createOutputVideoFile(video_out_path,
                                                         video_capture)
     video_capture.release()
 
     # Create output file data
-    file_metadata = fileManagement.setMetadata(video_name, 
+    file_metadata = file_management.setMetadata(video_name, 
                                                poses.KEYPOINT_DICT_MOVENET, 
                                                poses.JUMP_PROFILE_MOVENET[profile], 
                                                video_path)
                                                
-    fileManagement.writeToJsonFile(file_out_path, 
+    file_management.writeToJsonFile(file_out_path, 
                                    file_metadata, 
                                    write_mode='w+')
 
@@ -77,7 +77,7 @@ def prediction_to_video(video_name, video_path,
 
     # Create video file to process
     video_capture = cv2.VideoCapture(video_path)
-    if not fileManagement.videoCheck(video_capture):
+    if not file_management.videoCheck(video_capture):
         return
 
     # define info for DataMonitor plotting
@@ -158,7 +158,7 @@ def prediction_to_video(video_name, video_path,
 
                 # Write data to file
                 file_data = {'keypoints': selected_keypoints.tolist()}
-                fileManagement.writeToJsonFile(file_out_path, 
+                file_management.writeToJsonFile(file_out_path, 
                                                file_data, 
                                                write_mode='a')
                 
@@ -170,7 +170,7 @@ def prediction_to_video(video_name, video_path,
     
     # Create pickle output data
     pickle_output_data = {"header": file_metadata, "data": pickle_output_list}
-    fileManagement.writePickleFile(file_out_path, pickle_output_data)
+    file_management.writePickleFile(file_out_path, pickle_output_data)
 
     # Finish exhibition
     video_capture.release()
@@ -181,7 +181,7 @@ def prediction_to_video(video_name, video_path,
 # Main functions, select video and apply blazepose algorithm
 if __name__ == "__main__":
     # Select video
-    video_name, video_path, video_out_path, file_out_path, profile = userInterface.initialMenu("blazepose")
+    video_name, video_path, video_out_path, file_out_path, profile = user_interface.initialMenu("blazepose")
 
     # Make predictions
     prediction_to_video(video_name, 

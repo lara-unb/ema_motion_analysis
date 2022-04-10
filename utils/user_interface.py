@@ -3,7 +3,7 @@
 """
 
 import colors
-import fileManagement
+import file_management
 
 # Add new examples by selecter an interger key, a profile and it's path
 VIDEOS = {
@@ -61,7 +61,7 @@ def initialMenu(neural_network):
                 except:
                     print(colors.RED, "Valor inválido!", colors.RESET)
 
-            video_name, video_path, video_out_path, file_out_path = fileManagement.readFileDialog(neural_network, 
+            video_name, video_path, video_out_path, file_out_path = file_management.readFileDialog(neural_network, 
                                                                                                   "Open video file")
             break
         # Select video from examples
@@ -76,7 +76,7 @@ def initialMenu(neural_network):
                 except :
                     print(colors.RED, "Valor inválido!", colors.RESET)
             
-            video_path, video_out_path, file_out_path = fileManagement.getOutputsPaths(VIDEOS[selectedVideo][1],
+            video_path, video_out_path, file_out_path = file_management.getOutputsPaths(VIDEOS[selectedVideo][1],
                                                                                        VIDEOS[selectedVideo][2], 
                                                                                        neural_network)
             video_name = VIDEOS[selectedVideo][1]

@@ -7,8 +7,8 @@ import time
 
 sys.path.append("../utils/")
 from colors import *
-import serialOperations as serialOp
-import pygameOperations as pygameOp
+import serial_operations as serialOp
+import pygame_operations as pygameOp
 
 # Start - Set visual configurations ---------------------------------------------------------------------------
 WINDOW_SIZE =  600

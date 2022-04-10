@@ -9,8 +9,8 @@ import traceback
 import numpy as np
 sys.path.append("../utils/")
 from colors import *
-from realTimeDataMonitor import DataMonitor
-import serialOperations
+from data_monitor import DataMonitor
+import serial_operations
 
 # Transform quaternions to euler angles
 def euler_from_quaternion(x, y, z, w):
@@ -46,26 +46,26 @@ if __name__ == '__main__':
         addresses = [1,2,3,4,5,6,7,8]
 
         # Find and open serial port for the IMU dongle
-        serial_port = serialOperations.getDongleObject()
+        serial_port = serial_operations.getDongleObject()
 
 
         # Stop streaming
-        serial_port = serialOperations.stopStreaming(serial_port, addresses)
+        serial_port = serial_operations.stopStreaming(serial_port, addresses)
         # Manual flush. Might not be necessary
-        serial_port = serialOperations.manualFlush(serial_port)
+        serial_port = serial_operations.manualFlush(serial_port)
  
         print('Starting configuration')
 
         # Setting streaming slots, this means that while streaming sensors will send
         # this data to the dongle: 0 - Quaternions; 41 - Raw accelerations; 255 - No data
         commands = [0, 1, 255, 255, 255, 255, 255, 255]
-        serial_port = serialOperations.setStreamingSlots(serial_port, addresses, commands)
+        serial_port = serial_operations.setStreamingSlots(serial_port, addresses, commands)
 
         # Set magnetometer(explain it better), calibGyro if calibGyro=True and Tare sensor
-        serial_port = serialOperations.calibrateSensor(serial_port, addresses, calibGyro)
+        serial_port = serial_operations.calibrateSensor(serial_port, addresses, calibGyro)
 
         # Start streaming
-        serial_port = serialOperations.startStreaming(serial_port, addresses)
+        serial_port = serial_operations.startStreaming(serial_port, addresses)
         
         try:
             while True:
@@ -78,7 +78,7 @@ if __name__ == '__main__':
                     if len(data) <= 3 or data[0] != 0:
                         continue
 
-                    extracted_data = serialOperations.extractResponse(data)
+                    extracted_data = serial_operations.extractResponse(data)
 
                     # Convert quaternions to visual euler angles
                     euler_angles_rad = euler_from_quaternion(
@@ -119,8 +119,8 @@ if __name__ == '__main__':
             print(RED, "Unexpected exception ocurred: ", RESET)
             print(traceback.format_exc())
             print(GREEN, "Stoping streaming.", RESET)
-            serial_port = serialOperations.stopStreaming(serial_port, addresses)
+            serial_port = serial_operations.stopStreaming(serial_port, addresses)
         except KeyboardInterrupt:
             print(CYAN, "Keyboard finished execution.", RESET)
             print(RED, "Stop streaming.", RESET)
-            serial_port = serialOperations.stopStreaming(serial_port, addresses)
+            serial_port = serial_operations.stopStreaming(serial_port, addresses)
