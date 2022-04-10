@@ -76,7 +76,7 @@ def initialMenu(neural_network):
                 except :
                     print(colors.RED, "Valor inválido!", colors.RESET)
             
-            video_path, video_out_path, file_out_path = file_management.getOutputsPaths(VIDEOS[selectedVideo][1],
+            video_path, video_out_path, file_out_path = file_management.get_outputs_paths(VIDEOS[selectedVideo][1],
                                                                                        VIDEOS[selectedVideo][2], 
                                                                                        neural_network)
             video_name = VIDEOS[selectedVideo][1]
