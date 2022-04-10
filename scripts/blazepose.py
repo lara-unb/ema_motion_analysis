@@ -1,7 +1,7 @@
 """Pose detection using BlazePose.
-
-Esse código é uma modificação da solução demonstração disponível em 
+This code is inspired in the demo available in:
 https://google.github.io/mediapipe/solutions/pose.html#python-solution-api
+
 """
 
 # General imports
@@ -134,9 +134,8 @@ def prediction_to_video(video_name, video_path,
                                       selected_keypoints)
 
                 # Get angles and draw it in the  screen
-                poses_angles = angles.getAngles(selected_keypoints, 
-                                                poses.ANGLES_BLAZEPOSE, 
-                                                profile, 
+                poses_angles = angles.get_angles(selected_keypoints, 
+                                                poses.ANGLES_BLAZEPOSE[profile], 
                                                 pose_selected)
 
                 # Write angles data in the screen

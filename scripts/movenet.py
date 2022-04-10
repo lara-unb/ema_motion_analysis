@@ -134,9 +134,8 @@ def predictionToVideo(interpreter, video_name, video_path,
                                   selected_keypoints)
 
             # Get angles and draw it in the  screen
-            poses_angles = angles.getAngles(selected_keypoints, 
-                                            poses.ANGLES_MOVENET, 
-                                            profile, 
+            poses_angles = angles.get_angles(selected_keypoints, 
+                                            poses.ANGLES_MOVENET[profile],
                                             pose_selected)
 
             # Draw angle to the screen
