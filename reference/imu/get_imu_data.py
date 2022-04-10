@@ -16,7 +16,7 @@ import serial.tools.list_ports
 import sys
 
 sys.path.append("../utils/")
-from dataMonitor import DataMonitor
+from reference.dataMonitor import DataMonitor
 
 
 # --------------------------------------------------------- DATA MONITOR CONFIG
