@@ -131,10 +131,10 @@ class DataMonitor(object):
                           style=QtCore.Qt.SolidLine)
             channel['curve'] = channel['plot'].plot(pen = pen)
 
-        graphUpdateSpeedMs = 1
+        graph_update_ms = 1
         timer = QtCore.QTimer()
         timer.timeout.connect(self.animate)
-        timer.start(graphUpdateSpeedMs)   
+        timer.start(graph_update_ms)   
         QtGui.QApplication.instance().exec_()
 
     @property
