@@ -190,13 +190,15 @@ def selectConnections(desired_keypoints, keypoints_dict,
     if neural_network=="movenet":
         for pos, color in keypoints_connections.items():
             p1, p2 = pos
-            if (p1 in list(new_keypoints_dict.values())) and (p2 in list(new_keypoints_dict.values())):
+            if (p1 in list(new_keypoints_dict.values())
+                and p2 in list(new_keypoints_dict.values())):
                 p1_tf = list(new_keypoints_dict.values()).index(p1)
                 p2_tf = list(new_keypoints_dict.values()).index(p2)
                 new_keypoints_connections[(p1_tf, p2_tf)] = color
     if neural_network=="blazepose":
         for p1, p2 in keypoints_connections:
-            if (p1 in list(new_keypoints_dict.values())) and (p2 in list(new_keypoints_dict.values())):
+            if (p1 in list(new_keypoints_dict.values()) 
+                and p2 in list(new_keypoints_dict.values())):
                 p1_tf = list(new_keypoints_dict.values()).index(p1)
                 p2_tf = list(new_keypoints_dict.values()).index(p2)
                 new_keypoints_connections[(p1_tf, p2_tf)] = "c"
