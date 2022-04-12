@@ -31,10 +31,10 @@ imuConfiguration = {
     "gyroAutoCalib": True,
     "filterMode": 1,
     "tareSensor": False,
-    "logical_ids": [7],
+    "logical_ids": [7, 8],
     "streaming_commands": [2, 255, 255, 255, 255, 255, 255, 255]
 }
-serial_port = serialOp.initializeImu(imuConfiguration)
+serial_port = serialOp.initialize_imu(imuConfiguration)
 
 # Main Loop
 SCALE = 100
@@ -108,7 +108,7 @@ while True:
             data = serial_port.read(bytes_to_read)
             if data[0] != 0:
                 continue
-            extracted_data = serialOp.extractRotationMatrix(data)
+            extracted_data = serialOp.extract_rotation_matrix(data)
             rotation_matrix = extracted_data['rotation_matrix']
 
         # Event user event handling handling
@@ -121,7 +121,7 @@ while True:
             # Tare sensor
             keys = pygame.key.get_pressed()
             if keys[pygame.K_t]:
-                serialOp.tareSensor(serial_port, imuConfiguration['logical_ids'])
+                serialOp.tare_sensor(serial_port, imuConfiguration['logical_ids'])
         
         # Update pygame display
         pygame.display.update()
@@ -129,10 +129,10 @@ while True:
     except KeyboardInterrupt:
         print(CYAN, "Keyboard finished execution.", RESET)
         print(GREEN, "Stop streaming.", RESET)
-        serial_port = serialOp.stopStreaming(serial_port, imuConfiguration['logical_ids'])
+        serial_port = serialOp.stop_streaming(serial_port, imuConfiguration['logical_ids'])
         break
     # except Exception:
     #     print(RED, "Unexpected exception occured.", RESET)
     #     print(GREEN, "Stop streaming.", RESET)
-    #     serial_port = serialOp.stopStreaming(serial_port, imuConfiguration['logical_ids'])
+    #     serial_port = serialOp.stop_streaming(serial_port, imuConfiguration['logical_ids'])
     #     break

@@ -59,7 +59,7 @@ if __name__ == '__main__':
         # Setting streaming slots, this means that while streaming sensors will send
         # this data to the dongle: 0 - Quaternions; 41 - Raw accelerations; 255 - No data
         commands = [0, 1, 255, 255, 255, 255, 255, 255]
-        serial_port = serial_operations.setStreamingSlots(serial_port, addresses, commands)
+        serial_port = serial_operations.set_streaming_slots(serial_port, addresses, commands)
 
         # Set magnetometer(explain it better), calibGyro if calibGyro=True and Tare sensor
         serial_port = serial_operations.calibrateSensor(serial_port, addresses, calibGyro)

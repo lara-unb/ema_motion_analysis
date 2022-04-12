@@ -83,7 +83,7 @@ if __name__ == '__main__':
         # 41 - Raw accelerations; 
         # 255 - No data
         commands = [0, 1, 255, 255, 255, 255, 255, 255]
-        serial_port = serial_operations.setStreamingSlots(serial_port, logical_ids, commands)
+        serial_port = serial_operations.set_streaming_slots(serial_port, logical_ids, commands)
 
         # Configure dictionary
         configDict = {
@@ -94,10 +94,10 @@ if __name__ == '__main__':
             "filterMode": 1,
             "tareSensor": True
         }
-        serial_port = serial_operations.configureSensor(serial_port, logical_ids, configDict)
+        serial_port = serial_operations.configure_sensor(serial_port, logical_ids, configDict)
         
         # Show some sensor configuration
-        serial_operations.getSensorInformation(serial_port, logical_ids)
+        serial_operations.get_sensor_information(serial_port, logical_ids)
 
         # Start streaming
         serial_port = serial_operations.startStreaming(serial_port, logical_ids)

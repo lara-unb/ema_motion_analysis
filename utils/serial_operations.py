@@ -1,37 +1,61 @@
-from re import I
 import serial.tools.list_ports
 import time
 import numpy as np
-
 import sys
 sys.path.append("../utils/")
 from colors import *
 
+SMALL_IMU_DONGLE_PORT = 4128
 
 # If permission denied error occurs in Linux try:
 # sudo chmod 666 /dev/ttyACM0 -> with the correspondent COM port
-def getDongleObject():
+def get_dongle_object():
+    """ Create a serial port object to operate with imu dongle
+    
+    Returns: 
+        serial_port: PySerial object
+    """
+
+    # Lists available ports and select dongle port
     ports_list = serial.tools.list_ports.comports()
     print("Ports available: ")
     for wire in ports_list:
-        print("Port:", wire.device, "\tSerial#:", wire.serial_number, "\tDesc:", wire.description, 'PID', wire.pid)
-        if wire.pid == 4128: # small IMU dongle
+        text = "Port: {0}\tSerial#:{1}\tDesc:{2} PID {3}".format(wire.device, 
+                                                                wire.serial_number, 
+                                                                wire.description,
+                                                                wire.pid)
+        print(text)
+        if wire.pid == SMALL_IMU_DONGLE_PORT:
             portIMU = wire.device
-    # portIMU = '/dev/tty.usbmodem14101' # rPi
+
+    # Instantiate seria port object
     serial_port = serial.Serial(port=portIMU, baudrate=115200, timeout=0.01)
-    time.sleep(0.1)
-    serial_port.flush()
-    serial_port.flushInput()
-    serial_port.flushOutput()
-    time.sleep(0.1)
+    manual_flush(serial_port)
+
     return serial_port
 
-def manualFlush(serial_port):
+def manual_flush(serial_port):
+    """ Clean serial port buffer
+
+    Args:
+        serial_port: PySerial Object
+    """
     while not serial_port.inWaiting() == 0:
         serial_port.read(serial_port.inWaiting())
-    return serial_port
 
-def createIMUCommandString(logical_id, command_number, arguments = []):
+def create_imu_command(logical_id, command_number, arguments = []):
+    """ Create imu command string
+
+    Args: 
+        logical_id: integer represents imu sensor configure to dongle 
+        (configure in sensor suit)
+        command_number: integer represents a command (see all commands in
+        user manual)
+        arguments: list with arguments, if necessary
+    
+    Return:
+        encoded string with the command in the correct format
+    """
     # Create command
     command = ">"+str(logical_id)+","+str(command_number)
     if(len(arguments) != 0):
@@ -44,8 +68,15 @@ def createIMUCommandString(logical_id, command_number, arguments = []):
     command += '\n'
     return command.encode()
 
-def applyCommand(serial_port, commandString, showResponse=False):
-    serial_port.write(commandString)
+def apply_command(serial_port, command, showResponse=False):
+    """ Apply command in sensor
+
+    Args:
+        serial_port: PySerial Object
+        command: encoded string with the command
+        showResponse: boolean that decides if output will be displayed
+    """
+    serial_port.write(command)
     time.sleep(0.1)
     if(showResponse):
         while serial_port.inWaiting():
@@ -53,82 +84,126 @@ def applyCommand(serial_port, commandString, showResponse=False):
         print(out)
     time.sleep(0.1)
 
-def stopStreaming(serial_port, logical_ids):
+def stop_streaming(serial_port, logical_ids):
+    """ Apply stop streaming operation
+
+    Args:
+        serial_port: PySerial Object
+        logical_ids: list of sensors that the command should be applied
+    """
     for id in logical_ids:
-        commandString = createIMUCommandString(id, 86)
-        applyCommand(serial_port, commandString)
+        command = create_imu_command(id, 86)
+        apply_command(serial_port, command)
+
+def start_streaming(serial_port, logical_ids):
+    """ Apply start streaming operation
+
+    Args:
+        serial_port: PySerial Object
+        logical_ids: list of sensors that the command should be applied
+    """
+    for id in logical_ids:
+        command = create_imu_command(id, 85)
+        apply_command(serial_port, command)
     return serial_port
 
-def startStreaming(serial_port, logical_ids):
+def set_streaming_slots(serial_port, logical_ids, commands):
+    """ Set streaming slots
+
+    Args:
+        serial_port: PySerial Object
+        logical_ids: list of sensors that the command should be applied
+        commands: list of integer that commands slots should be filled
+    """
     for id in logical_ids:
-        commandString = createIMUCommandString(id, 85)
-        applyCommand(serial_port, commandString)
+        command = create_imu_command(id, 80, commands)
+        print(RED, command)
+        apply_command(serial_port, command, True)
     return serial_port
 
-def setStreamingSlots(serial_port, logical_ids, commands):
-    for id in logical_ids:
-        commandString = createIMUCommandString(id, 80, commands)
-        print(RED, commandString)
-        applyCommand(serial_port, commandString, True)
-    return serial_port
+def configure_sensor(serial_port, configDict):
+    """ Apply common sensor configuration
 
-# Explain configDict
-def configureSensor(serial_port, logical_ids, configDict):
+    Args:
+        serial_port: PySerial Object
+        configDict: dictionary with sensor basic configuration {
+                "disableCompass": Boolean,
+                "disableGyro": Boolean,
+                "disableAccelerometer": Boolean,
+                "gyroAutoCalib": Boolean,
+                "tareSensor": Boolean,
+                "filterMode": Integer (see user's manual)
+                "logical_ids": list of logical ids,
+                "streaming_commands": list of streaming slots
+        }
+    """
     if(configDict["disableGyro"]):
-        for id in logical_ids:
-            commandString = createIMUCommandString(id, 107)
-            applyCommand(serial_port, commandString)
+        for id in configDict["logical_ids"]:
+            command = create_imu_command(id, 107)
+            apply_command(serial_port, command)
+
     if(configDict["disableAccelerometer"]):
-        for id in logical_ids:
-            commandString = createIMUCommandString(id, 108)
-            applyCommand(serial_port, commandString)
+        for id in configDict["logical_ids"]:
+            command = create_imu_command(id, 108)
+            apply_command(serial_port, command)
+
     if(configDict["disableCompass"]):
-        for id in logical_ids:
-            commandString = createIMUCommandString(id, 109)
-            applyCommand(serial_port, commandString)
-    # Set filter mode
+        for id in configDict["logical_ids"]:
+            command = create_imu_command(id, 109)
+            apply_command(serial_port, command)
+
     filterMode = configDict["filterMode"]
-    for id in logical_ids:
-        commandString = createIMUCommandString(id, 123, [filterMode])
-        applyCommand(serial_port, commandString)
+    for id in configDict["logical_ids"]:
+        command = create_imu_command(id, 123, [filterMode])
+        apply_command(serial_port, command)
 
     if configDict["gyroAutoCalib"]:
-        for id in logical_ids:
-            commandString = createIMUCommandString(id, 165)
-            applyCommand(serial_port, commandString)
+        for id in configDict["logical_ids"]:
+            command = create_imu_command(id, 165)
+            apply_command(serial_port, command)
 
     if configDict["tareSensor"]:
-        for id in logical_ids:
-            commandString = createIMUCommandString(id, 96)
-            applyCommand(serial_port, commandString)
-    
-    return serial_port
+        for id in configDict["logical_ids"]:
+            command = create_imu_command(id, 96)
+            apply_command(serial_port, command)
 
-def tareSensor(serial_port, logical_ids):
+def tare_sensor(serial_port, logical_ids):
+    """ Apply tare sensor operation
+
+    Args:
+        serial_port: PySerial Object
+        logical_ids: list of sensors that the command should be applied
+    """
     for id in logical_ids:
-        commandString = createIMUCommandString(id, 96)
-        applyCommand(serial_port, commandString)
+        command = create_imu_command(id, 96)
+        apply_command(serial_port, command)
 
-def getSensorInformation(serial_port, addresses):
-    # Current Filter Mode 
-    for i in range(len(addresses)):
-        serial_port.write(('>'+str(addresses[i])+',152\n').encode())
-        time.sleep(0.1)
-        while serial_port.inWaiting():
-            out = serial_port.read(serial_port.inWaiting()).decode()
-            if(out[0] == "0"):
-                print("Current Filter Mode: >> ", out)
+def get_sensor_information(serial_port, logical_ids):
+    """ Get some sensor current information such as filter mode and trust values
+
+    Args:
+        serial_port: PySerial Object
+        logical_ids: list of sensors that the command should be applied
+    """ 
+    # Current filter mode
+    for id in logical_ids:
+        command = create_imu_command(id, 152)
+        apply_command(serial_port, command)
     # Current accelerometer trust values
-    for i in range(len(addresses)):
-        serial_port.write(('>'+str(addresses[i])+',130\n').encode())
-        time.sleep(0.1)
-        while serial_port.inWaiting():
-            out = serial_port.read(serial_port.inWaiting()).decode()
-            if(out[0] == "0"):
-                print("Current Accelerometer Trust Values: >> ", out)
+    for id in logical_ids:
+        command = create_imu_command(id, 130)
+        apply_command(serial_port, command)
 
 # Get rotation matrix streamed in first slot. 
-def extractRotationMatrix(data):
+def extract_rotation_matrix(data):
+    """ Manipulate data to obtain rotation matrix
+    
+    Args:
+        data: Raw data that sensor send
+    
+    Returns: 
+        rotation matrix dictionary
+    """
     decoded_data = data.decode()
     list_data = decoded_data.replace('\r\n',' ').split(' ')
     cleaned_list_data = list(filter(None, list_data))
@@ -137,18 +212,36 @@ def extractRotationMatrix(data):
     rotation_matrix = rotatation_vector.reshape((3,3))
     return {'rotation_matrix': rotation_matrix}   
 
-def initializeImu(configurationDict):
+def initialize_imu(configuration_dict):
+    """ Initialize imu dongle and sensor
+
+    Args:
+        configDict: dictionary with sensor basic configuration {
+                "disableCompass": Boolean,
+                "disableGyro": Boolean,
+                "disableAccelerometer": Boolean,
+                "gyroAutoCalib": Boolean,
+                "tareSensor": Boolean,
+                "filterMode": Integer (see user's manual)
+                "logical_ids": list of logical ids,
+                "streaming_commands": list of streaming slots
+        }
+    
+    Returns:
+        serial_port: PySerial Object
+
+    """
     # Find and open serial port for the IMU dongle
     print("Getting imu object:")
-    serial_port = getDongleObject()
+    serial_port = get_dongle_object()
     print(GREEN, "Done.", RESET)
 
     # Clean outputs 
-    serial_port = manualFlush(serial_port)
+    manual_flush(serial_port)
     
     # Stop streaming
     print("Stoping streaming.")
-    serial_port = stopStreaming(serial_port, configurationDict['logical_ids'])
+    stop_streaming(serial_port, configuration_dict['logical_ids'])
 
 
     # Setting streaming slots, this means that while streaming sensors will send
@@ -157,17 +250,20 @@ def initializeImu(configurationDict):
     # 1 - tared orientation as euler angles; 
     # 2 - rotation matrix
     # 255 - No data
-    serial_port = setStreamingSlots(serial_port, configurationDict['logical_ids'], configurationDict['streaming_commands'])
+    # See user manual to get more information
+    set_streaming_slots(serial_port, 
+                     configuration_dict['logical_ids'], 
+                     configuration_dict['streaming_commands'])
 
     # Set magnetometer(explain it better), calibGyro if calibGyro=True and Tare sensor
     print('Starting configuration: ')
-    serial_port = configureSensor(serial_port, configurationDict['logical_ids'], configurationDict)
+    configure_sensor(serial_port, configuration_dict)
     print(GREEN, "Done.", RESET)
 
 
     print(CYAN, "Starting streamnig.", RESET)
     # Start streaming
-    serial_port = startStreaming(serial_port, configurationDict['logical_ids'])
+    start_streaming(serial_port, configuration_dict['logical_ids'])
     
     print(GREEN, "IMU's ready to use.", RESET)
 
