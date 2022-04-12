@@ -53,6 +53,7 @@ if __name__ == '__main__':
 
         # Initialize imu
         serial_port = serial_op.initialize_imu(imuConfiguration)
+        
         try:
             startTime = time.time()
             while True:
