@@ -86,3 +86,9 @@ Para a execução dos programas da IMU certifique-se de que o dongle está conec
 
 Em caso de dúvidas ler o manual disponível em: 
 https://yostlabs.com/wp/wp-content/uploads/pdf/3-Space-Sensor-Users-Manual-1.pdf
+
+
+## Styleguide
+
+Os códigos desta demonstração foram escritos com base no style guide disponível 
+em: https://peps.python.org/pep-0008/#introduction.
