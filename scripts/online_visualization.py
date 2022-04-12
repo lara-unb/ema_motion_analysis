@@ -83,6 +83,12 @@ while True:
                                     WINDOW_SIZE,
                                     orientation_points)
 
+
+        # print("Euler angles: ")
+        # serial_op.manual_flush(serial_port)
+        # command  = serial_op.create_imu_command(7, 1)
+        # serial_op.apply_command(serial_port, command, True)[-3:]
+        # input()
         # Update rotation matrix if there are data
         print("running...")
         time.sleep(0.1)

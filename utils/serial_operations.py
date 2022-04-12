@@ -83,6 +83,7 @@ def apply_command(serial_port, command, showResponse=False):
             out = '>> ' + serial_port.read(serial_port.inWaiting()).decode()
         print(out)
     time.sleep(0.1)
+    # return out
 
 def stop_streaming(serial_port, logical_ids):
     """ Apply stop streaming operation
