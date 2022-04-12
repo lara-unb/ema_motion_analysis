@@ -137,3 +137,36 @@ def draw_cube_points(window, cube_points, rotation_matrix, points, SCALE, WINDOW
         points[i] = (x,y)
         i += 1
         pygame.draw.circle(window, CYAN_RGB, (x, y), 5)
+
+
+def render_information(window, 
+                       texts_dict, 
+                       cube_points, 
+                       rotation_matrix, 
+                       SCALE, 
+                       WINDOW_SIZE,
+                       orientation_points):
+    draw_texts(window, texts_dict)
+        
+    #draw cube points
+    points = [0 for _ in range(len(cube_points))]
+    draw_cube_points(
+        window, 
+        cube_points,
+        rotation_matrix,
+        points,
+        SCALE,
+        WINDOW_SIZE
+    )
+    # draw orientation points
+    o_points, orientation_colors = draw_orientation_points(
+        window,
+        rotation_matrix,
+        orientation_points,
+        SCALE,
+        WINDOW_SIZE
+    )
+
+    # Draw lines between points
+    connect_cube_points(window, points, pygame, WHITE_RGB)
+    connect_orientation_points(window, o_points, pygame, orientation_colors)

@@ -1,30 +1,30 @@
 import pygame
 from math import *
 import numpy as np
-from scipy.spatial.transform import Rotation as R
 import sys
 import time
+import traceback
 
 sys.path.append("../utils/")
 from colors import *
-import serial_operations as serialOp
-import pygame_operations as pygameOp
+import serial_operations as serial_op
+import pygame_operations as pygame_op
 
-# Start - Set visual configurations ---------------------------------------------------------------------------
+# Start - Set visual configurations 
 WINDOW_SIZE =  600
 window = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
 clock = pygame.time.Clock()
 
-# cube points inicial location
+# Cube points initialized
 SIZE_X = 1
 SIZE_Y = 0.5
 SIZE_Z = 1.5
-cube_points = pygameOp.get_3d_object_points(SIZE_X, SIZE_Y, SIZE_Z)
+cube_points = pygame_op.get_3d_object_points(SIZE_X, SIZE_Y, SIZE_Z)
 
-orientation_points = pygameOp.get_orientation_points()
+orientation_points = pygame_op.get_orientation_points()
 
 
-imuConfiguration = {
+imu_configuration = {
     "disableCompass": True,
     "disableGyro": False,
     "disableAccelerometer": False,
@@ -34,7 +34,7 @@ imuConfiguration = {
     "logical_ids": [7, 8],
     "streaming_commands": [2, 255, 255, 255, 255, 255, 255, 255]
 }
-serial_port = serialOp.initialize_imu(imuConfiguration)
+serial_port = serial_op.initialize_imu(imu_configuration)
 
 # Main Loop
 SCALE = 100
@@ -49,24 +49,24 @@ rotation_matrix = np.array([[0,0,0], [0,0,0], [0,0,0]])
 texts_dict = [
     {
         "text": "X axis",
-        "color": pygameOp.RED_RGB,
-        "position": (20, 20)
+        "color": pygame_op.RED_RGB,
+        "position": (20, 20),
     },
     {
         "text": "Y axis",
-        "color": pygameOp.GREEN_RGB,
-        "position": (20, 50)
+        "color": pygame_op.GREEN_RGB,
+        "position": (20, 50),
     },
     {
         "text": "Z axis",
-        "color": pygameOp.CYAN_RGB,
-        "position": (20, 80)
+        "color": pygame_op.CYAN_RGB,
+        "position": (20, 80),
     },
     {
         "text": "Press t to tare.",
-        "color": pygameOp.WHITE_RGB,
-        "position": (20, WINDOW_SIZE-40)
-    }
+        "color": pygame_op.WHITE_RGB,
+        "position": (20, WINDOW_SIZE-40),
+    },
 ]
 
 while True:
@@ -75,45 +75,28 @@ while True:
         clock.tick(60)
         window.fill((0,0,0))
 
-        pygameOp.draw_texts(window, texts_dict)
-        
-        #draw cube points
-        points = [0 for _ in range(len(cube_points))]
-        pygameOp.draw_cube_points(
-            window, 
-            cube_points,
-            rotation_matrix,
-            points,
-            SCALE,
-            WINDOW_SIZE
-        )
-        # draw orientation points
-        o_points, orientation_colors = pygameOp.draw_orientation_points(
-            window,
-            rotation_matrix,
-            orientation_points,
-            SCALE,
-            WINDOW_SIZE
-        )
-
-        # Draw lines between points
-        pygameOp.connect_cube_points(window, points, pygame, pygameOp.WHITE_RGB)
-        pygameOp.connect_orientation_points(window, o_points, pygame, orientation_colors)
+        pygame_op.render_information(window,
+                                    texts_dict,
+                                    cube_points,
+                                    rotation_matrix,
+                                    SCALE,
+                                    WINDOW_SIZE,
+                                    orientation_points)
 
         # Update rotation matrix if there are data
         print("running...")
         time.sleep(0.1)
         bytes_to_read = serial_port.inWaiting()
-        if(bytes_to_read > 0):
+        if bytes_to_read > 0:
             data = serial_port.read(bytes_to_read)
             if data[0] != 0:
                 continue
-            extracted_data = serialOp.extract_rotation_matrix(data)
+            extracted_data = serial_op.extract_rotation_matrix(data)
             rotation_matrix = extracted_data['rotation_matrix']
 
         # Event user event handling handling
         for event in pygame.event.get():
-            # Get qui event
+            # Get quit event
             if event.type == pygame.QUIT:
                 pygame.quit()
                 raise KeyboardInterrupt
@@ -121,7 +104,8 @@ while True:
             # Tare sensor
             keys = pygame.key.get_pressed()
             if keys[pygame.K_t]:
-                serialOp.tare_sensor(serial_port, imuConfiguration['logical_ids'])
+                serial_op.tare_sensor(serial_port, 
+                                      imu_configuration['logical_ids'])
         
         # Update pygame display
         pygame.display.update()
@@ -129,10 +113,13 @@ while True:
     except KeyboardInterrupt:
         print(CYAN, "Keyboard finished execution.", RESET)
         print(GREEN, "Stop streaming.", RESET)
-        serial_port = serialOp.stop_streaming(serial_port, imuConfiguration['logical_ids'])
+        serial_port = serial_op.stop_streaming(serial_port, 
+                                               imu_configuration['logical_ids'])
         break
-    # except Exception:
-    #     print(RED, "Unexpected exception occured.", RESET)
-    #     print(GREEN, "Stop streaming.", RESET)
-    #     serial_port = serialOp.stop_streaming(serial_port, imuConfiguration['logical_ids'])
-    #     break
+    except Exception:
+        print(RED, "Unexpected exception occured.", RESET)
+        print(traceback.format_exc())
+        print(GREEN, "Stop streaming.", RESET)
+        serial_port = serial_op.stop_streaming(serial_port, 
+                                               imu_configuration['logical_ids'])
+        break
