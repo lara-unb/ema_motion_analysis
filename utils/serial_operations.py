@@ -210,7 +210,23 @@ def extract_rotation_matrix(data):
     rotatation_vector = cleaned_list_data[0][3:].split(',')
     rotatation_vector = np.array(rotatation_vector, dtype=np.float64)
     rotation_matrix = rotatation_vector.reshape((3,3))
-    return {'rotation_matrix': rotation_matrix}   
+    return {'rotation_matrix': rotation_matrix}
+
+def extract_euler_angles(data):
+    """ Manipulate data to obtain rotation matrix
+    
+    Args:
+        data: Raw data that sensor send
+    
+    Returns: 
+        rotation matrix dictionary
+    """
+    decoded_data = data.decode()
+    list_data = decoded_data.replace('\r\n',' ').split(' ')
+    cleaned_list_data = list(filter(None, list_data))
+    euler_vector = cleaned_list_data[0][3:].split(',')
+    euler_vector = np.array(euler_vector, dtype=np.float64)
+    return {'euler_vector': euler_vector}
 
 def initialize_imu(configuration_dict):
     """ Initialize imu dongle and sensor
