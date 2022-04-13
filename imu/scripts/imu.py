@@ -8,9 +8,9 @@ import sys
 import traceback
 
 sys.path.append("../utils/")
-from colors import *
-from data_monitor import DataMonitor
-import serial_operations as serial_op
+from data_visualization.colors import *
+from data_visualization.data_monitor import DataMonitor
+import imu.utils.serial_operations as serial_op
 import math
 
 # Define data monitor channels

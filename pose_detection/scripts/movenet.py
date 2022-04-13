@@ -15,10 +15,11 @@ import drawing
 import poses
 import user_interface
 import angles
-import colors
-from data_monitor import DataMonitor
 import time
 
+sys.path.append("../../data_visualization")
+from data_monitor import DataMonitor
+import colors
 
 # Threshold of a prediction confidence
 THRESHOLD = 0.3

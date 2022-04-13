@@ -5,7 +5,8 @@
 from matplotlib import colors
 import numpy as np
 import cv2
-
+import sys
+sys.path.append("../../data_visualization")
 import colors
 
 LINEWIDTH_RATIO = 280

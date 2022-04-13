@@ -3,7 +3,7 @@ import time
 import numpy as np
 import sys
 sys.path.append("../utils/")
-from colors import *
+from data_visualization.colors import *
 
 SMALL_IMU_DONGLE_PORT = 4128
 

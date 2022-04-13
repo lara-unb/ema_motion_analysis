@@ -11,7 +11,7 @@ import numpy as np
 import mediapipe as mp
 import sys
 
-sys.path.append("../utils/")
+sys.path.append("../../data_visualization")
 import colors
 
 mp_pose = mp.solutions.pose

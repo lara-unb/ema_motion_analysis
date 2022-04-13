@@ -6,7 +6,10 @@ import pickle
 import cv2
 import json
 import pickle
-import colors
+import sys
+
+sys.path.append("../../data_visualization")
+import colors as colors
 import os
 
 def get_current_module_path():

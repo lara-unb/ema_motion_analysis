@@ -1,7 +1,8 @@
 """User interface functions and dicts.
 
 """
-
+import sys
+sys.path.append("../../data_visualization")
 import colors
 import file_management
 

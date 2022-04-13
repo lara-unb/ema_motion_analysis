@@ -14,12 +14,14 @@ import time
 
 # Ema motion analysis imports
 sys.path.append("../utils/")
-import colors
 import file_management
 import drawing
 import poses
 import user_interface
 import angles
+
+sys.path.append("../../data_visualization")
+import colors as colors
 from data_monitor import DataMonitor
 
 # Simplify mediapipe variables

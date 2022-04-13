@@ -10,9 +10,9 @@ import time
 import traceback
 
 sys.path.append("../utils/")
-from colors import *
-import serial_operations as serial_op
-import pygame_operations as pygame_op
+from data_visualization.colors import *
+import imu.utils.serial_operations as serial_op
+import imu.utils.pygame_operations as pygame_op
 
 # Start - Set visual configurations 
 WINDOW_SIZE =  600
