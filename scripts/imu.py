@@ -1,3 +1,7 @@
+"""Real time plot of IMU euler angles.
+
+"""
+
 import math
 import time
 import sys

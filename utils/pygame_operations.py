@@ -1,3 +1,7 @@
+"""Functions used for 3D IMU visualization
+
+"""
+
 import numpy as np
 import pygame
 
@@ -5,11 +9,13 @@ import pygame
 pygame.font.init()
 Font = pygame.font.SysFont('didot.ttc',  30)
 
+# Define constants for the colors used in the pygame window
 RED_RGB = (255, 0, 0)
 GREEN_RGB = (0, 255, 0)
 CYAN_RGB = (0, 255, 255) 
 WHITE_RGB = (255, 255, 255) 
 
+# Matrix to project a 3D object in 2D
 PROJECTION_MATRIX = [
     [1,0,0],
     [0,1,0],
@@ -18,6 +24,18 @@ PROJECTION_MATRIX = [
 
 
 def get_3d_object_points(size_x, size_y, size_z):
+    """ Get 3D object point 
+
+    Args:
+        size_x: float 
+        size_y: 
+        size_z: 
+    
+    Return:
+        objectPoints: 
+        
+
+    """
     objectPoints = [n for n in range(8)]
     objectPoints[0] = [[-size_x], [-size_y], [size_z]]
     objectPoints[1] = [[size_x],[-size_y],[size_z]]

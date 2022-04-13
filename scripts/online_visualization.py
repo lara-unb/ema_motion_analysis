@@ -1,3 +1,7 @@
+"""3D IMU visualization using rotation matrix
+
+"""
+
 import pygame
 from math import *
 import numpy as np
@@ -23,7 +27,7 @@ cube_points = pygame_op.get_3d_object_points(SIZE_X, SIZE_Y, SIZE_Z)
 
 orientation_points = pygame_op.get_orientation_points()
 
-
+# Set parameters that will be configured
 imu_configuration = {
     "disableCompass": True,
     "disableGyro": False,
