@@ -12,7 +12,7 @@ import sys
 sys.path.append("../utils/")
 import file_management
 import drawing
-import utils
+import data_operations
 import poses
 import user_interface
 import angles
@@ -108,10 +108,10 @@ def predictionToVideo(interpreter, video_name, video_path,
             # Key points
             frame_width = frame.shape[0]
             frame_height = frame.shape[1]
-            keypoints = utils.transformDATA(keypoints_with_scores, 
-                                            THRESHOLD, 
-                                            frame_width, 
-                                            frame_height)
+            keypoints = data_operations.mark_keypoints_bellow_threshold(keypoints_with_scores, 
+                                                              THRESHOLD, 
+                                                              frame_width, 
+                                                              frame_height)
 
             # Select correct pose profile
             pose_selected = poses.JUMP_PROFILE_MOVENET[profile]
