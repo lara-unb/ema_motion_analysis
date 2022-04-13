@@ -27,14 +27,13 @@ def get_3d_object_points(size_x, size_y, size_z):
     """ Get 3D object point 
 
     Args:
-        size_x: float 
-        size_y: 
-        size_z: 
+        size_x: float with the x point location
+        size_y: float with the y point location
+        size_z: float with the z point location
     
     Return:
-        objectPoints: 
+        objectPoints: vector with the (x, y, z) location of each point (8)
         
-
     """
     objectPoints = [n for n in range(8)]
     objectPoints[0] = [[-size_x], [-size_y], [size_z]]
@@ -47,21 +46,77 @@ def get_3d_object_points(size_x, size_y, size_z):
     objectPoints[7] = [[-size_x],[size_y],[-size_z]]
     return objectPoints
 
-# center -> orientation_points[0]
-# x axis -> orientation_points[1]
-# y axis -> orientation_points[2]
-# z axis -> orientation_points[3]
-# first vector: end of orientation arrow
-# second, third and fourth vectors: points to draw the arrow
 def get_orientation_points():
+    """ Get 3D Orientation points 
+
+    Return:
+        orientation_points: vector with the (x, y, z) location of each 
+            orientation (center, x, y, z) and their arrows
+        
+    """
+
+    # center -> orientation_points[0]
+    # x axis -> orientation_points[1]
+    # y axis -> orientation_points[2]
+    # z axis -> orientation_points[3]
+    # first vector: end of orientation arrow
+    # second, third and fourth vectors: points used to draw the arrow
+    #                                       with the draw_polygon function
     orientation_points = [n for n in range(4)]
-    orientation_points[0] = [[0], [0], [0]], [[0], [0], [0]], [[0], [0], [0]], [[0], [0], [0]] #center
-    orientation_points[1] = [[-2], [0], [0]], [[-2+0.07], [0.05], [0]], [[-2+0.07], [-0.05], [0]], [[-2+0.07], [0], [-0.05]]   # x axis
-    orientation_points[2] = [[0], [-2], [0]], [[0], [-2+0.07], [-0.05]], [[0], [-2+0.07], [0.05]], [[-0.05], [-2+0.07], [0]]   # y axis
-    orientation_points[3] = [[0], [0], [-2]], [[0.05], [0], [-2+0.07]], [[-0.05], [0], [-2+0.07]], [[0], [-0.05], [-2+0.07]]   # z axis
+    orientation_points[0] = [
+                                [[0], [0], [0]], # center point -> does not have arrow
+                                [[0], [0], [0]], 
+                                [[0], [0], [0]], 
+                                [[0], [0], [0]],
+                            ] #center
+
+    orientation_points[1] = [
+                                [[-2], [0], [0]],           # end of orientation arrow
+                                [[-2+0.07], [0.05], [0]],   # arrow point 1
+                                [[-2+0.07], [-0.05], [0]],  # arrow point 2
+                                [[-2+0.07], [0], [-0.05]],  # arrow point 3
+                            ]  # x axis
+
+    orientation_points[2] = [
+                                [[0], [-2], [0]],           # end of orientation arrow
+                                [[0], [-2+0.07], [-0.05]],  # arrow point 1
+                                [[0], [-2+0.07], [0.05]],   # arrow point 2
+                                [[-0.05], [-2+0.07], [0]],  # arrow point 3
+                            ]  # y axis
+
+    orientation_points[3] = [
+                                [[0], [0], [-2]],           # end of orientation arrow
+                                [[0.05], [0], [-2+0.07]],   # arrow point 1
+                                [[-0.05], [0], [-2+0.07]],  # arrow point 2
+                                [[0], [-0.05], [-2+0.07]],  # arrow point 3
+                            ]  # z axis
+
     return orientation_points
 
-def get_points_to_draw_arrows(projection_matrix, rotation_matrix, point, scale, WINDOW_SIZE):
+def get_rotated_orientation_points(projection_matrix, 
+                                   rotation_matrix, 
+                                   point, 
+                                   scale, 
+                                   WINDOW_SIZE):
+    """ Get rotaded orientation arrow points 
+
+    Args: 
+        projection_matrix:
+        rotation_matrix:
+        point:
+        scale:
+        WINDOW_SIZE: 
+    Return:
+        x:
+        y:
+        x1:
+        y1:
+        x2:
+        y2:
+        x3:
+        y3:
+        
+    """
     #center and edge points
     rotated_point = np.matmul(rotation_matrix, point[0])
     point_2d = np.matmul(projection_matrix, rotated_point)
@@ -125,7 +180,7 @@ def draw_orientation_points(window, rotation_matrix, orientation_points, SCALE, 
     for point in orientation_points:
     
         # points to draw the arrow -------------------------------
-        x, y, x1, y1, x2, y2, x3, y3 = get_points_to_draw_arrows(
+        x, y, x1, y1, x2, y2, x3, y3 = get_rotated_orientation_points(
             PROJECTION_MATRIX,
             rotation_matrix,
             point,
