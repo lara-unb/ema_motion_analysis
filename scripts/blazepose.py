@@ -54,21 +54,21 @@ def prediction_to_video(video_name, video_path,
 
     # Get video
     video_capture = cv2.VideoCapture(video_path)
-    if not file_management.videoCheck(video_capture):
+    if not file_management.video_check(video_capture):
         return
 
     # Create output video file
-    output_video = file_management.createOutputVideoFile(video_out_path,
+    output_video = file_management.create_output_video_file(video_out_path,
                                                         video_capture)
     video_capture.release()
 
     # Create output file data
-    file_metadata = file_management.setMetadata(video_name, 
+    file_metadata = file_management.set_video_metadata(video_name, 
                                                poses.KEYPOINT_DICT_MOVENET, 
                                                poses.JUMP_PROFILE_MOVENET[profile], 
                                                video_path)
                                                
-    file_management.writeToJsonFile(file_out_path, 
+    file_management.write_to_json_file(file_out_path, 
                                    file_metadata, 
                                    write_mode='w+')
 
@@ -77,7 +77,7 @@ def prediction_to_video(video_name, video_path,
 
     # Create video file to process
     video_capture = cv2.VideoCapture(video_path)
-    if not file_management.videoCheck(video_capture):
+    if not file_management.video_check(video_capture):
         return
 
     # define info for DataMonitor plotting
@@ -115,22 +115,22 @@ def prediction_to_video(video_name, video_path,
                 pose_selected = poses.JUMP_PROFILE_BLAZEPOSE[profile]
 
                 # Get pairings of interest
-                keypoint_connections = poses.selectConnections(pose_selected, 
+                keypoint_connections = poses.select_connections(pose_selected, 
                                                                poses.KEYPOINT_DICT_BLAZEPOSE, 
                                                                mp_pose.POSE_CONNECTIONS, 
                                                                neural_network="blazepose")
 
-                selected_keypoints = poses.selectKeypoints(frame, 
+                selected_keypoints = poses.select_keypoints(frame, 
                                                            mp_results_object.pose_landmarks, 
                                                            pose_selected, 
                                                            poses.KEYPOINT_DICT_BLAZEPOSE, 
                                                            'blazepose')
 
                 # Draw joints and pairings
-                drawing.drawConnections(frame, 
+                drawing.draw_connections(frame, 
                                         selected_keypoints, 
                                         keypoint_connections)
-                drawing.drawKeypoints(frame,
+                drawing.draw_keypoints(frame,
                                       selected_keypoints)
 
                 # Get angles and draw it in the  screen
@@ -139,7 +139,7 @@ def prediction_to_video(video_name, video_path,
                                                 pose_selected)
 
                 # Write angles data in the screen
-                drawing.writeAnglesLegends(frame, 
+                drawing.write_angles_legends(frame, 
                                            poses_angles, 
                                            poses.ANGLES_BLAZEPOSE[profile])
 
@@ -157,7 +157,7 @@ def prediction_to_video(video_name, video_path,
 
                 # Write data to file
                 file_data = {'keypoints': selected_keypoints.tolist()}
-                file_management.writeToJsonFile(file_out_path, 
+                file_management.write_to_json_file(file_out_path, 
                                                file_data, 
                                                write_mode='a')
                 
@@ -169,7 +169,7 @@ def prediction_to_video(video_name, video_path,
     
     # Create pickle output data
     pickle_output_data = {"header": file_metadata, "data": pickle_output_list}
-    file_management.writePickleFile(file_out_path, pickle_output_data)
+    file_management.write_pickle_file(file_out_path, pickle_output_data)
 
     # Finish exhibition
     video_capture.release()

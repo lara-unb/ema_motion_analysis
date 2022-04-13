@@ -11,7 +11,7 @@ import colors
 LINEWIDTH_RATIO = 280
 CIRCLE_RATIO = 170
 
-def drawKeypoints(frame, keypoints):
+def draw_keypoints(frame, keypoints):
     """ Draw the keypoints in the specified frame
 
     Args:
@@ -32,7 +32,7 @@ def drawKeypoints(frame, keypoints):
                        -1)
         
 
-def drawConnections(frame, selected_joints, keypoints_connections):
+def draw_connections(frame, selected_joints, keypoints_connections):
     """ Draw the keypoint connections in the specified frame
 
     Args:
@@ -60,7 +60,7 @@ def drawConnections(frame, selected_joints, keypoints_connections):
                      linewidth)
 
 
-def writeAnglesLegends(frame, _angles, dict_profile_angles):
+def write_angles_legends(frame, _angles, dict_profile_angles):
     """ Write the angle values in the video frame
 
     Args:

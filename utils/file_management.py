@@ -67,7 +67,7 @@ def read_file_dialog(neural_network, title="Open File", file_type="All Files"):
     return video_name, video_path, video_out_path, file_out_path
 
 
-def videoCheck(video):
+def video_check(video):
     """ Check if video is opened
 
     Args: 
@@ -81,7 +81,7 @@ def videoCheck(video):
         return False
     return True
 
-def createOutputVideoFile(video_out_path, video_capture):
+def create_output_video_file(video_out_path, video_capture):
     """ Creates an output video file
 
     Args: 
@@ -104,7 +104,7 @@ def createOutputVideoFile(video_out_path, video_capture):
                           fps, 
                           (frame_width,frame_height))
 
-def setMetadata(video_name, mapping, pairs, video_path, summary="None"):
+def set_video_metadata(video_name, mapping, pairs, video_path, summary="None"):
     """ Set video metadata object
     Args:
         video_name: string of video name
@@ -118,7 +118,7 @@ def setMetadata(video_name, mapping, pairs, video_path, summary="None"):
     """
 
     video_capture = cv2.VideoCapture(video_path)
-    videoCheck(video_capture)
+    video_check(video_capture)
 
     length = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
     fps = int(video_capture.get(cv2.CAP_PROP_FPS))
@@ -146,7 +146,7 @@ def setMetadata(video_name, mapping, pairs, video_path, summary="None"):
     
     return file_metadata
     
-def writeToJsonFile(file_out_path, data, write_mode='w'):
+def write_to_json_file(file_out_path, data, write_mode='w'):
     """ Write video information to a json file
 
     Args:
@@ -158,7 +158,7 @@ def writeToJsonFile(file_out_path, data, write_mode='w'):
         f.write(json.dumps(data))
         f.write('\n')
 
-def writePickleFile(file_out_path, data):
+def write_pickle_file(file_out_path, data):
     """ Write video information to a pickle file
 
     Args:
@@ -168,7 +168,7 @@ def writePickleFile(file_out_path, data):
     with open(file_out_path+".pickle", 'wb') as f:
         pickle.dump(data, f)
 
-def readPickleFile(file_out_path):
+def read_pickle_file(file_out_path):
     """ Read video information of pickle files
 
     Args:
