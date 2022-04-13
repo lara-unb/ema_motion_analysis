@@ -21,7 +21,7 @@ import user_interface
 import angles
 
 sys.path.append("../../data_visualization")
-import colors as colors
+import colors 
 from data_monitor import DataMonitor
 
 # Simplify mediapipe variables

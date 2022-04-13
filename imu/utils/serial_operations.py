@@ -2,8 +2,10 @@ import serial.tools.list_ports
 import time
 import numpy as np
 import sys
-sys.path.append("../utils/")
-from data_visualization.colors import *
+
+
+sys.path.append("../../data_visualization")
+from colors import *
 
 SMALL_IMU_DONGLE_PORT = 4128
 

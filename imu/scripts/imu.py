@@ -8,10 +8,13 @@ import sys
 import traceback
 
 sys.path.append("../utils/")
-from data_visualization.colors import *
-from data_visualization.data_monitor import DataMonitor
-import imu.utils.serial_operations as serial_op
+import serial_operations as serial_op
 import math
+
+sys.path.append("../../data_visualization")
+from colors import *
+from data_monitor import DataMonitor
+
 
 # Define data monitor channels
 channels = [
@@ -52,7 +55,7 @@ if __name__ == '__main__':
             "filterMode": 1,
             "tareSensor": True,
             "logical_ids": [7, 8],
-            "streaming_commands": [1, 255, 255, 255, 255, 255, 255, 255]
+            "streaming_commands": [1, 255, 255, 255, 255, 255, 255, 255],
         }
 
         # Initialize imu
@@ -72,6 +75,7 @@ if __name__ == '__main__':
                     
                     # Extract euler angles
                     extracted_data = serial_op.extract_euler_angles(data)
+                    print('EXTRACTED DATA: ', extracted_data)
 
                     # Update data monitor
                     dm.data = {
