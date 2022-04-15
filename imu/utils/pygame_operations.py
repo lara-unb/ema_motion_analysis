@@ -14,6 +14,9 @@ RED_RGB = (255, 0, 0)
 GREEN_RGB = (0, 255, 0)
 CYAN_RGB = (0, 255, 255) 
 WHITE_RGB = (255, 255, 255) 
+PINK_RGB = (255, 203, 219)
+YELLOW_RGB = (252, 247, 135) 
+
 
 # Matrix to project a 3D object in 2D
 PROJECTION_MATRIX = [
@@ -35,6 +38,8 @@ def get_3d_object_points(size_x, size_y, size_z):
         objectPoints: vector with the (x, y, z) location of each point (8)
         
     """
+    
+
     objectPoints = [n for n in range(8)]
     objectPoints[0] = [[-size_x], [-size_y], [size_z]]
     objectPoints[1] = [[size_x],[-size_y],[size_z]]
@@ -97,83 +102,133 @@ def get_rotated_orientation_points(projection_matrix,
                                    rotation_matrix, 
                                    point, 
                                    scale, 
-                                   WINDOW_SIZE):
+                                   offset_x,
+                                   offset_y):
     """ Get rotaded orientation arrow points 
 
     Args: 
-        projection_matrix:
-        rotation_matrix:
-        point:
-        scale:
-        WINDOW_SIZE: 
+        projection_matrix: matrix used to project a 3D object in 2D
+        rotation_matrix: matrix to rotate the 3D object
+        point: victor of points to be rotated
+        scale: constant used to scale the image 
+        WINDOW_SIZE: pygame window size (constant)
     Return:
-        x:
-        y:
-        x1:
-        y1:
-        x2:
-        y2:
-        x3:
-        y3:
+        x: x location of the edge of the orientation axis
+        y: y location of the edge of the orientation axis
+        x1: x location of the 1st arrow point of the orientation axis
+        y1: y location of the 1st arrow point of the orientation axis
+        x2: x location of the 2nd arrow point of the orientation axis
+        y2: y location of the 2nd arrow point of the orientation axis
+        x3: x location of the 3rd arrow point of the orientation axis
+        y3: y location of the 3rd arrow point of the orientation axis
         
     """
+
     #center and edge points
     rotated_point = np.matmul(rotation_matrix, point[0])
     point_2d = np.matmul(projection_matrix, rotated_point)
-    x = (point_2d[0][0] * scale) + WINDOW_SIZE/2
-    y = (point_2d[1][0] * scale) + WINDOW_SIZE/2
+    x = (point_2d[0][0] * scale) + offset_x
+    y = (point_2d[1][0] * scale) + offset_y
     
+    #1st arrow point of the orientation axis
     rotated_point = np.matmul(rotation_matrix, point[1])
     point_2d = np.matmul(projection_matrix, rotated_point)
-    x1 = (point_2d[0][0] * scale) + WINDOW_SIZE/2
-    y1 = (point_2d[1][0] * scale) + WINDOW_SIZE/2
+    x1 = (point_2d[0][0] * scale) + offset_x
+    y1 = (point_2d[1][0] * scale) + offset_y
 
+    #2nd arrow point of the orientation axis
     rotated_point = np.matmul(rotation_matrix, point[2])
     point_2d = np.matmul(projection_matrix, rotated_point)
-    x2 = (point_2d[0][0] * scale) + WINDOW_SIZE/2
-    y2 = (point_2d[1][0] * scale) + WINDOW_SIZE/2
+    x2 = (point_2d[0][0] * scale) + offset_x
+    y2 = (point_2d[1][0] * scale) + offset_y
 
+    #3rd arrow point of the orientation axis
     rotated_point = np.matmul(rotation_matrix, point[3])
     point_2d = np.matmul(projection_matrix, rotated_point)
-    x3 = (point_2d[0][0] * scale) + WINDOW_SIZE/2
-    y3 = (point_2d[1][0] * scale) + WINDOW_SIZE/2
+    x3 = (point_2d[0][0] * scale) + offset_x
+    y3 = (point_2d[1][0] * scale) + offset_y
     
     return x, y, x1, y1, x2, y2, x3, y3
 
-#draw cube connections
-def connect_cube_points(window, points, pygame, color):
-        connect_point(window, 0, 1, points, pygame, color)
-        connect_point(window, 0, 3, points, pygame, color)
-        connect_point(window, 0, 4, points, pygame, color)
-        connect_point(window, 1, 2, points, pygame, color)
-        connect_point(window, 1, 5, points, pygame, color)
-        connect_point(window, 2, 6, points, pygame, color)
-        connect_point(window, 2, 3, points, pygame, color)
-        connect_point(window, 3, 7, points, pygame, color)
-        connect_point(window, 4, 5, points, pygame, color)
-        connect_point(window, 4, 7, points, pygame, color)
-        connect_point(window, 6, 5, points, pygame, color)
-        connect_point(window, 6, 7, points, pygame, color)
+def connect_cube_points(window, points, color):
+    """ Draw cube connections 
+
+    Args: 
+        window: pygame window to draw the connections
+        point: vector of points to be connected
+        color: color of the connection line
+
+    """
+    connect_point(window, 0, 1, points, color)
+    connect_point(window, 0, 3, points, color)
+    connect_point(window, 0, 4, points, color)
+    connect_point(window, 1, 2, points, color)
+    connect_point(window, 1, 5, points, color)
+    connect_point(window, 2, 6, points, color)
+    connect_point(window, 2, 3, points, color)
+    connect_point(window, 3, 7, points, color)
+    connect_point(window, 4, 5, points, color)
+    connect_point(window, 4, 7, points, color)
+    connect_point(window, 6, 5, points, color)
+    connect_point(window, 6, 7, points, color)
 
 #draw orientation arrows conections
-def connect_orientation_points(window, points, pygame, colors):
-        connect_point(window, 0, 1, points, pygame, colors[0])
-        connect_point(window, 0, 2, points, pygame, colors[1])
-        connect_point(window, 0, 3, points, pygame, colors[2])
+def connect_orientation_points(window, points, colors):
+    """ Draw orientation axis connections 
 
-# connect 2 points
-def connect_point(window, i, j, points, pygame, color):
-    pygame.draw.line(window, color, (points[i][0], points[i][1]) , (points[j][0], points[j][1]))
+    Args: 
+        window: pygame window to draw the connections
+        point: vector of points to be connected
+        color: color of the connection line
+
+    """
+    connect_point(window, 0, 1, points, colors[0])
+    connect_point(window, 0, 2, points, colors[1])
+    connect_point(window, 0, 3, points, colors[2])
+
+def connect_point(window, i, j, points, color):
+    """ Draw connection between 2 points 
+
+    Args: 
+        window: pygame window to draw the connections
+        i: point 1 index
+        j: point 2 index
+        points: vector of points to be connected
+        color: color of the connection line
+
+    """
+    pygame.draw.line(window, 
+                     color, 
+                     (points[i][0], points[i][1]), 
+                     (points[j][0], points[j][1]))
 
 
-# Draw texts
 def draw_texts(window, texts:dict):
+    """ Draw text in pygame window 
+
+    Args: 
+        window: pygame window to draw the connections
+        texts: dict of the texts and their positions
+
+    """
     for textValue in texts:
         text =  Font.render(textValue['text'], True, textValue['color'])
         window.blit(text, textValue['position'])
 
 # Essa função retornar é feio :( 
-def draw_orientation_points(window, rotation_matrix, orientation_points, SCALE, WINDOW_SIZE):
+def draw_orientation_points(window, 
+                            rotation_matrix, 
+                            orientation_points, 
+                            SCALE, 
+                            offset_x,
+                            offset_y):
+    """ Draw text in pygame window 
+
+    Args: 
+        window: pygame window to draw the connections
+        texts: dict of the texts and their positions
+
+    """                 
     orientation_colors = [RED_RGB, GREEN_RGB, CYAN_RGB]
     o_points = [0 for _ in range(len(orientation_points))]
     i = 0
@@ -185,7 +240,8 @@ def draw_orientation_points(window, rotation_matrix, orientation_points, SCALE, 
             rotation_matrix,
             point,
             SCALE,
-            WINDOW_SIZE
+            offset_x,
+            offset_y,
         )
 
         o_points[i] = (x,y)
@@ -198,18 +254,25 @@ def draw_orientation_points(window, rotation_matrix, orientation_points, SCALE, 
         
         i += 1
     return o_points, orientation_colors
-def draw_cube_points(window, cube_points, rotation_matrix, points, SCALE, WINDOW_SIZE):
+def draw_cube_points(window, 
+                     cube_points, 
+                     rotation_matrix, 
+                     points, 
+                     SCALE, 
+                     offset_x,
+                     offset_y, 
+                     color):
     i = 0
     for point in cube_points:
         rotated_point = np.matmul(rotation_matrix, point)
         point_2d = np.matmul(PROJECTION_MATRIX, rotated_point)
     
-        x = (point_2d[0][0] * SCALE) + WINDOW_SIZE/2
-        y = (point_2d[1][0] * SCALE) + WINDOW_SIZE/2
+        x = (point_2d[0][0] * SCALE) + offset_x
+        y = (point_2d[1][0] * SCALE) + offset_y
 
         points[i] = (x,y)
         i += 1
-        pygame.draw.circle(window, CYAN_RGB, (x, y), 5)
+        pygame.draw.circle(window, color, (x, y), 5)
 
 
 def render_information(window, 
@@ -217,8 +280,10 @@ def render_information(window,
                        cube_points, 
                        rotation_matrix, 
                        SCALE, 
-                       WINDOW_SIZE,
-                       orientation_points):
+                       offset_x,
+                       offset_y,
+                       orientation_points,
+                       color):
     draw_texts(window, texts_dict)
         
     #draw cube points
@@ -229,7 +294,9 @@ def render_information(window,
         rotation_matrix,
         points,
         SCALE,
-        WINDOW_SIZE
+        offset_x,
+        offset_y,
+        color,
     )
     # draw orientation points
     o_points, orientation_colors = draw_orientation_points(
@@ -237,9 +304,10 @@ def render_information(window,
         rotation_matrix,
         orientation_points,
         SCALE,
-        WINDOW_SIZE
+        offset_x,
+        offset_y,
     )
 
     # Draw lines between points
-    connect_cube_points(window, points, pygame, WHITE_RGB)
-    connect_orientation_points(window, o_points, pygame, orientation_colors)
+    connect_cube_points(window, points, color)
+    connect_orientation_points(window, o_points, orientation_colors)
