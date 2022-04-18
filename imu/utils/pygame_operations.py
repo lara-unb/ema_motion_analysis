@@ -22,7 +22,7 @@ YELLOW_RGB = (252, 247, 135)
 PROJECTION_MATRIX = [
     [1,0,0],
     [0,1,0],
-    [0,0,0]
+    [0,0,0],
 ]
 
 
@@ -39,7 +39,6 @@ def get_3d_object_points(size_x, size_y, size_z):
         
     """
     
-
     objectPoints = [n for n in range(8)]
     objectPoints[0] = [[-size_x], [-size_y], [size_z]]
     objectPoints[1] = [[size_x],[-size_y],[size_z]]
@@ -215,18 +214,25 @@ def draw_texts(window, texts:dict):
         text =  Font.render(textValue['text'], True, textValue['color'])
         window.blit(text, textValue['position'])
 
-# Essa função retornar é feio :( 
 def draw_orientation_points(window, 
                             rotation_matrix, 
                             orientation_points, 
                             SCALE, 
                             offset_x,
                             offset_y):
-    """ Draw text in pygame window 
+    """ Draw orienentation axis edge ponits 
 
     Args: 
         window: pygame window to draw the connections
-        texts: dict of the texts and their positions
+        rotation_matrix: rotation matrix used to multiply each point
+        orientation_points: edge points of the orientation axis
+        SCALE: constant int to scale the drawing
+        offset_x: x position representing the center of the orientation axis
+        offset_y: y position representing the center of the orientation axis
+
+    Return:
+        o_points: rotaded edge points of orientation axis (tuple vector)
+        orientation_colors: vector with the color of each orientation axis
 
     """                 
     orientation_colors = [RED_RGB, GREEN_RGB, CYAN_RGB]
@@ -254,6 +260,7 @@ def draw_orientation_points(window,
         
         i += 1
     return o_points, orientation_colors
+
 def draw_cube_points(window, 
                      cube_points, 
                      rotation_matrix, 
@@ -262,16 +269,31 @@ def draw_cube_points(window,
                      offset_x,
                      offset_y, 
                      color):
+    """ Draw cube points 
+
+    Args: 
+        window: pygame window to draw the connections
+        cube_points: vector with the location of each cube point
+        rotation_matrix: rotation matrix used to multiply each point
+        ponits: vector of zeros to be filled with the rotaded cube points
+        SCALE: constant int to scale the drawing
+        offset_x: x position representing the center of the orientation axis
+        offset_y: y position representing the center of the orientation axis
+        color: color of the cube ponits
+
+    """     
     i = 0
     for point in cube_points:
+        # rotate point
         rotated_point = np.matmul(rotation_matrix, point)
+        # project 3d point in 2d
         point_2d = np.matmul(PROJECTION_MATRIX, rotated_point)
-    
         x = (point_2d[0][0] * SCALE) + offset_x
         y = (point_2d[1][0] * SCALE) + offset_y
 
         points[i] = (x,y)
         i += 1
+        # draw cube edge
         pygame.draw.circle(window, color, (x, y), 5)
 
 
@@ -284,6 +306,21 @@ def render_information(window,
                        offset_y,
                        orientation_points,
                        color):
+    """ Show cube drawing and text in the window 
+
+    Args: 
+        window: pygame window to draw the connections
+        texts_dict: dict of the texts and their positions
+        cube_points: vector with the location of each cube point
+        rotation_matrix: rotation matrix used to multiply each point
+        ponits: vector of zeros to be filled with the rotaded cube points
+        SCALE: constant int to scale the drawing
+        offset_x: x position representing the center of the orientation axis
+        offset_y: y position representing the center of the orientation axis
+        orientation_points: edge points of the orientation axis
+        color: color of the cube ponits
+
+    """    
     draw_texts(window, texts_dict)
         
     #draw cube points
