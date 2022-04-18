@@ -51,7 +51,7 @@ pygame.display.set_caption('IMU 3D Visualization')
 
 
 # Initialize rotation matrix
-rotation_matrix = np.array([[0,0,0], [0,0,0], [0,0,0]])
+rotation_matrix = np.array([[1,0,0], [0,1,0], [0,0,1]])
 
 texts_dict = [
     {
@@ -76,6 +76,10 @@ texts_dict = [
     },
 ]
 
+
+offset_x = WINDOW_SIZE/2
+offset_y = WINDOW_SIZE/2
+
 while True:
 
     try:
@@ -87,8 +91,10 @@ while True:
                                     cube_points,
                                     rotation_matrix,
                                     SCALE,
-                                    WINDOW_SIZE,
-                                    orientation_points)
+                                    offset_x,
+                                    offset_y,
+                                    orientation_points,
+                                    pygame_op.WHITE_RGB)
 
 
         # print("Euler angles: ")
