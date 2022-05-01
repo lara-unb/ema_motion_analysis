@@ -8,10 +8,12 @@ import numpy as np
 import sys
 import time
 import traceback
+from scipy.spatial.transform import Rotation as R
 
 sys.path.append("../utils/")
 import serial_operations as serial_op
 import pygame_operations as pygame_op
+import orientation_operations as orientation_op
 
 sys.path.append("../../data_visualization")
 from colors import *
@@ -39,15 +41,14 @@ imu_configuration = {
     "filterMode": 1,
     "tareSensor": False,
     "logical_ids": [7],
-    "streaming_commands": [2, 255, 255, 255, 255, 255, 255, 255]
+    "streaming_commands": [0, 255, 255, 255, 255, 255, 255, 255]
 }
 
 serial_port = serial_op.initialize_imu(imu_configuration)
 
-answer = serial_op.write_command_read_answer(serial_port, imu_configuration["logical_ids"], 12)
-
-print(answer)
-input()
+offset_quat = orientation_op.get_offset_quaternion(serial_port, 7)
+print(offset_quat)
+# input()
 # Main Loop
 SCALE = 100
 
@@ -85,6 +86,7 @@ texts_dict = [
 offset_x = WINDOW_SIZE/2
 offset_y = WINDOW_SIZE/2
 
+vector = [0.0, 0.0, 0.0]
 while True:
 
     try:
@@ -116,9 +118,21 @@ while True:
             data = serial_port.read(bytes_to_read)
             if data[0] != 0:
                 continue
-            extracted_data = serial_op.extract_rotation_matrix(data)
-            rotation_matrix = extracted_data['rotation_matrix']
+            extracted_data = serial_op.extract_quaternions(data)
 
+            # Calculate device vector
+            quat =  orientation_op.multiply_quaternions(extracted_data["quaternions"], offset_quat)
+            
+            vector_ref = [0.0, 1.0, 0.0]
+
+            vector = orientation_op.quaternion_vector_multiplication(quat, vector_ref)
+
+            r = R.from_quat(extracted_data['quaternions'])
+            rotation_matrix = r.as_matrix()
+
+            print(RED, vector, RESET)
+            # input()
+            
         # Event user event handling handling
         for event in pygame.event.get():
             # Get quit event
