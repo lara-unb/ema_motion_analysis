@@ -132,7 +132,8 @@ def write_command_read_answer(serial_port, logical_ids, command_number, argument
         time.sleep(0.1)
         cleaned_data = clean_data_vector(serial_port.read(serial_port.inWaiting()))
         answer.append(cleaned_data)
-    
+
+    start_streaming(serial_port, logical_ids)
     return answer
 
 def set_streaming_slots(serial_port, logical_ids, commands):
