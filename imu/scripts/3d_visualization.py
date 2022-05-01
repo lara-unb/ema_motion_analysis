@@ -38,7 +38,7 @@ imu_configuration = {
     "gyroAutoCalib": True,
     "filterMode": 1,
     "tareSensor": False,
-    "logical_ids": [7, 8],
+    "logical_ids": [7],
     "streaming_commands": [2, 255, 255, 255, 255, 255, 255, 255]
 }
 serial_port = serial_op.initialize_imu(imu_configuration)

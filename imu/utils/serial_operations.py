@@ -87,6 +87,8 @@ def apply_command(serial_port, command, showResponse=False):
     time.sleep(0.1)
     # return out
 
+
+
 def stop_streaming(serial_port, logical_ids):
     """ Apply stop streaming operation
 
@@ -109,6 +111,29 @@ def start_streaming(serial_port, logical_ids):
         command = create_imu_command(id, 85)
         apply_command(serial_port, command)
     return serial_port
+def clean_data_vector(data):
+    decoded_data = data.decode()
+    cleaned_data = decoded_data.replace('\r\n',' ').split(' ')
+    cleaned_data = list(filter(None, cleaned_data))[0].split(",")
+    cleaned_data = [float(d) for d in cleaned_data]
+    return cleaned_data
+def write_command_read_answer(serial_port, logical_ids, command_number, arguments=[]):
+    # If it's streaming stop it
+    stop_streaming(serial_port, logical_ids)
+    time.sleep(0.1)
+    manual_flush(serial_port)
+    
+    # Apply imu command to each logical id and saves it's answers
+    answer = []
+    for id in logical_ids:
+        time.sleep(0.1)
+        command = create_imu_command(id, command_number, arguments)
+        apply_command(serial_port, command)
+        time.sleep(0.1)
+        cleaned_data = clean_data_vector(serial_port.read(serial_port.inWaiting()))
+        answer.append(cleaned_data)
+    
+    return answer
 
 def set_streaming_slots(serial_port, logical_ids, commands):
     """ Set streaming slots
