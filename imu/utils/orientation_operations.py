@@ -2,10 +2,19 @@ from venv import create
 import serial_operations as serial_op
 import math
 import numpy as np
-def calculate_angle(vector0, vector1):
+
+READ_FILT_TARED_QUAT_COMMAND = 0
+READ_FILT_QUAT_COMMAND = 6
+READ_NORTH_GRAVITY_COMMAND = 12
+SET_TARE_QUAT_COMMAND = 97
+
+def calculate_angle(vector0, vector1, vector2=None):
     # The max and min is used to account for possible floating point erro
     dot_product = max(min(np.dot(vector0, vector1), 1.0), -1.0)
     angle = math.acos(dot_product)
+    if vector2 is not None:
+        axis = normalize_vector(np.cross(vector0, vector1))
+        angle = math.copysign(angle, np.dot(vector2, axis))
     return angle
 
 def vector_len(vector):
@@ -51,13 +60,15 @@ def multiply_quaternions(quat0, quat1):
 
 def get_offset_quaternion(serial_port, logical_id, gravity=[-1.0, 0.0, 0.0]):
     north_gravity = serial_op.write_command_read_answer(serial_port, 
-                                                        [logical_id], 12)
+                                                        [logical_id], 
+                                                        READ_NORTH_GRAVITY_COMMAND)
                      
     sensor_gravity = north_gravity[0][6:]
     print("sensor_gravity: ", sensor_gravity)
 
     filtered_orientation = serial_op.write_command_read_answer(serial_port, 
-                                                        [logical_id], 0)[0][3:]
+                                                        [logical_id], 
+                                                        READ_FILT_QUAT_COMMAND)[0][3:]
     print("quat: ", filtered_orientation)
 
     angle = calculate_angle(sensor_gravity, gravity)
@@ -70,7 +81,10 @@ def get_offset_quaternion(serial_port, logical_id, gravity=[-1.0, 0.0, 0.0]):
 
     tare_data = multiply_quaternions(filtered_orientation, offset)
 
-    serial_op.write_command_read_answer(serial_port, [logical_id], 97, tare_data)
+    serial_op.write_command_read_answer(serial_port, 
+                                        [logical_id], 
+                                        SET_TARE_QUAT_COMMAND, 
+                                        tare_data)
 
     return offset
 
@@ -99,3 +113,18 @@ def quaternion_vector_multiplication(quat, vector):
     z = neg_qz * w_new + z_new * neg_qw + z_cross
 
     return [x, y, z]
+
+
+def calculate_device_vector(serial_port, logical_id, vector_ref, offset_quat):
+    data = serial_op.write_command_read_answer(serial_port, 
+                                               [logical_id], 
+                                               READ_FILT_TARED_QUAT_COMMAND)[0][3:]
+
+    quat =  multiply_quaternions(data, offset_quat)
+
+    vector = quaternion_vector_multiplication(quat, vector_ref)
+
+    return vector
+
+def calculate_roll_pitch_yaw():
+    pass

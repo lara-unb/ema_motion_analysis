@@ -119,7 +119,7 @@ def clean_data_vector(data):
     return cleaned_data
 def write_command_read_answer(serial_port, logical_ids, command_number, arguments=[]):
     # If it's streaming stop it
-    stop_streaming(serial_port, logical_ids)
+    # stop_streaming(serial_port, logical_ids)
     time.sleep(0.1)
     manual_flush(serial_port)
     
@@ -133,7 +133,7 @@ def write_command_read_answer(serial_port, logical_ids, command_number, argument
         cleaned_data = clean_data_vector(serial_port.read(serial_port.inWaiting()))
         answer.append(cleaned_data)
 
-    start_streaming(serial_port, logical_ids)
+    # start_streaming(serial_port, logical_ids)
     return answer
 
 def set_streaming_slots(serial_port, logical_ids, commands):
@@ -195,6 +195,11 @@ def configure_sensor(serial_port, configDict):
         for id in configDict["logical_ids"]:
             command = create_imu_command(id, 96)
             apply_command(serial_port, command)
+        
+    # Forcing axis configuration to standar
+    for id in configDict["logical_ids"]:
+        command = create_imu_command(id, 116, [0])
+        apply_command(serial_port, command)
 
 def tare_sensor(serial_port, logical_ids):
     """ Apply tare sensor operation
