@@ -8,6 +8,7 @@ import numpy as np
 import sys
 import time
 import traceback
+from pyquaternion import Quaternion
 
 sys.path.append("../utils/")
 import serial_operations as serial_op
@@ -39,7 +40,7 @@ imu_configuration = {
     "disableAccelerometer": False,
     "gyroAutoCalib": True,
     "filterMode": 1,
-    "tareSensor": False,
+    "tareSensor": True,
     "logical_ids": [7, 8],
     "streaming_commands": [0, 255, 255, 255, 255, 255, 255, 255] # 2 -> rotation matrix
 }
@@ -87,6 +88,9 @@ offset_x2 = WINDOW_SIZE/2
 offset_y2 = 3 * WINDOW_SIZE/4
 
 time.sleep(2)
+
+quaternions1 = [0, 0, 0, 0]
+quaternions2 = [0, 0, 0, 0]
 
 while True:
 
@@ -136,12 +140,21 @@ while True:
 
             print('DATA 1: ', data[1])
             if data[1] == 8:
-                extracted_data1 = serial_op.extract_rotation_matrix(data)
-                rotation_matrix1 = extracted_data1['rotation_matrix']
-
+                extracted_data1 = serial_op.extract_quaternions(data)
+                quaternions1 = extracted_data1['quaternions']
+                quaternionObject1 = Quaternion(quaternions1)
+                rotation_matrix1 = quaternionObject1.rotation_matrix
             elif data[1] == 7:
-                extracted_data2 = serial_op.extract_rotation_matrix(data)
-                rotation_matrix2 = extracted_data2['rotation_matrix']
+                extracted_data2 = serial_op.extract_quaternions(data)
+                quaternions2 = extracted_data2['quaternions']
+                quaternionObject2 = Quaternion(quaternions2)
+                rotation_matrix2 = quaternionObject2.rotation_matrix
+            
+            
+            print()
+            print(quaternions_op.calculate_angle_between_quaternions(quaternions1, quaternions2))
+            print()
+
 
         # Event user event handling handling
         for event in pygame.event.get():

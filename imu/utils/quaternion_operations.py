@@ -32,8 +32,11 @@ def calculate_angle_between_quaternions(firstQuaternion : Quaternion,
     secondQuaterionObject = convert_quaternion_to_unit_quaternion_if_needed(secondQuaterionObject)
 
     resultantQuaternion = firstQuaternionObject.conjugate * secondQuaterionObject
+    minQuat = resultantQuaternion[0]
+    if resultantQuaternion[0] > 1 and resultantQuaternion[0] < -1: 
+        minQuat = 1 if resultantQuaternion[0] > 0 else -1
 
-    angleDegrees = 2 * math.degrees(math.acos(resultantQuaternion[0]))
+    angleDegrees = 2 * math.degrees(math.acos(minQuat))
     return angleDegrees
 
 
