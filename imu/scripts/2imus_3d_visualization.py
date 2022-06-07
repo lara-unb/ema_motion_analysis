@@ -12,6 +12,7 @@ import traceback
 sys.path.append("../utils/")
 import serial_operations as serial_op
 import pygame_operations as pygame_op
+import quaternion_operations as quaternions_op
 
 sys.path.append("../../data_visualization")
 from colors import *
