@@ -1,3 +1,4 @@
+from cv2 import log
 from pyquaternion import Quaternion # http://kieranwynn.github.io/pyquaternion/
 import math
 
@@ -33,9 +34,8 @@ def calculate_angle_between_quaternions(firstQuaternion : Quaternion,
 
     resultantQuaternion = firstQuaternionObject.conjugate * secondQuaterionObject
     minQuat = resultantQuaternion[0]
-    if resultantQuaternion[0] > 1 and resultantQuaternion[0] < -1: 
+    if abs(resultantQuaternion[0]) > 1:
         minQuat = 1 if resultantQuaternion[0] > 0 else -1
-
     angleDegrees = 2 * math.degrees(math.acos(minQuat))
     return angleDegrees
 
