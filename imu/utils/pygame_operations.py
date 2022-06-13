@@ -63,9 +63,18 @@ def get_orientation_points():
     # x axis -> orientation_points[1]
     # y axis -> orientation_points[2]
     # z axis -> orientation_points[3]
-    # first vector: end of orientation arrow
+    # first vector: end of orientation axis
     # second, third and fourth vectors: points used to draw the arrow
     #                                       with the draw_polygon function
+
+
+    # asz  -> axis size
+    asz = 2
+    # abo -> arrow base offset
+    abo = 0.05
+    # apo -> arrow point offset
+    apo = 0.07
+
     orientation_points = [n for n in range(4)]
     orientation_points[0] = [
                                 [[0], [0], [0]], # center point -> does not have arrow
@@ -75,24 +84,24 @@ def get_orientation_points():
                             ] #center
 
     orientation_points[1] = [
-                                [[-2], [0], [0]],           # end of orientation arrow
-                                [[-2+0.07], [0.05], [0]],   # arrow point 1
-                                [[-2+0.07], [-0.05], [0]],  # arrow point 2
-                                [[-2+0.07], [0], [-0.05]],  # arrow point 3
+                                [[-asz], [0], [0]],         # end of orientation axis
+                                [[-asz+apo], [abo], [0]],   # arrow point 1
+                                [[-asz+apo], [-abo], [0]],  # arrow point 2
+                                [[-asz+apo], [0], [-abo]],  # arrow point 3
                             ]  # x axis
 
     orientation_points[2] = [
-                                [[0], [-2], [0]],           # end of orientation arrow
-                                [[0], [-2+0.07], [-0.05]],  # arrow point 1
-                                [[0], [-2+0.07], [0.05]],   # arrow point 2
-                                [[-0.05], [-2+0.07], [0]],  # arrow point 3
+                                [[0], [-asz], [0]],         # end of orientation axis
+                                [[0], [-asz+apo], [-abo]],  # arrow point 1
+                                [[0], [-asz+apo], [abo]],   # arrow point 2
+                                [[-abo], [-asz+apo], [0]],  # arrow point 3
                             ]  # y axis
 
     orientation_points[3] = [
-                                [[0], [0], [-2]],           # end of orientation arrow
-                                [[0.05], [0], [-2+0.07]],   # arrow point 1
-                                [[-0.05], [0], [-2+0.07]],  # arrow point 2
-                                [[0], [-0.05], [-2+0.07]],  # arrow point 3
+                                [[0], [0], [-asz]],         # end of orientation axis
+                                [[abo], [0], [-asz+apo]],   # arrow point 1
+                                [[-abo], [0], [-asz+apo]],  # arrow point 2
+                                [[0], [-abo], [-asz+apo]],  # arrow point 3
                             ]  # z axis
 
     return orientation_points
