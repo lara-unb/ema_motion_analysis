@@ -15,6 +15,9 @@ import serial_operations as serial_op
 import pygame_operations as pygame_op
 import quaternion_operations as quaternions_op
 
+from scipy.spatial.transform import Rotation as R
+
+
 sys.path.append("../../data_visualization")
 from colors import *
 
@@ -142,13 +145,20 @@ while True:
             if data[1] == 8:
                 extracted_data1 = serial_op.extract_quaternions(data)
                 quaternions1 = extracted_data1['quaternions']
-                quaternionObject1 = Quaternion(quaternions1)
-                rotation_matrix1 = quaternionObject1.rotation_matrix
+                # quaternionObject1 = Quaternion(quaternions1)
+                # rotation_matrix1 = quaternionObject1.rotation_matrix
+                rotation_matrix1 = R.from_quat(quaternions1).as_matrix()
+                rotation_matrix1[[1, 2]] = rotation_matrix1[[2, 1]]
+
             elif data[1] == 7:
                 extracted_data2 = serial_op.extract_quaternions(data)
                 quaternions2 = extracted_data2['quaternions']
-                quaternionObject2 = Quaternion(quaternions2)
-                rotation_matrix2 = quaternionObject2.rotation_matrix
+                # quaternionObject2 = Quaternion(quaternions2)
+                # rotation_matrix2 = quaternionObject2.rotation_matrix
+                rotation_matrix2 = R.from_quat(quaternions2).as_matrix()
+                rotation_matrix2[[1, 2]] = rotation_matrix2[[2, 1]]
+
+
             
             
             print()
