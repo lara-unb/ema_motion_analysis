@@ -60,6 +60,8 @@ pygame.display.set_caption('IMU 3D Visualization')
 rotation_matrix1 = np.array([[1,0,0], [0,1,0], [0,0,1]])
 rotation_matrix2 = np.array([[1,0,0], [0,1,0], [0,0,1]])
 
+imus_angle = 0
+
 texts_dict = [
     {
         "text": "X axis",
@@ -80,6 +82,16 @@ texts_dict = [
         "text": "Press t to tare.",
         "color": pygame_op.WHITE_RGB,
         "position": (20, WINDOW_SIZE-40),
+    },
+    {
+        "text": "Angle between IMUs: ",
+        "color": pygame_op.PINK_RGB,
+        "position": (200, WINDOW_SIZE-40),
+    },
+    {
+        "text": str(imus_angle),
+        "color": pygame_op.CYAN_RGB,
+        "position": (300, WINDOW_SIZE-40),
     },
 ]
 
@@ -159,12 +171,16 @@ while True:
                 rotation_matrix2[[1, 2]] = rotation_matrix2[[2, 1]]
 
 
-            
-            
-            print()
-            print(quaternions_op.calculate_angle_between_quaternions(quaternions1, quaternions2))
-            print()
+            # calculate angle between IMUs
+            imus_angle = quaternions_op.calculate_angle_between_quaternions(quaternions1, quaternions2)
+            print(imus_angle)
 
+            # show angle on the screen
+            texts_dict[5] = {
+                                "text": str(int(imus_angle)),
+                                "color": pygame_op.PINK_RGB,
+                                "position": (420, WINDOW_SIZE-40),
+                            }
 
         # Event user event handling handling
         for event in pygame.event.get():
