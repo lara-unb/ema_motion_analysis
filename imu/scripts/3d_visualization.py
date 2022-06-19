@@ -6,7 +6,6 @@ import pygame
 from math import *
 import numpy as np
 import sys
-import time
 import traceback
 
 sys.path.append("../utils/")
@@ -98,13 +97,6 @@ while True:
                                     orientation_points,
                                     pygame_op.WHITE_RGB)
 
-
-        # print("Euler angles: ")
-        # serial_op.manual_flush(serial_port)
-        # command  = serial_op.create_imu_command(7, 1)
-        # serial_op.apply_command(serial_port, command, True)[-3:]
-        # input()
-        # Update rotation matrix if there are data
         print("running...")
         bytes_to_read = serial_port.inWaiting()
         
