@@ -8,11 +8,15 @@ import numpy as np
 import sys
 import time
 import traceback
+from pyquaternion import Quaternion
 
 sys.path.append("../utils/")
 import serial_operations as serial_op
 import pygame_operations as pygame_op
 import quaternion_operations as quaternions_op
+
+from scipy.spatial.transform import Rotation as R
+
 
 sys.path.append("../../data_visualization")
 from colors import *
@@ -28,8 +32,9 @@ SIZE_X = 1
 SIZE_Y = 0.5
 SIZE_Z = 1.5
 
+# set location of each cube point
 cube_points = pygame_op.get_3d_object_points(SIZE_X, SIZE_Y, SIZE_Z)
-
+# set de location of the orientation axis points
 orientation_points = pygame_op.get_orientation_points()
 
 # Set parameters that will be configured
@@ -39,9 +44,9 @@ imu_configuration = {
     "disableAccelerometer": False,
     "gyroAutoCalib": True,
     "filterMode": 1,
-    "tareSensor": False,
+    "tareSensor": True,
     "logical_ids": [7, 8],
-    "streaming_commands": [2, 255, 255, 255, 255, 255, 255, 255] # 2 -> rotation matrix
+    "streaming_commands": [0, 255, 255, 255, 255, 255, 255, 255] # 0 -> quaternions
 }
 serial_port = serial_op.initialize_imu(imu_configuration)
 
@@ -55,6 +60,8 @@ pygame.display.set_caption('IMU 3D Visualization')
 # Initialize rotation matrix
 rotation_matrix1 = np.array([[1,0,0], [0,1,0], [0,0,1]])
 rotation_matrix2 = np.array([[1,0,0], [0,1,0], [0,0,1]])
+
+imus_angle = 0
 
 texts_dict = [
     {
@@ -77,6 +84,16 @@ texts_dict = [
         "color": pygame_op.WHITE_RGB,
         "position": (20, WINDOW_SIZE-40),
     },
+    {
+        "text": "Angle between IMUs: ",
+        "color": pygame_op.PINK_RGB,
+        "position": (200, WINDOW_SIZE-40),
+    },
+    {
+        "text": str(imus_angle),
+        "color": pygame_op.CYAN_RGB,
+        "position": (300, WINDOW_SIZE-40),
+    },
 ]
 
 
@@ -87,6 +104,9 @@ offset_x2 = WINDOW_SIZE/2
 offset_y2 = 3 * WINDOW_SIZE/4
 
 time.sleep(2)
+
+quaternions1 = [0, 0, 0, 0]
+quaternions2 = [0, 0, 0, 0]
 
 while True:
 
@@ -136,12 +156,32 @@ while True:
 
             print('DATA 1: ', data[1])
             if data[1] == 8:
-                extracted_data1 = serial_op.extract_rotation_matrix(data)
-                rotation_matrix1 = extracted_data1['rotation_matrix']
+                extracted_data1 = serial_op.extract_quaternions(data)
+                quaternions1 = extracted_data1['quaternions']
+                # quaternionObject1 = Quaternion(quaternions1)
+                # rotation_matrix1 = quaternionObject1.rotation_matrix
+                rotation_matrix1 = R.from_quat(quaternions1).as_matrix()
+                rotation_matrix1[[1, 2]] = rotation_matrix1[[2, 1]]
 
             elif data[1] == 7:
-                extracted_data2 = serial_op.extract_rotation_matrix(data)
-                rotation_matrix2 = extracted_data2['rotation_matrix']
+                extracted_data2 = serial_op.extract_quaternions(data)
+                quaternions2 = extracted_data2['quaternions']
+                # quaternionObject2 = Quaternion(quaternions2)
+                # rotation_matrix2 = quaternionObject2.rotation_matrix
+                rotation_matrix2 = R.from_quat(quaternions2).as_matrix()
+                rotation_matrix2[[1, 2]] = rotation_matrix2[[2, 1]]
+
+
+            # calculate angle between IMUs
+            imus_angle = quaternions_op.calculate_angle_between_quaternions(quaternions1, quaternions2)
+            print(imus_angle)
+
+            # show angle on the screen
+            texts_dict[5] = {
+                                "text": str(int(imus_angle)),
+                                "color": pygame_op.PINK_RGB,
+                                "position": (420, WINDOW_SIZE-40),
+                            }
 
         # Event user event handling handling
         for event in pygame.event.get():

@@ -26,8 +26,10 @@ clock = pygame.time.Clock()
 SIZE_X = 1
 SIZE_Y = 0.5
 SIZE_Z = 1.5
-cube_points = pygame_op.get_3d_object_points(SIZE_X, SIZE_Y, SIZE_Z)
 
+# set location of each cube point
+cube_points = pygame_op.get_3d_object_points(SIZE_X, SIZE_Y, SIZE_Z)
+# set de location of the orientation axis points
 orientation_points = pygame_op.get_orientation_points()
 
 # Set parameters that will be configured
