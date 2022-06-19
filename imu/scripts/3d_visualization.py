@@ -15,21 +15,31 @@ import pygame_operations as pygame_op
 sys.path.append("../../data_visualization")
 from colors import *
 
-
 # Start - Set visual configurations 
 WINDOW_SIZE =  600
-window = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
-clock = pygame.time.Clock()
 
 # Cube points initialized
 SIZE_X = 1
 SIZE_Y = 0.5
 SIZE_Z = 1.5
+SCALE = 100
+
+# Define imu offsets (center of imu in the screen)
+offset_x = WINDOW_SIZE/2
+offset_y = WINDOW_SIZE/2
+
+# Initialize pygame graphics interface
+window = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
+clock = pygame.time.Clock()
 
 # set location of each cube point
 cube_points = pygame_op.get_3d_object_points(SIZE_X, SIZE_Y, SIZE_Z)
+
 # set de location of the orientation axis points
 orientation_points = pygame_op.get_orientation_points()
+
+# set the pygame window name
+pygame.display.set_caption('IMU 3D Visualization')
 
 # Set parameters that will be configured
 imu_configuration = {
@@ -39,21 +49,15 @@ imu_configuration = {
     "gyroAutoCalib": True,
     "filterMode": 1,
     "tareSensor": False,
-    "logical_ids": [7],
+    "logical_ids": [8],
     "streaming_commands": [2, 255, 255, 255, 255, 255, 255, 255]
 }
 serial_port = serial_op.initialize_imu(imu_configuration)
 
-# Main Loop
-SCALE = 100
-
-# set the pygame window name
-pygame.display.set_caption('IMU 3D Visualization')
-
-
 # Initialize rotation matrix
 rotation_matrix = np.array([[1,0,0], [0,1,0], [0,0,1]])
 
+# Define shown texts
 texts_dict = [
     {
         "text": "X axis",
@@ -77,12 +81,7 @@ texts_dict = [
     },
 ]
 
-
-offset_x = WINDOW_SIZE/2
-offset_y = WINDOW_SIZE/2
-
 while True:
-
     try:
         clock.tick(60)
         window.fill((0,0,0))
@@ -100,8 +99,7 @@ while True:
         print("running...")
         bytes_to_read = serial_port.inWaiting()
         
-        # NUMERO DO ALEM VAMOS DESCOBRIR PQ
-        if  0 < bytes_to_read > 80:
+        if  0 < bytes_to_read:
             data = serial_port.read(bytes_to_read)
             if data[0] != 0:
                 continue

@@ -1,4 +1,4 @@
-"""3D IMU visualization using rotation matrix
+""" 2 IMU's 3d visualization and angle difference using quaternions
 
 """
 
@@ -8,34 +8,43 @@ import numpy as np
 import sys
 import time
 import traceback
-from pyquaternion import Quaternion
+from scipy.spatial.transform import Rotation as R
 
 sys.path.append("../utils/")
 import serial_operations as serial_op
 import pygame_operations as pygame_op
 import quaternion_operations as quaternions_op
 
-from scipy.spatial.transform import Rotation as R
-
-
 sys.path.append("../../data_visualization")
 from colors import *
 
-
 # Start - Set visual configurations 
 WINDOW_SIZE =  600
-window = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
-clock = pygame.time.Clock()
 
 # Cube points initialized
 SIZE_X = 1
 SIZE_Y = 0.5
 SIZE_Z = 1.5
+SCALE = 45
+
+# Define imu's offsets (center of imu in the screen)
+offset_x1 = WINDOW_SIZE/2
+offset_y1 = WINDOW_SIZE/4
+offset_x2 = WINDOW_SIZE/2
+offset_y2 = 3 * WINDOW_SIZE/4
+
+# Initialize pygame graphics interface
+window = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
+clock = pygame.time.Clock()
 
 # set location of each cube point
 cube_points = pygame_op.get_3d_object_points(SIZE_X, SIZE_Y, SIZE_Z)
+
 # set de location of the orientation axis points
 orientation_points = pygame_op.get_orientation_points()
+
+# set the pygame window name
+pygame.display.set_caption('IMU 3D Visualization')
 
 # Set parameters that will be configured
 imu_configuration = {
@@ -46,23 +55,18 @@ imu_configuration = {
     "filterMode": 1,
     "tareSensor": True,
     "logical_ids": [7, 8],
-    "streaming_commands": [0, 255, 255, 255, 255, 255, 255, 255] # 0 -> quaternions
+    "streaming_commands": [0, 255, 255, 255, 255, 255, 255, 255]
 }
 serial_port = serial_op.initialize_imu(imu_configuration)
-
-# Main Loop
-SCALE = 45
-
-# set the pygame window name
-pygame.display.set_caption('IMU 3D Visualization')
-
 
 # Initialize rotation matrix
 rotation_matrix1 = np.array([[1,0,0], [0,1,0], [0,0,1]])
 rotation_matrix2 = np.array([[1,0,0], [0,1,0], [0,0,1]])
 
-imus_angle = 0
+# Initialize angle between IMU's
+angle_between_imus = 0
 
+# Define shown texts
 texts_dict = [
     {
         "text": "X axis",
@@ -90,30 +94,28 @@ texts_dict = [
         "position": (200, WINDOW_SIZE-40),
     },
     {
-        "text": str(imus_angle),
+        "text": str(angle_between_imus),
         "color": pygame_op.CYAN_RGB,
         "position": (300, WINDOW_SIZE-40),
     },
 ]
 
-
-offset_x1 = WINDOW_SIZE/2
-offset_y1 = WINDOW_SIZE/4
-
-offset_x2 = WINDOW_SIZE/2
-offset_y2 = 3 * WINDOW_SIZE/4
-
-time.sleep(2)
-
+# Initialize imu's quaternions
 quaternions1 = [0, 0, 0, 0]
 quaternions2 = [0, 0, 0, 0]
 
-while True:
+# Wait configurations processing to avoid breaking
+time.sleep(2)
 
+while True:
     try:
+        # Pygame update rate
         clock.tick(60)
+        
+        # Clean screen
         window.fill((0,0,0))
 
+        # Draw IMU's in the screen
         pygame_op.render_information(window,
                                     texts_dict,
                                     cube_points,
@@ -123,8 +125,6 @@ while True:
                                     offset_y1,
                                     orientation_points, 
                                     pygame_op.PINK_RGB)
-
-
         pygame_op.render_information(window,
                             texts_dict,
                             cube_points,
@@ -135,50 +135,39 @@ while True:
                             orientation_points,
                             pygame_op.YELLOW_RGB)
 
-
-        # print("Euler angles: ")
-        # serial_op.manual_flush(serial_port)
-        # command  = serial_op.create_imu_command(7, 1)
-        # serial_op.apply_command(serial_port, command, True)[-3:]
-        # input()
-        # Update rotation matrix if there are data
         print("running...")
         bytes_to_read = serial_port.inWaiting()
-        print(CYAN, 'BYTES TO READ: ', bytes_to_read, RESET)
 
-        # NUMERO DO ALEM VAMOS DESCOBRIR PQ
-        if  0 < bytes_to_read > 86:
+        # If there are data waiting in dongle, process it
+        if  0 < bytes_to_read:
+
+            # Obtain data in dongle serial port
             data = serial_port.read(bytes_to_read)
+
+            # Check if data package is OK - See sesnor user's manual.
             if data[0] != 0:
-                print(RED, 'CONTINUE', RESET)
+                print(RED, 'Corrupted data read.', RESET)
                 continue
                 
-
-            print('DATA 1: ', data[1])
             if data[1] == 8:
                 extracted_data1 = serial_op.extract_quaternions(data)
                 quaternions1 = extracted_data1['quaternions']
-                # quaternionObject1 = Quaternion(quaternions1)
-                # rotation_matrix1 = quaternionObject1.rotation_matrix
                 rotation_matrix1 = R.from_quat(quaternions1).as_matrix()
                 rotation_matrix1[[1, 2]] = rotation_matrix1[[2, 1]]
 
             elif data[1] == 7:
                 extracted_data2 = serial_op.extract_quaternions(data)
                 quaternions2 = extracted_data2['quaternions']
-                # quaternionObject2 = Quaternion(quaternions2)
-                # rotation_matrix2 = quaternionObject2.rotation_matrix
                 rotation_matrix2 = R.from_quat(quaternions2).as_matrix()
                 rotation_matrix2[[1, 2]] = rotation_matrix2[[2, 1]]
 
-
             # calculate angle between IMUs
-            imus_angle = quaternions_op.calculate_angle_between_quaternions(quaternions1, quaternions2)
-            print(imus_angle)
+            angle_between_imus = quaternions_op.calculate_angle_between_quaternions(quaternions1, quaternions2)
+            print(angle_between_imus)
 
             # show angle on the screen
             texts_dict[5] = {
-                                "text": str(int(imus_angle)),
+                                "text": str(int(angle_between_imus)),
                                 "color": pygame_op.PINK_RGB,
                                 "position": (420, WINDOW_SIZE-40),
                             }
