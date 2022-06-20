@@ -2,9 +2,8 @@
 
 Demonstração de análise automática do movimento humano.
 
-<!-- COLOCAR AQUI GIF DE UMA DETECÇÃO DE POSE -->
+![Exemplo de detecção de pose com o blazepose.](examples/blazepose-gif-example.gif)
 
-<!-- COLOCAR AQUI GRÁFICO DE UMA DETECÇÃO DE MOVIMENTO -->
 
 ## Pré-requisitos
 
@@ -68,25 +67,39 @@ Nas pasta "outputs" serão salvos os arquivos com os dados do processamento (loc
 
 ## Execução dos programas de IMU
 
-Navegue para a pasta de scrpits:
+Navegue para a pasta imu e em seguida para a pasta scripts:
 ```
+cd imu
 cd scripts
+```
+
+Para uma visualização 3D da IMU, execute:
+```
+python 3d_visualization.py
 ```
 
 Para visualização dos gráficos de ângulos de Euler execute:
 ```
-python imu.py
-```
-Para uma visualização 3D da IMU, execute:
-```
-python online3DVisualization.py
+python 2imus_3d_visualization.py
 ```
 
-Para a execução dos programas da IMU certifique-se de que o dongle está conectado a seu computador e que a IMU a ser utilizada está ligada e com bateria
+Para a execução dos programas da IMU certifique-se de que o dongle está conectado a seu 
+computador e que a IMU a ser utilizada está ligada e com bateria, além disso é necessário
+configurar o endereço das IMU's na memória do dongle com o auxílio da suite do fabricante
+[Ver página 10 do manual disponível na pasta manual deste repositório].
 
-Em caso de dúvidas ler o manual disponível em: 
-https://yostlabs.com/wp/wp-content/uploads/pdf/3-Space-Sensor-Users-Manual-1.pdf
-
+Para melhor entendimento do código das IMU's é necessária a leitura do manual do
+dispositivo disponível na pasta manual deste repositório, sendo tópicos mais importantes
+o modo como são enviados os comandos (neste repositório usa-se ASCII por simplicidade), 
+o formato em que são recebidas as respostas, o modo streamings e o significado de cada
+comando. Apesar de ser fortmente recomendada a leitura do manual, as funções implementadas
+no modulo serial_operations() foram implementadas de modo que seja possível realizar a 
+obtenção de dados simplesmente configurando a IMU para o modo streaming como é feito
+nos dos arquivos exemplos com o dicionário imu_configuration e em seguida com a leitura dos
+dados e extração dos mesmos de acordo com o formato previamente configurado. No quesito extração
+de dados foram feitas as configurações para extração de quaternions, angulos de euler e 
+matrizes de rotação de forma isolada, para extração destes em uma mesma configuração de streaming 
+é necessária a implementação de novas funções.
 
 ## Styleguide
 
