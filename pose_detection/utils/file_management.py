@@ -157,6 +157,10 @@ def write_to_json_file(file_out_path, data, write_mode='w'):
         data: dictionary with the data that should be writen
         write_mode: a string that defines write mode
     """
+
+    # Create outputs directory if needed
+    if not os.path.isdir("../outputs"):  os.makedirs("../outputs")
+
     with open(file_out_path+".data", write_mode) as f:
         f.write(json.dumps(data))
         f.write('\n')
