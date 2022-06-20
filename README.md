@@ -2,7 +2,7 @@
 
 Demonstração de análise automática do movimento humano.
 
-![Exemplo de detecção de pose com o blazepose.](examples/blazepose-gif-example.gif)
+![Exemplo de detecção de pose com o blazepose.](/examples/blazepose-gif-example.gif "Exemplo de detecção de pose com o blazepose.")
 
 
 ## Pré-requisitos
