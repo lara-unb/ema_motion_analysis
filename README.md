@@ -1,17 +1,26 @@
 # ema_motion_analysis
 
-Demonstração de análise automática do movimento humano.
+Este repositório tem como objetivo a implementação de uma demonstração
+da detecção automática do movimento humano por meio de redes neurais e sensores inerciais
+(IMU's). Este foi desenvolvido com o intuito de analisar o salto vertical, no entanto
+pode ser adaptado para outros movimentos. 
 
 <!-- Funciona no github -->
+Exemplo do funcionamento da detecção de pose. 
 <p align="center">
   <img src="/examples/blazepose-example.gif" alt="Exemplo de detecção de pose com o blazepose." />
+</p>
+
+<!-- Funciona no github -->
+Exemplo do funcionamento do uso de 2 IMU's calculando o menor ângulo entre elas. 
+<p align="center">
+  <img src="/examples/imu-example.gif" alt="Exemplo de detecção de pose com o blazepose." />
 </p>
 
 ## Pré-requisitos
 
 - Ambiente de desenvolvimento Anaconda
 - Python 3
-
 
 ## Instalação do pacotes Pacotes
 
@@ -32,6 +41,7 @@ pip install PyQt5==5.12.3
 pip install pyserial==3.5
 pip install pyqtgraph
 pip install pyquaternion
+pip install scipy
 ```
 
 Exclusivo Linux e MacOs
