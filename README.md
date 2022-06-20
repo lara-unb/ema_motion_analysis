@@ -39,9 +39,9 @@ pip install matplotlib==3.5.1
 pip install mediapipe==0.8.9.1
 pip install PyQt5==5.12.3
 pip install pyserial==3.5
-pip install pyqtgraph
-pip install pyquaternion
-pip install scipy
+pip install pyqtgraph==0.12.4
+pip install pyquaternion==0.9.9
+pip install scipy==1.7.3
 ```
 
 Exclusivo Linux e MacOs
@@ -57,8 +57,9 @@ pip install opencv-python==4.5.1.48
 ```
 ## Execução dos programas de deteção de pose
 
-Navegue para a pasta de scrpits:
+Navegue para a pasta pose_detection e depois scripts:
 ```
+cd pose_detection
 cd scripts
 ```
 
