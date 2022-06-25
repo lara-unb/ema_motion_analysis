@@ -2,6 +2,7 @@ from cv2 import log
 from pyquaternion import Quaternion # http://kieranwynn.github.io/pyquaternion/
 import math
 from scipy.spatial.transform import Rotation as R
+from sympy import degree
 
 def convert_quaternion_to_unit_quaternion_if_needed(quaternion : Quaternion):
     """ Convert a quarternion in a unit quaternion if isn't.
@@ -27,8 +28,10 @@ def calculate_angle_between_quaternions(firstQuaternion : Quaternion,
     Returns:
         Angle between quaternions in degrees
     """
-    firstQuaternionObject = Quaternion(firstQuaternion[0], firstQuaternion[1], firstQuaternion[2], firstQuaternion[3])
-    secondQuaterionObject = Quaternion(secondQuaternion[0], secondQuaternion[1], secondQuaternion[2], secondQuaternion[3])
+
+    # Quaternion(w, x, y, z) -> imu yei format (x, y, z, w) -> See user's manual
+    firstQuaternionObject = Quaternion(firstQuaternion[1], firstQuaternion[2], firstQuaternion[3], firstQuaternion[0])
+    secondQuaterionObject = Quaternion(secondQuaternion[1], secondQuaternion[2], secondQuaternion[3], secondQuaternion[0])
 
     firstQuaternionObject = convert_quaternion_to_unit_quaternion_if_needed(firstQuaternionObject)
     secondQuaterionObject = convert_quaternion_to_unit_quaternion_if_needed(secondQuaterionObject)
