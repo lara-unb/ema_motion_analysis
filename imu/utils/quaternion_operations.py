@@ -1,6 +1,7 @@
 from cv2 import log
 from pyquaternion import Quaternion # http://kieranwynn.github.io/pyquaternion/
 import math
+from scipy.spatial.transform import Rotation as R
 
 def convert_quaternion_to_unit_quaternion_if_needed(quaternion : Quaternion):
     """ Convert a quarternion in a unit quaternion if isn't.
@@ -39,7 +40,14 @@ def calculate_angle_between_quaternions(firstQuaternion : Quaternion,
     angleDegrees = 2 * math.degrees(math.acos(minQuat))
     return angleDegrees
 
+def get_rotation_matrix_from_quaternions(quaternions, desired_format = {}):
+    # Convert quaternions to rotation matrix
+    rotation_matrix = R.from_quat(quaternions).as_matrix()
 
+    # change tare position 90 degress
+    rotation_matrix[[1, 2]] = rotation_matrix[[2, 1]]
+
+    return rotation_matrix
 # Check quaternion operations in isolation
 # Source to check: https://www.mathworks.com/matlabcentral/answers/415936-angle-between-2-quaternions
 # See for answers!!! 

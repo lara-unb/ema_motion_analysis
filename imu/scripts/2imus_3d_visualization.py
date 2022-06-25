@@ -8,7 +8,7 @@ import numpy as np
 import sys
 import time
 import traceback
-from scipy.spatial.transform import Rotation as R
+
 
 sys.path.append("../utils/")
 import serial_operations as serial_op
@@ -153,16 +153,14 @@ while True:
             if data[1] == 8:
                 extracted_data1 = serial_op.extract_quaternions(data)
                 quaternions1 = extracted_data1['quaternions']
-                rotation_matrix1 = R.from_quat(quaternions1).as_matrix()
-                # change tare position 90 degress
-                rotation_matrix1[[1, 2]] = rotation_matrix1[[2, 1]]
+                rotation_matrix1 = quaternions_op.get_rotation_matrix_from_quaternions(quaternions1)
+                
+                
 
             elif data[1] == 7:
                 extracted_data2 = serial_op.extract_quaternions(data)
                 quaternions2 = extracted_data2['quaternions']
-                rotation_matrix2 = R.from_quat(quaternions2).as_matrix()
-                # change tare position 90 degrees
-                rotation_matrix2[[1, 2]] = rotation_matrix2[[2, 1]]
+                rotation_matrix2 = quaternions_op.get_rotation_matrix_from_quaternions(quaternions2)
 
             # calculate angle between IMUs
             angle_between_imus = quaternions_op.calculate_angle_between_quaternions(quaternions1, quaternions2)
