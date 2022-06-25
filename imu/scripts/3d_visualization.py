@@ -81,11 +81,16 @@ texts_dict = [
     },
 ]
 
+#  Main loop
 while True:
     try:
+        # Pygame update rate
         clock.tick(60)
+        
+        # Clean screen
         window.fill((0,0,0))
 
+        # Draw IMU in the screen
         pygame_op.render_information(window,
                                     texts_dict,
                                     cube_points,

@@ -107,6 +107,7 @@ quaternions2 = [0, 0, 0, 0]
 # Wait configurations processing to avoid breaking
 time.sleep(2)
 
+#  Main loop
 while True:
     try:
         # Pygame update rate
@@ -165,9 +166,8 @@ while True:
 
             # calculate angle between IMUs
             angle_between_imus = quaternions_op.calculate_angle_between_quaternions(quaternions1, quaternions2)
-            print(angle_between_imus)
 
-            # show angle on the screen
+            # Update angle shown in the screen
             texts_dict[5] = {
                                 "text": str(int(angle_between_imus)),
                                 "color": pygame_op.PINK_RGB,
