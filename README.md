@@ -14,7 +14,7 @@ Exemplo do funcionamento da detecção de pose.
 <!-- Funciona no github -->
 Exemplo do funcionamento do uso de 2 IMU's calculando o menor ângulo entre elas. 
 <p align="center">
-  <img src="/examples/imu-example.gif" alt="Exemplo de detecção de pose com o blazepose." />
+  <img src="/examples/imu-example.gif" alt="Exemplo de visualização 3d com angulos em tempo real entre IMU's." />
 </p>
 
 ## Pré-requisitos
@@ -104,15 +104,22 @@ configurar o endereço das IMU's na memória do dongle com o auxílio da suite d
 Para melhor entendimento do código das IMU's é necessária a leitura do manual do
 dispositivo disponível na pasta manual deste repositório, sendo tópicos mais importantes
 o modo como são enviados os comandos (neste repositório usa-se ASCII por simplicidade), 
-o formato em que são recebidas as respostas, o modo streamings e o significado de cada
-comando. Apesar de ser fortmente recomendada a leitura do manual, as funções implementadas
-no modulo serial_operations() foram implementadas de modo que seja possível realizar a 
+o formato em que são recebidas as respostas, o modo streaming e o significado de cada
+comando. Apesar de ser fortemente recomendada a leitura do manual, as funções implementadas
+no modulo serial_operations foram implementadas de modo que seja possível realizar a 
 obtenção de dados simplesmente configurando a IMU para o modo streaming como é feito
 nos dos arquivos exemplos com o dicionário imu_configuration e em seguida com a leitura dos
 dados e extração dos mesmos de acordo com o formato previamente configurado. No quesito extração
 de dados foram feitas as configurações para extração de quaternions, angulos de euler e 
 matrizes de rotação de forma isolada, para extração destes em uma mesma configuração de streaming 
 é necessária a implementação de novas funções.
+
+OBS: para a visualização em 3d ser fidedigna (sem espelhamentos ou inversões de eixos) é necessário
+realizar a tara das imu's em pés como apresentado na figura abaixo com relação à tela em que a 
+representação é visualizada.
+<p align="center">
+  <img src="/examples/tara-imu.jpeg" alt="Modo correto de tarar a IMU em relação ao PC." />
+</p>
 
 ## Styleguide
 

@@ -1,8 +1,6 @@
-from cv2 import log
 from pyquaternion import Quaternion # http://kieranwynn.github.io/pyquaternion/
 import math
 from scipy.spatial.transform import Rotation as R
-from sympy import degree
 
 def convert_quaternion_to_unit_quaternion_if_needed(quaternion : Quaternion):
     """ Convert a quarternion in a unit quaternion if isn't.
@@ -43,7 +41,15 @@ def calculate_angle_between_quaternions(firstQuaternion : Quaternion,
     angleDegrees = 2 * math.degrees(math.acos(minQuat))
     return angleDegrees
 
-def get_rotation_matrix_from_quaternions(quaternions, desired_format = {}):
+def get_rotation_matrix_from_quaternions(quaternions):
+    """ Receiveis a quaternions and returns a rotation matrix rotated 90º around
+    x axis to start in position presented in README.md.
+    
+    Args:
+        quaternions: vector with quaternions x, y, z, w format    
+    Returns: 
+        rotation matrix representing imu's rotation
+    """
     # create rotation object
     quaternionObject = R.from_quat(quaternions)
 
