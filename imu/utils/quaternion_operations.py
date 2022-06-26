@@ -44,8 +44,13 @@ def calculate_angle_between_quaternions(firstQuaternion : Quaternion,
     return angleDegrees
 
 def get_rotation_matrix_from_quaternions(quaternions, desired_format = {}):
+
+    quaternionObject = R.from_quat(quaternions)
+
+    quaternionObject *= R.from_euler('xyz', [0,0,0],degrees=True)
     # Convert quaternions to rotation matrix
-    rotation_matrix = R.from_quat(quaternions).as_matrix()
+    # rotation_matrix = R.from_quat(quaternions).as_matrix()
+    rotation_matrix = quaternionObject.as_matrix()
 
     # change tare position 90 degress
     rotation_matrix[[1, 2]] = rotation_matrix[[2, 1]]
