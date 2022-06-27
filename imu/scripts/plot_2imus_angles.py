@@ -59,7 +59,6 @@ if __name__ == '__main__':
         startTime = time.time()
         while True:
             try:
-                print("running...")
                 bytes_to_read = serial_port.inWaiting()
 
                 # If there are data waiting in dongle, process it
@@ -84,11 +83,11 @@ if __name__ == '__main__':
                     # calculate angle between IMUs
                     angle_between_imus = quaternions_op.calculate_angle_between_quaternions(quaternions1, quaternions2)
 
-                # Update Data monitor
-                dm.data = {
-                    "data": (angle_between_imus, ),
-                    "time": time.time() - startTime
-                }
+                    # Update Data monitor
+                    dm.data = {
+                        "data": (angle_between_imus, ),
+                        "time": time.time() - startTime
+                    }
 
             except ExitDataMonitorException:
                 print("Finished execution.")
