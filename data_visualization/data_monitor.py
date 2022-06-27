@@ -9,6 +9,8 @@ import pyqtgraph as pg
 from pyqtgraph.Qt import QtGui, QtCore
 import numpy as np
 
+class ExitDataMonitorException(Exception):
+    pass
 class DataMonitor(object):
     """ DataMonitor class encapsulate threads logic to plot data in a non-block
     way.
@@ -78,7 +80,7 @@ class DataMonitor(object):
 
             self._data_queue.close()
             self._data_queue = None
-
+        raise ExitDataMonitorException("Left data monitor.")
     def start(self):
         """ Starts the QtCore.QTimer() as subprocess (non-blocking, 
         queue communication) 
