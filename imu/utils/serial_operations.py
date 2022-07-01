@@ -274,9 +274,37 @@ def extract_quaternions(data):
     decoded_data = data.decode()
     list_data = decoded_data.replace('\r\n',' ').split(' ')
     cleaned_list_data = list(filter(None, list_data))
-    euler_vector = cleaned_list_data[0][3:].split(',')
-    euler_vector = np.array(euler_vector, dtype=np.float64)
-    return {'quaternions': euler_vector}
+    quaternion = cleaned_list_data[0][3:].split(',')
+    quaternion = np.array(quaternion, dtype=np.float64)
+    return {'quaternions': quaternion}
+
+
+def extract_acc_quat(data):
+    """ Manipulate data to obtain rotation matrix
+    
+    Args:
+        data: Raw data that sensor send
+    
+    Returns: 
+        rotation matrix dictionary
+    """
+    print('COMEÇOU ESSA FUNCAO')
+    decoded_data = data.decode()
+    list_data = decoded_data.replace('\r\n',' ').split(' ')
+    cleaned_list_data = list(filter(None, list_data))
+    print(cleaned_list_data)
+    acc = cleaned_list_data[0][3:].split(',')
+    print(acc)
+    quaternion = cleaned_list_data[1][:].split(',')
+    print(quaternion)
+
+    acc = np.array(acc, dtype=np.float64)
+    print(acc)
+    quaternion = np.array(quaternion, dtype=np.float64)
+    print(quaternion)
+
+    return {'acc': acc, 'quaternions': quaternion}
+
 
 def initialize_imu(configuration_dict):
     """ Initialize imu dongle and sensor
