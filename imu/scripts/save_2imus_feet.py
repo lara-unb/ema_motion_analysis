@@ -103,7 +103,7 @@ if __name__ == '__main__':
                     "acc": str(acc1),
                     "quaternion": str(quaternions1),
                 }
-                file_management.write_to_json_file("data/coleta3_pe.json", 
+                file_management.write_to_json_file("data/coleta3_pe1.json", 
                                                file_data, 
                                                write_mode='a')
 
@@ -112,11 +112,11 @@ if __name__ == '__main__':
             serial_op.stop_streaming(serial_port, imu_configuration['logical_ids'])
             serial_op.manual_flush(serial_port)
             plt.plot(angles_timestamps, angles_values)
-            plt.savefig("data/coleta3_pe_angulo"+ ".pdf") # str(time.time()) +
+            plt.savefig("data/coleta3_pe_angulo1"+ ".pdf") # str(time.time()) +
             plt.show()
 
             plt.plot(acc_timestamps, acc_values)
-            plt.savefig("data/coleta3_pe_acc"+ ".pdf") # str(time.time()) +
+            plt.savefig("data/coleta3_pe_acc1"+ ".pdf") # str(time.time()) +
             plt.show()
             break
         except Exception as error:

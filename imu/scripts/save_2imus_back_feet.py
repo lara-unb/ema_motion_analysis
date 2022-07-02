@@ -104,7 +104,7 @@ if __name__ == '__main__':
                     "acc": str(acc1),
                     "quaternion": str(quaternions1),
                 }
-                file_management.write_to_json_file("data/coleta2_sacro.json", 
+                file_management.write_to_json_file("data/coleta2_mao3.json", 
                                                back_data, 
                                                write_mode='a')
 
@@ -113,7 +113,7 @@ if __name__ == '__main__':
                     "acc": str(acc2),
                     "quaternion": str(quaternions2),
                 }
-                file_management.write_to_json_file("data/coleta2_pe.json", 
+                file_management.write_to_json_file("data/coleta2_pe3.json", 
                                                feet_data, 
                                                write_mode='a')
 
@@ -123,11 +123,11 @@ if __name__ == '__main__':
             serial_op.manual_flush(serial_port)
 
             plt.plot(acc_timestamps, acc_values_back)
-            plt.savefig("data/coleta2_sacro_acc"+ ".pdf") # str(time.time()) +
+            plt.savefig("data/coleta2_mao_acc3"+ ".pdf") # str(time.time()) +
             plt.show()
             
             plt.plot(acc_timestamps, acc_values_feet)
-            plt.savefig("data/coleta2_pe_acc"+ ".pdf") # str(time.time()) +
+            plt.savefig("data/coleta2_pe_acc3"+ ".pdf") # str(time.time()) +
             plt.show()
             break
         except Exception as error:
