@@ -1,21 +1,6 @@
-# ema_motion_analysis
+# Simplest IMU YostLabs Data Acquisition
 
-Este repositório tem como objetivo a implementação de uma demonstração
-da detecção automática do movimento humano por meio de redes neurais e sensores inerciais
-(IMU's). Este foi desenvolvido com o intuito de analisar o salto vertical, no entanto
-pode ser adaptado para outros movimentos. 
-
-<!-- Funciona no github -->
-Exemplo do funcionamento da detecção de pose. 
-<p align="center">
-  <img src="/examples/blazepose-example.gif" alt="Exemplo de detecção de pose com o blazepose." />
-</p>
-
-<!-- Funciona no github -->
-Exemplo do funcionamento do uso de 2 IMU's calculando o menor ângulo entre elas. 
-<p align="center">
-  <img src="/examples/imu-example.gif" alt="Exemplo de visualização 3d com angulos em tempo real entre IMU's." />
-</p>
+A ideia deste branch é isolar as funcionalidades de obtenção de dados das IMU's para uma simples coleta.
 
 ## Pré-requisitos
 
@@ -36,47 +21,12 @@ Instale os seguintes pacotes com o comando conda (Windows, Linux e MacOS):
 ```
 conda install -c anaconda numpy=1.21.2
 pip install matplotlib==3.5.1
-pip install mediapipe==0.8.9.1
 pip install PyQt5==5.12.3
 pip install pyserial==3.5
 pip install pyqtgraph==0.12.4
 pip install pyquaternion==0.9.9
 pip install scipy==1.7.3
 ```
-
-Exclusivo Linux e MacOs
-```
-conda install -c conda-forge tensorflow=2.7.0
-pip install opencv-python==4.5.2.54
-```
-
-Exclusivo Windows
-```
-conda install -c conda-forge tensorflow=2.6.0
-pip install opencv-python==4.5.1.48
-```
-## Execução dos programas de deteção de pose
-
-Navegue para a pasta pose_detection e depois scripts:
-```
-cd pose_detection
-cd scripts
-```
-
-Execute a detecção de pose com alguma das redes:
-
-```
-python blazepose.py
-```
-ou
-
-```
-python movenet.py
-```
-
-Então será aberto um menu do usuário em que este pode escolher entre executar alguns dos exemplos prontos disponíveis ou carregar um exemplo próprio.
-
-Nas pasta "outputs" serão salvos os arquivos com os dados do processamento (localização dos pontos para cada frame) e os vídeos com as identificações das poses.
 
 ## Execução dos programas de IMU
 
