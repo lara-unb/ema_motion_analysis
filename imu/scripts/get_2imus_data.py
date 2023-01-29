@@ -11,16 +11,15 @@ import sys
 import time
 import traceback
 import matplotlib.pyplot as plt
-import file_management
 
 sys.path.append("../utils/")
 import serial_operations as serial_op
 import quaternion_operations as quaternions_op
+import file_management
 
 
 sys.path.append("../../data_visualization")
 from colors import *
-from data_monitor import *
 
 # Set parameters that will be configured
 imu_configuration = {
