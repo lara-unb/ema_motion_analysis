@@ -17,6 +17,10 @@ Exemplo do funcionamento do uso de 2 IMU's calculando o menor ângulo entre elas
   <img src="/examples/imu-example.gif" alt="Exemplo de visualização 3d com angulos em tempo real entre IMU's." />
 </p>
 
+## Separação de Branchs
+
+- Se você é um iniciante no desenvolvimento com sensores inerciais, comece pelo branch: imu-data-acquisition-starter deste repositório. Neste está contido apenas um script simples para a obtenção de dados e não é necessária a instalação de vários pacotes.
+
 ## Pré-requisitos
 
 - Ambiente de desenvolvimento Anaconda
