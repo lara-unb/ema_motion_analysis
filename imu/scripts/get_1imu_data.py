@@ -45,6 +45,9 @@ if __name__ == '__main__':
     # Wait configurations processing to avoid breaking
     time.sleep(2)
 
+    # Alert user
+    print("Movement is beeing captured.")
+
     startTime = time.time()
     while True:
         try:

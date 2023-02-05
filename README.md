@@ -4,29 +4,33 @@ A ideia deste branch é isolar as funcionalidades de obtenção de dados das IMU
 
 ## Pré-requisitos
 
-- Ambiente de desenvolvimento Anaconda
-- Python 3
+- Instalar e conhecer minimamente Python 3
+- (Recomendado) Ler manual da IMU Yost Labs e manual da suíte.
 
-## Instalação do pacotes Pacotes
+## Instalação do pacotes
 
-Primeiramente, crie um ambiente de desenvolvimento:
+
+Instale os seguintes pacotes com o comandos com pip no windows, para o linux os mesmos comandos podem ser executados sem a flag --user:
 ```
-conda create --no-default-packages -n ema_motion_env python=3.9.1
+pip install matplotlib==3.5.1 --user 
+pip install pyserial==3.5 --user
+pip install numpy=1.21.2 --user
+pip install pyquaternion==0.9.9 --user
+pip install scipy==1.7.3 --user
 ```
-Ative o ambiente de desenvolvimento com:
-```
-conda activate ema_motion_env
-```
-Instale os seguintes pacotes com o comando conda (Windows, Linux e MacOS):
-```
-conda install -c anaconda numpy=1.21.2
-pip install matplotlib==3.5.1
-pip install PyQt5==5.12.3
-pip install pyserial==3.5
-pip install pyqtgraph==0.12.4
-pip install pyquaternion==0.9.9
-pip install scipy==1.7.3
-```
+
+## Organização das pastas e programas de interesse
+- /data_visualization -> Contém definição de constantes para imprimir colorido no terminal.
+- /imu
+  - /scripts
+    - get_1imu_data.py para obter dados com a imu que deve ser executado.
+    - /data -> dados coletados no script de aquisição
+  - /utils
+    - file_management.py -> funções para escrita em  arquivo.
+    - quaternion_operations.py -> funções para manipulação de dados com quaternions
+    - serial_operations.py -> Funções para interação com interface serial do dongle da imu da Yost Labs
+
+OBS: Antes de executar o programa, passe por todo o código e entenda seu funcionamento, assim será possível realizar ajustes simples caso haja problemas na execução.
 
 ## Execução dos programas de IMU
 
@@ -34,16 +38,6 @@ Navegue para a pasta imu e em seguida para a pasta scripts:
 ```
 cd imu
 cd scripts
-```
-
-Para uma visualização 3D da IMU, execute:
-```
-python 3d_visualization.py
-```
-
-Para visualização dos gráficos de ângulos de Euler execute:
-```
-python 2imus_3d_visualization.py
 ```
 
 Para a execução dos programas da IMU certifique-se de que o dongle está conectado a seu 
@@ -59,19 +53,23 @@ comando. Apesar de ser fortemente recomendada a leitura do manual, as funções 
 no modulo serial_operations foram implementadas de modo que seja possível realizar a 
 obtenção de dados simplesmente configurando a IMU para o modo streaming como é feito
 nos dos arquivos exemplos com o dicionário imu_configuration e em seguida com a leitura dos
-dados e extração dos mesmos de acordo com o formato previamente configurado. No quesito extração
-de dados foram feitas as configurações para extração de quaternions, angulos de euler e 
-matrizes de rotação de forma isolada, para extração destes em uma mesma configuração de streaming 
-é necessária a implementação de novas funções.
+dados e extração dos mesmos de acordo com o formato previamente configurado. No quesito extração de dados foram feitas as configurações para extração de quaternions, angulos de euler e matrizes de rotação de forma isolada, para extração destes em uma mesma configuração de streaming é necessária a implementação de novas funções.
 
-OBS: para a visualização em 3d ser fidedigna (sem espelhamentos ou inversões de eixos) é necessário
-realizar a tara das imu's em pés como apresentado na figura abaixo com relação à tela em que a 
-representação é visualizada.
-<p align="center">
-  <img src="/examples/tara-imu.jpeg" alt="Modo correto de tarar a IMU em relação ao PC." />
-</p>
+Para para iniciar a coleta com a IMU, execute:
+```
+python get_1imu_data.py (Windows)
+python3 get_1imu_data.py (Linux)
+```
+OBS: Ao exeutar o programa, por alguns segundos deixa a IMU parada por alguns segundos até que no console do PC seja impresso "Movement is beeing captured.". Então, o programa vai executar infinitamente até que seja pressionado "ctrl+c". Então a IMU mostra os gráficos e os salva dentro da pasta /data. 
 
-## Styleguide
+OBS: ao executar o programa em linux pode ser necessário executar o comando que permite todos poderem escrever na porta /dev/ttyACM0 que está conectada o usb:
+```
+sudo chmod 666 /dev/ttyACM0 
+```
+OBS2: se o dongle não está conectado na porta acima, liste as portas e identifique-as com o comando:
+```
+dmesg | grep tty
+```
 
-Os códigos desta demonstração foram escritos com base no style guide disponível 
-em: https://peps.python.org/pep-0008/#introduction.
+
+
