@@ -11,6 +11,8 @@ import sys
 import time
 import traceback
 import matplotlib.pyplot as plt
+
+sys.path.append("../")
 import file_management
 
 sys.path.append("../../utils/")
@@ -18,9 +20,17 @@ import serial_operations as serial_op
 import quaternion_operations as quaternions_op
 
 
-sys.path.append("../../data_visualization")
+sys.path.append("../../../data_visualization")
 from colors import *
 from data_monitor import *
+
+RED = "\033[1;31m"
+BLUE = "\033[1;34m"
+CYAN = "\033[1;36m"
+GREEN = "\033[0;32m"
+RESET = "\033[0;0m"
+BOLD = "\033[;1m"
+REVERSE = "\033[;7m"
 
 # Set parameters that will be configured
 imu_configuration = {
@@ -30,7 +40,7 @@ imu_configuration = {
     "gyroAutoCalib": True,
     "filterMode": 1,
     "tareSensor": True,
-    "logical_ids": [7, 8],
+    "logical_ids": [3, 8],
     "streaming_commands": [39, 0, 255, 255, 255, 255, 255, 255]
 }
 
@@ -39,8 +49,11 @@ imu_configuration = {
 angle_between_imus = 0
 
 # Initialize imu's quaternions
-quaternions1 = [0, 0, 0, 0]
-quaternions2 = [0, 0, 0, 0]
+quaternions_thigh = [0, 0, 0, 0]
+quaternions_ankle = [0, 0, 0, 0]
+
+acc1 = [0, 0, 0]
+acc2 = [0, 0, 0]
 
 
 #angles_values = []
@@ -74,18 +87,18 @@ if __name__ == '__main__':
                     print(RED, 'Corrupted data read.', RESET)
                     continue
                     
-                if data[1] == 7:
+                if data[1] == 3:
                     extracted_data1 = serial_op.extract_acc_quat(data)
                     acc1 = extracted_data1['acc']
-                    quaternions1 = extracted_data1['quaternions']
+                    quaternions_thigh = extracted_data1['quaternions']
 
                 elif data[1] == 8:
                     extracted_data2 = serial_op.extract_acc_quat(data)
                     acc2 = extracted_data2['acc']
-                    quaternions2 = extracted_data2['quaternions']
+                    quaternions_ankle = extracted_data2['quaternions']
 
                 # calculate angle between IMUs
-                angle_between_imus = quaternions_op.calculate_angle_between_quaternions(quaternions1, quaternions2)
+                angle_between_imus = quaternions_op.calculate_angle_between_quaternions(quaternions_thigh, quaternions_ankle)
 
                 # save imu angle history
                 #print(quaternions1[2])
@@ -94,13 +107,13 @@ if __name__ == '__main__':
 
 
                 acc_values_thigh.append(acc1[2])
-                acc_values_feet.append(acc2[1])
+                acc_values_feet.append(acc2[2])
                 acc_timestamps.append(time.time() - startTime)
 
                 data_imus = {
                     "time_stamp": time.time() - startTime,
-                    "quaternion1": str(quaternions1),
-                    "quaternion2": str(quaternions2),
+                    "quaternion_thigh": str(quaternions_thigh),
+                    "quaternion_ankle": str(quaternions_ankle),
                 }
                 file_management.write_to_json_file("data/teste.json", 
                                                data_imus, 
@@ -121,11 +134,11 @@ if __name__ == '__main__':
             serial_op.manual_flush(serial_port)
 
             plt.plot(acc_timestamps, acc_values_thigh)
-            plt.savefig("data/coleta1_coxa_acc3"+ ".pdf") # str(time.time()) +
+            #plt.savefig("data/coleta1_coxa_acc3"+ ".pdf") # str(time.time()) +
             plt.show()
             
             plt.plot(acc_timestamps, acc_values_feet)
-            plt.savefig("data/coleta1_pe_acc3"+ ".pdf") # str(time.time()) +
+            #plt.savefig("data/coleta1_pe_acc3"+ ".pdf") # str(time.time()) +
             plt.show()
             break
         except Exception as error:
