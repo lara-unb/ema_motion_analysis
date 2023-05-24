@@ -288,20 +288,20 @@ def extract_acc_quat(data):
     Returns: 
         rotation matrix dictionary
     """
-    print('COMEÇOU ESSA FUNCAO')
+    #print('COMEÇOU ESSA FUNCAO')
     decoded_data = data.decode()
     list_data = decoded_data.replace('\r\n',' ').split(' ')
     cleaned_list_data = list(filter(None, list_data))
-    print(cleaned_list_data)
+    #print(cleaned_list_data)
     acc = cleaned_list_data[0][3:].split(',')
-    print(acc)
+    #print(acc)
     quaternion = cleaned_list_data[1][:].split(',')
-    print(quaternion)
+    #print(quaternion)
 
     acc = np.array(acc, dtype=np.float64)
-    print(acc)
+    #print(acc)
     quaternion = np.array(quaternion, dtype=np.float64)
-    print(quaternion)
+    #print(quaternion)
 
     return {'acc': acc, 'quaternions': quaternion}
 
