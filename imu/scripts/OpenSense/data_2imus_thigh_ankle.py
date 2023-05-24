@@ -13,7 +13,7 @@ import traceback
 import matplotlib.pyplot as plt
 import file_management
 
-sys.path.append("../utils/")
+sys.path.append("../../utils/")
 import serial_operations as serial_op
 import quaternion_operations as quaternions_op
 
@@ -41,11 +41,9 @@ angle_between_imus = 0
 # Initialize imu's quaternions
 quaternions1 = [0, 0, 0, 0]
 quaternions2 = [0, 0, 0, 0]
-acc1 = [0, 0, 0]
-acc2 = [0, 0, 0]
 
 
-angles_values = []
+#angles_values = []
 angles_timestamps = []
 
 acc_values_thigh = []
@@ -99,23 +97,23 @@ if __name__ == '__main__':
                 acc_values_feet.append(acc2[1])
                 acc_timestamps.append(time.time() - startTime)
 
-                thigh_data = {
+                data_imus = {
                     "time_stamp": time.time() - startTime,
-                    "acc": str(acc1),
-                    "quaternion": str(quaternions1),
+                    "quaternion1": str(quaternions1),
+                    "quaternion2": str(quaternions2),
                 }
-                file_management.write_to_json_file("data/coleta1_coxa3.json", 
-                                               thigh_data, 
+                file_management.write_to_json_file("data/teste.json", 
+                                               data_imus, 
                                                write_mode='a')
 
-                feet_data = {
-                    "time_stamp": time.time() - startTime,
-                    "acc": str(acc2),
-                    "quaternion": str(quaternions2),
-                }
-                file_management.write_to_json_file("data/coleta1_pe3.json", 
-                                               feet_data, 
-                                               write_mode='a')
+                # feet_data = {
+                #     "time_stamp": time.time() - startTime,
+                #     "acc": str(acc2),
+                #     "quaternion": str(quaternions2),
+                # }
+                # file_management.write_to_json_file("data/coleta1_pe3.json", 
+                #                                feet_data, 
+                #                                write_mode='a')
 
         except KeyboardInterrupt:
             print("Finished execution with control + c. ")
