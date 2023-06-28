@@ -35,10 +35,14 @@ df['quaternion_thigh'] = [','.join(map(str, l)) for l in df['quaternion_thigh']]
 # Rename columns
 df = df.rename(columns={'time_stamp':'time', 'quaternion_ankle': 'tibia_r_imu', 'quaternion_thigh': 'femur_r_imu'})
 
+#df['calcn_r_imu'] = df['tibia_r_imu']
 
 print(df)
 
 # Save file .sto
+nomeOut_position = 'teste_parado.sto'
 nomeOut = 'teste.sto'
+df.head(1).to_csv(nomeOut_position, header=True, index=None, sep='\t', mode='a')
+
 df.to_csv(nomeOut, header=True, index=None, sep='\t', mode='a')
 
