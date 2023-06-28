@@ -6,25 +6,30 @@ import json
 # Read JSON file to Data Frame 
 df = pd.read_json('data/teste.json', lines=True)
 
+
 # Drop rows before 0.1s
 df = df.drop(df[df['time_stamp'] < 0.1].index)
 df = df.reset_index(drop=True)
 
 
 # Change data format to mach .sto
-df['quaternion_ankle'] = df['quaternion_ankle'].str.replace('[','', regex=True)
-df['quaternion_ankle'] = df['quaternion_ankle'].str.replace(']','', regex=True)
-df['quaternion_ankle'] = df['quaternion_ankle'].str.replace('   ',',', regex=True)
-df['quaternion_ankle'] = df['quaternion_ankle'].str.replace('  ',',', regex=True)
-df['quaternion_ankle'] = df['quaternion_ankle'].str.lstrip()
-df['quaternion_ankle'] = df['quaternion_ankle'].str.replace('/^\w+/\s', '', regex=True)
+#remove []
+df['quaternion_ankle'] = df['quaternion_ankle'].str.strip('[]')
+df['quaternion_thigh'] = df['quaternion_thigh'].str.strip('[]')
 
-df['quaternion_thigh'] = df['quaternion_thigh'].str.replace('[','', regex=True)
-df['quaternion_thigh'] = df['quaternion_thigh'].str.replace(']','', regex=True)
-df['quaternion_thigh'] = df['quaternion_thigh'].str.replace('   ',',', regex=True)
-df['quaternion_thigh'] = df['quaternion_thigh'].str.replace('  ',',', regex=True)
+#remove first white space
+df['quaternion_ankle'] = df['quaternion_ankle'].str.lstrip()
+df['quaternion_ankle'] = df['quaternion_ankle'].str.rstrip()
 df['quaternion_thigh'] = df['quaternion_thigh'].str.lstrip()
-df['quaternion_thigh'] = df['quaternion_thigh'].str.replace(' ',',', regex=True)
+df['quaternion_thigh'] = df['quaternion_thigh'].str.rstrip()
+
+# create list spliting by whitespace
+df['quaternion_ankle'] = df['quaternion_ankle'].str.split(' +')
+df['quaternion_thigh'] = df['quaternion_thigh'].str.split(' +')
+
+#convert list to string removing space
+df['quaternion_ankle'] = [','.join(map(str, l)) for l in df['quaternion_ankle']]
+df['quaternion_thigh'] = [','.join(map(str, l)) for l in df['quaternion_thigh']]
 
 
 # Rename columns
