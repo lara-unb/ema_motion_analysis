@@ -1,4 +1,6 @@
-""" Show real time angle between imu's
+""" Get data from 2 IMUs
+        Quaternions to save in a JSON file with timestamp
+        Acceleration for visualization
 
 """
 import os
