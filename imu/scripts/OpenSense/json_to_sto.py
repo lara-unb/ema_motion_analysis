@@ -6,6 +6,8 @@ import sys
 sys.path.append("../../utils/")
 from file_format import *
 
+# COMENTAR CERTINHO ESSE CODIGO 
+
 
 # Read JSON file to Data Frame 
 df = pd.read_json('data/coleta1_trike.json', lines=True)
@@ -24,7 +26,6 @@ format_to_sto('quaternion_thigh', df)
 # Rename columns
 df = df.rename(columns={'time_stamp':'time', 'quaternion_ankle': 'tibia_r_imu', 'quaternion_thigh': 'femur_r_imu'})
 
-#df['calcn_r_imu'] = df['tibia_r_imu']
 
 print(df)
 
@@ -32,10 +33,9 @@ print(df)
 nomeOut_position = 'data/coleta1_trike_posTESTE.sto'
 nomeOut = 'data/coleta1_trike_movTESTE.sto'
 df.head(1).to_csv(nomeOut_position, header=True, index=None, sep='\t', mode='a')
-
 df.to_csv(nomeOut, header=True, index=None, sep='\t', mode='a')
 
-# Add header 
+# Add header to sto files
 list_of_lines = ['DataType=Quaternion', 'OpenSimVersion=4.4',  'endheader']
 prepend_multiple_lines(nomeOut_position, list_of_lines)
 prepend_multiple_lines(nomeOut, list_of_lines)

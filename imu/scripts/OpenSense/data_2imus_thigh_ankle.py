@@ -3,6 +3,17 @@
         Acceleration for visualization
 
 """
+
+
+"""
+        COISAS PARA FAZER NESSE ARQUIVO:
+
+            1. ADAPTAR PARA QUANTIDADE VARIAVEL DE IMUS
+            2. MOSTRAR SAMPLE RATE DE CADA IMU 
+            3. COMENTAR     
+"""
+
+
 import os
 
 from numpy import byte
@@ -40,9 +51,10 @@ imu_configuration = {
     "disableGyro": False,
     "disableAccelerometer": False,
     "gyroAutoCalib": True,
-    "filterMode": 1,
+    "filterMode": 1, # kalman filter
     "tareSensor": True,
     "logical_ids": [3, 4],
+    ## 39 - acc, 0 - quaternions
     "streaming_commands": [39, 0, 255, 255, 255, 255, 255, 255]
 }
 
@@ -129,6 +141,7 @@ if __name__ == '__main__':
                 # file_management.write_to_json_file("data/coleta1_pe3.json", 
                 #                                feet_data, 
                 #                                write_mode='a')
+        
 
         except KeyboardInterrupt:
             print("Finished execution with control + c. ")
@@ -149,3 +162,6 @@ if __name__ == '__main__':
             print(traceback.format_exc())
             serial_op.stop_streaming(serial_port, imu_configuration['logical_ids'])
             break 
+
+
+
