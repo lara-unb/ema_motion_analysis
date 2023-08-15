@@ -4,7 +4,7 @@ import json
 
 
 # Read JSON file to Data Frame 
-df = pd.read_json('data/coleta4.json', lines=True)
+df = pd.read_json('data/coleta1_trike.json', lines=True)
 
 
 # Drop rows before 0.1s
@@ -40,8 +40,8 @@ df = df.rename(columns={'time_stamp':'time', 'quaternion_ankle': 'tibia_r_imu', 
 print(df)
 
 # Save file .sto
-nomeOut_position = 'coleta4_pos.sto'
-nomeOut = 'coleta4_mov.sto'
+nomeOut_position = 'data/coleta1_trike.sto'
+nomeOut = 'data/coleta1_trike.sto'
 df.head(1).to_csv(nomeOut_position, header=True, index=None, sep='\t', mode='a')
 
 df.to_csv(nomeOut, header=True, index=None, sep='\t', mode='a')
