@@ -42,7 +42,7 @@ imu_configuration = {
     "gyroAutoCalib": True,
     "filterMode": 1,
     "tareSensor": True,
-    "logical_ids": [3, 8],
+    "logical_ids": [3, 4],
     "streaming_commands": [39, 0, 255, 255, 255, 255, 255, 255]
 }
 
@@ -94,7 +94,7 @@ if __name__ == '__main__':
                     acc1 = extracted_data1['acc']
                     quaternions_thigh = extracted_data1['quaternions']
 
-                elif data[1] == 8:
+                elif data[1] == 4:
                     extracted_data2 = serial_op.extract_acc_quat(data)
                     acc2 = extracted_data2['acc']
                     quaternions_ankle = extracted_data2['quaternions']
@@ -117,7 +117,7 @@ if __name__ == '__main__':
                     "quaternion_thigh": str(quaternions_thigh),
                     "quaternion_ankle": str(quaternions_ankle),
                 }
-                file_management.write_to_json_file("data/teste.json", 
+                file_management.write_to_json_file("data/coleta4.json", 
                                                data_imus, 
                                                write_mode='a')
 

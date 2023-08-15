@@ -4,11 +4,11 @@ import json
 
 
 # Read JSON file to Data Frame 
-df = pd.read_json('data/teste.json', lines=True)
+df = pd.read_json('data/coleta4.json', lines=True)
 
 
 # Drop rows before 0.1s
-df = df.drop(df[df['time_stamp'] < 0.1].index)
+df = df.drop(df[df['time_stamp'] < 1].index)
 df = df.reset_index(drop=True)
 
 
@@ -40,8 +40,8 @@ df = df.rename(columns={'time_stamp':'time', 'quaternion_ankle': 'tibia_r_imu', 
 print(df)
 
 # Save file .sto
-nomeOut_position = 'teste_parado.sto'
-nomeOut = 'teste.sto'
+nomeOut_position = 'coleta4_pos.sto'
+nomeOut = 'coleta4_mov.sto'
 df.head(1).to_csv(nomeOut_position, header=True, index=None, sep='\t', mode='a')
 
 df.to_csv(nomeOut, header=True, index=None, sep='\t', mode='a')
