@@ -18,3 +18,16 @@ def prepend_multiple_lines(file_name, list_of_lines):
     os.remove(file_name)
     # Rename dummy file as the original file
     os.rename(aux_file, file_name)
+
+
+def format_to_sto(column_name, data_frame):
+
+    #remove []
+    data_frame[column_name] = data_frame[column_name].str.strip('[]')
+    #remove first white space
+    data_frame[column_name] = data_frame[column_name].str.lstrip()
+    data_frame[column_name] = data_frame[column_name].str.rstrip()
+    # create list spliting by whitespace
+    data_frame[column_name] = data_frame[column_name].str.split(' +')
+    #convert list to string removing space
+    data_frame[column_name] = [','.join(map(str, l)) for l in data_frame[column_name]]

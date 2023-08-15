@@ -4,7 +4,7 @@ import json
 import sys
 
 sys.path.append("../../utils/")
-from file_format import prepend_multiple_lines
+from file_format import *
 
 
 # Read JSON file to Data Frame 
@@ -17,23 +17,8 @@ df = df.reset_index(drop=True)
 
 
 # Change data format to mach .sto
-#remove []
-df['quaternion_ankle'] = df['quaternion_ankle'].str.strip('[]')
-df['quaternion_thigh'] = df['quaternion_thigh'].str.strip('[]')
-
-#remove first white space
-df['quaternion_ankle'] = df['quaternion_ankle'].str.lstrip()
-df['quaternion_ankle'] = df['quaternion_ankle'].str.rstrip()
-df['quaternion_thigh'] = df['quaternion_thigh'].str.lstrip()
-df['quaternion_thigh'] = df['quaternion_thigh'].str.rstrip()
-
-# create list spliting by whitespace
-df['quaternion_ankle'] = df['quaternion_ankle'].str.split(' +')
-df['quaternion_thigh'] = df['quaternion_thigh'].str.split(' +')
-
-#convert list to string removing space
-df['quaternion_ankle'] = [','.join(map(str, l)) for l in df['quaternion_ankle']]
-df['quaternion_thigh'] = [','.join(map(str, l)) for l in df['quaternion_thigh']]
+format_to_sto('quaternion_ankle', df)
+format_to_sto('quaternion_thigh', df)
 
 
 # Rename columns
@@ -44,8 +29,8 @@ df = df.rename(columns={'time_stamp':'time', 'quaternion_ankle': 'tibia_r_imu', 
 print(df)
 
 # Save file .sto
-nomeOut_position = 'data/coleta1_trike_pos.sto'
-nomeOut = 'data/coleta1_trike_mov.sto'
+nomeOut_position = 'data/coleta1_trike_posTESTE.sto'
+nomeOut = 'data/coleta1_trike_movTESTE.sto'
 df.head(1).to_csv(nomeOut_position, header=True, index=None, sep='\t', mode='a')
 
 df.to_csv(nomeOut, header=True, index=None, sep='\t', mode='a')
