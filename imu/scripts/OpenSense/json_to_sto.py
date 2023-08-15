@@ -1,6 +1,10 @@
 import pandas as pd
 import numpy as np
 import json
+import sys
+
+sys.path.append("../../utils/")
+from file_format import prepend_multiple_lines
 
 
 # Read JSON file to Data Frame 
@@ -40,9 +44,14 @@ df = df.rename(columns={'time_stamp':'time', 'quaternion_ankle': 'tibia_r_imu', 
 print(df)
 
 # Save file .sto
-nomeOut_position = 'data/coleta1_trike.sto'
-nomeOut = 'data/coleta1_trike.sto'
+nomeOut_position = 'data/coleta1_trike_pos.sto'
+nomeOut = 'data/coleta1_trike_mov.sto'
 df.head(1).to_csv(nomeOut_position, header=True, index=None, sep='\t', mode='a')
 
 df.to_csv(nomeOut, header=True, index=None, sep='\t', mode='a')
+
+# Add header 
+list_of_lines = ['DataType=Quaternion', 'OpenSimVersion=4.4',  'endheader']
+prepend_multiple_lines(nomeOut_position, list_of_lines)
+prepend_multiple_lines(nomeOut, list_of_lines)
 
