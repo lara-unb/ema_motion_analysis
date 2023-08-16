@@ -1,12 +1,14 @@
 from tkinter import E
 from sympy import re
-from fileManagement import readACPFile, openFileACP2
+# from fileManagement import readACPFile, openFileACP2
 import json
 import matplotlib.pyplot as plt
 import numpy as np
 import csv
-from constants import vicon_lower_body
+# from constants import vicon_lower_body
 from more_itertools import locate
+
+
 # This part should be remove in the next collects - Fixed in save function
 def remove_especial_chars(text: str):
     return text.replace('[', "").replace(']', "").replace(',', '.').split(' ')
@@ -32,15 +34,15 @@ def calc_resultant_acc(acc):
     return resultant_acc
     
 
-def read_acp(file_path):
-    fp_data, var_names, jump_type = readACPFile(file_path)
-    pp_dic, proc_dic = openFileACP2(file_path + '2')
-    force = fp_data['Raw Fz (N)']
-    time = fp_data['Time (s)']
-    fs = int(1/(time[1]-time[0]))
-    time_of_flight = proc_dic['Time of Flight (ms)']
-    jump_high = proc_dic['Jump Height ToF (cm)']
-    return force, time, time_of_flight, jump_high
+# def read_acp(file_path):
+#     fp_data, var_names, jump_type = readACPFile(file_path)
+#     pp_dic, proc_dic = openFileACP2(file_path + '2')
+#     force = fp_data['Raw Fz (N)']
+#     time = fp_data['Time (s)']
+#     fs = int(1/(time[1]-time[0]))
+#     time_of_flight = proc_dic['Time of Flight (ms)']
+#     jump_high = proc_dic['Jump Height ToF (cm)']
+#     return force, time, time_of_flight, jump_high
 
 
 def read_json(file_path, 
@@ -140,79 +142,79 @@ def find_indices(list_to_check, item_to_find):
     indices = locate(list_to_check, lambda x: x == item_to_find)
     return list(indices)
 
-def read_file_vicon(file_path, 
-        data_format={ 
-            "force":"two_platforms"
-        },
-        subject="Davi Muniz", 
-        types = ["Trajectories", "Devices"], makers=["RTOE"]):
-    data = read_csv(file_path)
-    forces = {}
-    position_fps, force_fps = 0, 0
-    positions = {}
-    velocities = {}
-    accelerations = {}
-    data_returned = {}
+# def read_file_vicon(file_path, 
+#         data_format={ 
+#             "force":"two_platforms"
+#         },
+#         subject="Davi Muniz", 
+#         types = ["Trajectories", "Devices"], makers=["RTOE"]):
+#     data = read_csv(file_path)
+#     forces = {}
+#     position_fps, force_fps = 0, 0
+#     positions = {}
+#     velocities = {}
+#     accelerations = {}
+#     data_returned = {}
 
-    if "Devices" in types:
-        data_values = data["Devices"]["values"]
-        data_values = np.array(data_values, dtype=np.float64)
+#     if "Devices" in types:
+#         data_values = data["Devices"]["values"]
+#         data_values = np.array(data_values, dtype=np.float64)
         
-        try:
-            force1_index = data["Devices"]["device_details"].index("AMTI 400600 V1.0 #1 - Force")
-        except:
-            force1_index = data["Devices"]["device_details"].index("Imported AMTI 400600 V1.0 #1 - Force")
-        force1 = data_values[:, force1_index:force1_index+3]
-        forces["force1"] = force1
+#         try:
+#             force1_index = data["Devices"]["device_details"].index("AMTI 400600 V1.0 #1 - Force")
+#         except:
+#             force1_index = data["Devices"]["device_details"].index("Imported AMTI 400600 V1.0 #1 - Force")
+#         force1 = data_values[:, force1_index:force1_index+3]
+#         forces["force1"] = force1
         
-        if data_format["force"] == "two_platforms":
-            try:
-                force2_index = data["Devices"]["device_details"].index("AMTI 400600 V1.0 #2 - Force")
-            except:
-                force2_index = data["Devices"]["device_details"].index("Imported AMTI 400600 V1.0 #2 - Force")
-            force2 = data_values[:, force2_index:force2_index+3]
-            forces["force2"] = force2 
+#         if data_format["force"] == "two_platforms":
+#             try:
+#                 force2_index = data["Devices"]["device_details"].index("AMTI 400600 V1.0 #2 - Force")
+#             except:
+#                 force2_index = data["Devices"]["device_details"].index("Imported AMTI 400600 V1.0 #2 - Force")
+#             force2 = data_values[:, force2_index:force2_index+3]
+#             forces["force2"] = force2 
 
-        force_fps = float(data["Devices"]["device_fps"][0])
+#         force_fps = float(data["Devices"]["device_fps"][0])
     
-    if "Trajectories" in types:
-        data_values = data["Trajectories"]["values"]
-        # Fill gaps with zeros (could be better - i.e.: average)
-        for i in range(len(data_values)): 
-            for j in range(len(data_values[i])):
-                if data_values[i][j] == "": data_values[i][j] = '0'
+#     if "Trajectories" in types:
+#         data_values = data["Trajectories"]["values"]
+#         # Fill gaps with zeros (could be better - i.e.: average)
+#         for i in range(len(data_values)): 
+#             for j in range(len(data_values[i])):
+#                 if data_values[i][j] == "": data_values[i][j] = '0'
         
-        data_values = np.array(data_values, dtype=np.float64)
-        i = 0
-        for model_key in vicon_lower_body.keys():
-            try:
-                indexes = find_indices(data["Trajectories"]["device_details"], subject+":"+model_key)
-                position_index = indexes[0]
-                velocity_index = indexes[1]
-                acceleration_index = indexes[2]
+#         data_values = np.array(data_values, dtype=np.float64)
+#         i = 0
+#         for model_key in vicon_lower_body.keys():
+#             try:
+#                 indexes = find_indices(data["Trajectories"]["device_details"], subject+":"+model_key)
+#                 position_index = indexes[0]
+#                 velocity_index = indexes[1]
+#                 acceleration_index = indexes[2]
 
 
-                positions[model_key] = data_values[:, position_index:position_index+3]
-                velocities[model_key] = data_values[:, velocity_index:velocity_index+3]
-                accelerations[model_key] = data_values[:, acceleration_index:acceleration_index+3]
+#                 positions[model_key] = data_values[:, position_index:position_index+3]
+#                 velocities[model_key] = data_values[:, velocity_index:velocity_index+3]
+#                 accelerations[model_key] = data_values[:, acceleration_index:acceleration_index+3]
 
 
-            except:
-                position_index = data["Trajectories"]["device_details"].index(subject+":"+model_key)
+#             except:
+#                 position_index = data["Trajectories"]["device_details"].index(subject+":"+model_key)
                 
 
-                if(position_index != -1):
-                    positions[model_key] = data_values[:, position_index:position_index+3]
+#                 if(position_index != -1):
+#                     positions[model_key] = data_values[:, position_index:position_index+3]
         
         
-        data_fps = float(data["Trajectories"]["device_fps"][0])
-        data_returned = {
-            "positions": positions,
-        }
-        if(not not velocities):
-            data_returned["velocities"] = velocities
-        if(not not accelerations):
-             data_returned["accelerations"] = accelerations
+#         data_fps = float(data["Trajectories"]["device_fps"][0])
+#         data_returned = {
+#             "positions": positions,
+#         }
+#         if(not not velocities):
+#             data_returned["velocities"] = velocities
+#         if(not not accelerations):
+#              data_returned["accelerations"] = accelerations
 
 
-    return forces, force_fps, data_returned, data_fps
+#     return forces, force_fps, data_returned, data_fps
