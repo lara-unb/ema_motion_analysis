@@ -36,13 +36,13 @@ if __name__ == '__main__':
     # Get imu quaternion data
     quaternion_ankle = quaternion_data['quaternion_ankle']['values']
 
-    print(quaternion_thigh[:, 0])
+    print(quaternion_thigh)
     print(quaternion_ankle)
 
 
-    plt.plot(time_stamp, quaternion_thigh[:, 0])
-    #plt.savefig("data/coleta1_coxa_acc3"+ ".pdf") # str(time.time()) +
-    plt.show()
+    # plt.plot(time_stamp, quaternion_thigh[:, 0])
+    # #plt.savefig("data/coleta1_coxa_acc3"+ ".pdf") # str(time.time()) +
+    # plt.show()
 
     # butter_highpass_filter(data, cutoff, fs, order=5)
 

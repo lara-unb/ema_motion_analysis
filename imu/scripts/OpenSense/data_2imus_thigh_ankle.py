@@ -129,7 +129,7 @@ if __name__ == '__main__':
                     "quaternion_thigh": str(quaternions_thigh),
                     "quaternion_ankle": str(quaternions_ankle),
                 }
-                file_management.write_to_json_file("data/coleta4.json", 
+                file_management.write_to_json_file("data/coleta3_trike.json", 
                                                data_imus, 
                                                write_mode='a')
 
