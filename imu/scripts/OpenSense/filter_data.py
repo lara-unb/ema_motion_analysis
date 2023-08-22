@@ -72,7 +72,7 @@ if __name__ == '__main__':
 
     #parametros da filtragem
     quaternions_cols = ['x', 'y', 'z', 'w']
-    cutoff = 10 #hz
+    cutoff = 1 #hz
     order = 2
 
     df_thigh = filter_quaternions_dataframe(df_thigh, quaternions_cols, cutoff, imu_sampling_frequency_thigh, order)
