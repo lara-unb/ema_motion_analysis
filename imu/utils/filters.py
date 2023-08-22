@@ -1,4 +1,5 @@
 from scipy import signal
+import numpy as np
 
 def butter_lowpass(cutoff, fs, order=5):
     return signal.butter(order, cutoff, fs=fs, btype='low', analog=False)
@@ -18,3 +19,9 @@ def butter_highpass_filter(data, cutoff, fs, order=5):
     b, a = butter_highpass(cutoff, fs, order=order)
     y = signal.filtfilt(b, a, data)
     return y
+
+def filter_quaternions_dataframe(df, columns, cutoff, fs, order=5):
+
+    for col in columns:
+        df[col] =  butter_lowpass_filter(np.asarray(df[col], float), cutoff, fs, order)
+    return df
