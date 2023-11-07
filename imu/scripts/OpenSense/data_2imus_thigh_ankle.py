@@ -36,7 +36,7 @@ REVERSE = "\033[;7m"
 logical_ids = [3, 4]
 
 # name of the JSON file to save the data
-file_name = "COLETA.json"
+file_name = "data/coleta.json"
 
 # Set parameters that will be configured
 imu_configuration = {
