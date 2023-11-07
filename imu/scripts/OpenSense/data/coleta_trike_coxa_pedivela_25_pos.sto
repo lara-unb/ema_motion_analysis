@@ -1,0 +1,5 @@
+DataType=Quaternion
+OpenSimVersion=4.4
+endheader
+time	femur_r_imu	Gear_imu
+1.002970933914184	-0.00521,-0.11373,0.0019,0.9935	0.00607,0.53357,-0.02197,0.84545

@@ -8,9 +8,11 @@ from file_format import *
 
 # COMENTAR CERTINHO ESSE CODIGO 
 
+file_name = 'data/coleta1_powertap_coxa_panturrilha'
+file_read = file_name + '.json'
 
 # Read JSON file to Data Frame 
-df = pd.read_json('data/coleta3_trike.json', lines=True)
+df = pd.read_json(file_read, lines=True)
 
 
 # Drop rows before 0.1s
@@ -30,8 +32,8 @@ df = df.rename(columns={'time_stamp':'time', 'quaternion_ankle': 'tibia_r_imu', 
 print(df)
 
 # Save file .sto
-nomeOut_position = 'data/coleta3_trike_pos.sto'
-nomeOut = 'data/coleta3_trike_mov.sto'
+nomeOut_position = file_name + '_pos.sto'
+nomeOut = file_name + '_mov.sto'
 df.head(1).to_csv(nomeOut_position, header=True, index=None, sep='\t', mode='a')
 df.to_csv(nomeOut, header=True, index=None, sep='\t', mode='a')
 
