@@ -6,7 +6,6 @@ import sys
 sys.path.append("../../utils/")
 from file_format import *
 
-# COMENTAR CERTINHO ESSE CODIGO 
 
 file_name = 'data/coleta1_powertap_coxa_panturrilha'
 file_read = file_name + '.json'

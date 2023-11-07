@@ -1,7 +1,5 @@
 import os
 
-# COMENTAR CERTINHO ESSE CODIGO 
-
 
 def prepend_multiple_lines(file_name, list_of_lines):
     """Insert given list of strings as a new lines at the beginning of a file"""
